@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Paramètres</title>
+    <style>
+        /* ============ STYLE IDENTIQUE À CLASSES.HTML ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Thème sombre */
+        body.dark-mode {
+            background: #1a1a2e;
+        }
+        
+        body.dark-mode .header,
+        body.dark-mode .param-card,
+        body.dark-mode .stat-card,
+        body.dark-mode .param-tabs,
+        body.dark-mode .modal-content {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+        
+        body.dark-mode .page-title {
+            background: linear-gradient(135deg, #6abfad 0%, #5aa695 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        body.dark-mode .stat-value,
+        body.dark-mode .param-card-title,
+        body.dark-mode .form-group label,
+        body.dark-mode .toggle-label strong {
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .stat-label,
+        body.dark-mode .toggle-label span,
+        body.dark-mode .form-group label {
+            color: #b0b0b0;
+        }
+        
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .btn-secondary {
+            border-color: #6abfad;
+            color: #6abfad;
+        }
+        
+        body.dark-mode .btn-secondary:hover {
+            background: #6abfad;
+            color: #16213e;
+        }
+        
+        body.dark-mode .btn-danger {
+            background: #2d1a1a;
+            border-color: #5a2a2a;
+            color: #ff6b6b;
+        }
+        
+        body.dark-mode .btn-danger:hover {
+            background: #5a2a2a;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: #1e3b36;
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-danger {
+            background: #fff5f5;
+            color: #e03131;
+            border: 1px solid #ffe3e3;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-danger:hover {
+            background: #ffe3e3;
+            border-color: #e03131;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(76, 168, 150, 0.1);
+            border-color: #4ca896;
+        }
+
+        .stat-label {
+            color: #5a9d91;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #1e3b36;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* Tabs */
+        .param-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 1rem;
+            border-radius: 20px;
+            border: 1px solid #e0e9e7;
+            transition: all 0.3s ease;
+        }
+
+        .param-tab {
+            padding: 0.8rem 2rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .param-tab:hover {
+            background: #e0f2f1;
+            color: #4ca896;
+            transform: translateY(-2px);
+        }
+
+        .param-tab.active {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .param-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 1px solid rgba(76, 168, 150, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .param-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4ca896, #ff9466, #4ca896);
+            background-size: 200% 100%;
+            transition: all 0.4s ease;
+        }
+
+        .param-card:hover::before {
+            background-position: 100% 0;
+        }
+
+        .param-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(76, 168, 150, 0.15);
+            border-color: rgba(76, 168, 150, 0.4);
+        }
+
+        .param-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .param-card-title span:first-child {
+            font-size: 1.5rem;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #5a9d91;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: #fefefe;
+            color: #1e3b36;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 4px rgba(76, 168, 150, 0.1);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .toggle-switch:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .toggle-label strong {
+            color: #1e3b36;
+            font-size: 1rem;
+        }
+
+        .toggle-label span {
+            color: #5a9d91;
+            font-size: 0.75rem;
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4ca896;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e9e7;
+        }
+
+        /* Alert */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            color: #2d6b63;
+            border-left: 4px solid #4ca896;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #e03131;
+        }
+
+        .alert-info {
+            background: #e7f5ff;
+            color: #1e88e5;
+            border-left: 4px solid #339af0;
+        }
+
+        body.dark-mode .alert-info {
+            background: #1a3a4a;
+            color: #66c0ff;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: #e0f2f1;
+            color: #2d6b63;
+            margin-left: 0.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .modal-header h2 {
+            color: #1e3b36;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #5a9d91;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .param-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+            
+            .param-tab {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <h1 class="page-title" onclick="location.reload()">
+                <span>⚙️</span>
+                <span id="pageTitle">Paramètres de l'application</span>
+            </h1>
+        </div>
+        <div>
+            <button class="btn-secondary" onclick="exportConfig()">
+                <span>📤</span> <span id="exportBtn">Exporter</span>
+            </button>
+            <button class="btn-secondary" onclick="importConfig()" style="margin-left: 0.5rem;">
+                <span>📥</span> <span id="importBtn">Importer</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label" id="versionLabel">Version</div>
+            <div class="stat-value" id="versionValue">2.0.0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label" id="lastUpdateLabel">Dernière mise à jour</div>
+            <div class="stat-value" id="lastUpdateValue"></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label" id="schoolYearLabel">Année scolaire</div>
+            <div class="stat-value" id="anneeValue">2025-2026</div>
+        </div>
+      
+    </div>
+
+    <div class="param-tabs">
+        <button class="param-tab active" data-tab="ecole">
+            <span>🏫</span> <span id="tabEcole">École</span>
+        </button>
+        <button class="param-tab" data-tab="notifications">
+            <span>🔔</span> <span id="tabNotifications">Notifications</span>
+        </button>
+        <button class="param-tab" data-tab="interface">
+            <span>🎨</span> <span id="tabInterface">Interface</span>
+        </button>
+        <button class="param-tab" data-tab="permissions">
+            <span>🔐</span> <span id="tabPermissions">Permissions</span>
+        </button>
+        <button class="param-tab" data-tab="avance">
+            <span>🚀</span> <span id="tabAvance">Avancé</span>
+        </button>
+    </div>
+
+    <!-- Onglet École -->
+    <div id="tab-ecole" class="tab-content active">
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>🏫</span> <span id="generalInfo">Informations générales</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="schoolNameLabel">Nom de l'école</label>
+                    <input type="text" id="ecoleNom" placeholder="SAGHIRY Academy">
+                </div>
+                <div class="form-group">
+                    <label id="schoolYearSelectLabel">Année scolaire</label>
+                    <select id="anneeScolaire">
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2025-2026" selected>2025-2026</option>
+                        <option value="2026-2027">2026-2027</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="addressLabel">Adresse</label>
+                    <input type="text" id="ecoleAdresse" placeholder="Adresse complète">
+                </div>
+                <div class="form-group">
+                    <label id="phoneLabel">Téléphone</label>
+                    <input type="tel" id="ecoleTel" placeholder="+216 XX XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label id="emailLabel">Email</label>
+                    <input type="email" id="ecoleEmail" placeholder="contact@saghiry.edu.tn">
+                </div>
+                <div class="form-group">
+                    <label id="websiteLabel">Site web</label>
+                    <input type="url" id="ecoleSite" placeholder="https://www.saghiry.edu.tn">
+                </div>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>⏰</span> <span id="schedulesLabel">Horaires scolaires</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="morningStartLabel">Heure début (matin)</label>
+                    <input type="time" id="heureDebutMatin" value="08:00">
+                </div>
+                <div class="form-group">
+                    <label id="morningEndLabel">Heure fin (matin)</label>
+                    <input type="time" id="heureFinMatin" value="12:00">
+                </div>
+                <div class="form-group">
+                    <label id="afternoonStartLabel">Heure début (après-midi)</label>
+                    <input type="time" id="heureDebutApresMidi" value="14:00">
+                </div>
+                <div class="form-group">
+                    <label id="afternoonEndLabel">Heure fin (après-midi)</label>
+                    <input type="time" id="heureFinApresMidi" value="17:00">
+                </div>
+                <div class="form-group">
+                    <label id="slotDurationLabel">Durée créneau (minutes)</label>
+                    <select id="dureeCreneau">
+                        <option value="45">45 minutes</option>
+                        <option value="55">55 minutes</option>
+                        <option value="60" selected>60 minutes</option>
+                        <option value="90">90 minutes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="lunchBreakLabel">Pause déjeuner</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="time" id="pauseDebut" value="12:00" style="flex:1">
+                        <span>-</span>
+                        <input type="time" id="pauseFin" value="14:00" style="flex:1">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglet Notifications -->
+    <div id="tab-notifications" class="tab-content">
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>📧</span> <span id="notificationChannelsLabel">Canaux de notification</span>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="emailNotifLabel">Notifications par email</strong>
+                    <span id="emailDescLabel">Envoyer des notifications par email</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="activerEmail" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="pushNotifLabel">Notifications push</strong>
+                    <span id="pushDescLabel">Notifications sur mobile et navigateur</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="activerPush" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="smsNotifLabel">Notifications par SMS</strong>
+                    <span id="smsDescLabel">SMS pour les alertes importantes</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="activerSMS">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>📋</span> <span id="notificationTypesLabel">Types de notifications</span>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong>📝 <span id="notesNotifLabel">Notes</span></strong>
+                    <span id="notesDescLabel">Notification lors de l'ajout d'une note</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notifNotes" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong>🚫 <span id="absencesNotifLabel">Absences</span></strong>
+                    <span id="absencesDescLabel">Notification en cas d'absence</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notifAbsences" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong>⏰ <span id="delaysNotifLabel">Retards</span></strong>
+                    <span id="delaysDescLabel">Notification en cas de retard</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notifRetards" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong>📢 <span id="announcementsNotifLabel">Annonces</span></strong>
+                    <span id="announcementsDescLabel">Nouvelles annonces de l'école</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notifAnnonces" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong>📚 <span id="worksNotifLabel">Travaux</span></strong>
+                    <span id="worksDescLabel">Devoirs et projets à rendre</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notifTravaux" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>⏱️</span> <span id="sendSettingsLabel">Paramètres d'envoi</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="autoRemindersLabel">Rappels automatiques</label>
+                    <select id="rappelsAuto">
+                        <option value="true" id="enabledOption">Activés</option>
+                        <option value="false" selected id="disabledOption">Désactivés</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="reminderDaysLabel">Jours avant rappel</label>
+                    <input type="number" id="joursRappel" value="2" min="1" max="7">
+                </div>
+                <div class="form-group">
+                    <label id="sendTimeLabel">Heure d'envoi préférée</label>
+                    <input type="time" id="heureEnvoi" value="08:00">
+                </div>
+                <div class="form-group">
+                    <label id="retentionDaysLabel">Conservation (jours)</label>
+                    <input type="number" id="conservationJours" value="365" min="30" max="730">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglet Interface -->
+    <div id="tab-interface" class="tab-content">
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>🎨</span> <span id="appearanceLabel">Apparence</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="themeLabel">Thème</label>
+                    <select id="themeSelect">
+                        <option value="clair" id="lightOption">Clair</option>
+                        <option value="sombre" id="darkOption">Sombre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="languageLabel">Langue</label>
+                    <select id="langueSelect">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="itemsPerPageLabel">Éléments par page</label>
+                    <select id="itemsParPage">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="primaryColorLabel">Couleur primaire</label>
+                    <input type="color" id="couleurPrimaire" value="#4ca896">
+                </div>
+                <div class="form-group">
+                    <label id="secondaryColorLabel">Couleur secondaire</label>
+                    <input type="color" id="couleurSecondaire" value="#ff9466">
+                </div>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>👁️</span> <span id="displaySettingsLabel">Affichage</span>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="showDashboardLabel">Afficher le tableau de bord</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="afficherDashboard" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="showCalendarLabel">Afficher le calendrier</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="afficherCalendrier" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="toastNotificationsLabel">Notifications toast</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notificationsToast" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglet Permissions -->
+    <div id="tab-permissions" class="tab-content">
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>👪</span> <span id="parentsPermissionsLabel">Permissions Parents</span>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="viewGradesLabel">Voir les notes</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="parentsVoirNotes" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="viewAbsencesLabel">Voir les absences</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="parentsVoirAbsences" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="contactTeachersLabel">Contacter les enseignants</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="parentsContacter" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>👨‍🏫</span> <span id="teachersPermissionsLabel">Permissions Enseignants</span>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="editGradesLabel">Modifier les notes</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="enseignantsModifierNotes" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="viewOtherClassesLabel">Voir autres classes</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="enseignantsVoirAutres">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="sendNotificationsLabel">Envoyer notifications</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="enseignantsEnvoyerNotifs" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>🧑‍🎓</span> <span id="studentsPermissionsLabel">Permissions Élèves</span>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="viewAveragesLabel">Voir les moyennes</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="elevesVoirMoyennes" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <div class="toggle-label">
+                    <strong id="viewRankingLabel">Voir le classement</strong>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="elevesVoirClassement">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglet Avancé -->
+    <div id="tab-avance" class="tab-content">
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>🔄</span> <span id="maintenanceLabel">Maintenance</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="maintenanceModeLabel">Mode maintenance</label>
+                    <select id="modeMaintenance">
+                        <option value="false" id="disabledMaintenanceLabel">Désactivé</option>
+                        <option value="true" id="enabledMaintenanceLabel">Activé</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="maintenanceMessageLabel">Message de maintenance</label>
+                    <textarea id="messageMaintenance" rows="3">Site en maintenance, revenez plus tard.</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>📊</span> <span id="dataSettingsLabel">Données</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="autoBackupLabel">Sauvegarde automatique</label>
+                    <select id="sauvegardeAuto">
+                        <option value="daily" id="dailyOption">Quotidienne</option>
+                        <option value="weekly" selected id="weeklyOption">Hebdomadaire</option>
+                        <option value="monthly" id="monthlyOption">Mensuelle</option>
+                        <option value="never" id="neverOption">Jamais</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="backupTimeLabel">Heure de sauvegarde</label>
+                    <input type="time" id="heureSauvegarde" value="02:00">
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn-danger" id="btnNettoyerNotifications">
+                    🧹 <span id="cleanNotificationsLabel">Nettoyer les anciennes notifications</span>
+                </button>
+                <button class="btn-secondary" id="btnResetParams">
+                    🔄 <span id="resetLabel">Réinitialiser</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="param-card">
+            <div class="param-card-title">
+                <span>🆔</span> <span id="systemInfoLabel">Informations système</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label id="appVersionLabel">Version de l'application</label>
+                    <input type="text" id="appVersion" value="2.0.0" disabled>
+                    <span class="badge" id="latestBadge">Dernière version</span>
+                </div>
+                <div class="form-group">
+                    <label id="lastUpdateSystemLabel">Dernière mise à jour</label>
+                    <input type="text" id="lastUpdate" disabled>
+                </div>
+                <div class="form-group">
+                    <label id="environmentLabel">Environnement</label>
+                    <input type="text" id="environment" value="Production" disabled>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="btn-secondary" id="btnAnnuler"><span id="cancelLabel">Annuler</span></button>
+        <button class="btn-primary" id="btnEnregistrer"><span id="saveLabel">Enregistrer les modifications</span></button>
+    </div>
+
+    <!-- Modal Import -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="importConfigLabel">Importer la configuration</h2>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div style="text-align: center; padding: 1rem;">
+                <input type="file" id="importFile" accept=".json" style="margin-bottom: 1rem; border: 2px solid #e0e9e7; border-radius: 12px; padding: 0.5rem;">
+                <button class="btn-primary" onclick="processImport()" id="importBtnModal">Importer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // PARAMÈTRES - AVEC GESTION SÉCURISÉE CROSS-ORIGIN
+        // ============================================
+
+        // Dictionnaire des traductions
+        const translations = {
+            fr: {
+                title: "Paramètres de l'application", export: "Exporter", import: "Importer",
+                version: "Version", last_update: "Dernière mise à jour", school_year: "Année scolaire", mode: "Mode",
+                tab_ecole: "École", tab_notifications: "Notifications", tab_interface: "Interface",
+                tab_permissions: "Permissions", tab_avance: "Avancé", general_info: "Informations générales",
+                school_name: "Nom de l'école", school_year_label: "Année scolaire", address: "Adresse",
+                phone: "Téléphone", email: "Email", website: "Site web", schedules: "Horaires scolaires",
+                morning_start: "Heure début (matin)", morning_end: "Heure fin (matin)",
+                afternoon_start: "Heure début (après-midi)", afternoon_end: "Heure fin (après-midi)",
+                slot_duration: "Durée créneau (minutes)", lunch_break: "Pause déjeuner",
+                notification_channels: "Canaux de notification", email_notif: "Notifications par email",
+                email_desc: "Envoyer des notifications par email", push_notif: "Notifications push",
+                push_desc: "Notifications sur mobile et navigateur", sms_notif: "Notifications par SMS",
+                sms_desc: "SMS pour les alertes importantes", notification_types: "Types de notifications",
+                notes_notif: "Notes", notes_desc: "Notification lors de l'ajout d'une note",
+                absences_notif: "Absences", absences_desc: "Notification en cas d'absence",
+                delays_notif: "Retards", delays_desc: "Notification en cas de retard",
+                announcements_notif: "Annonces", announcements_desc: "Nouvelles annonces de l'école",
+                works_notif: "Travaux", works_desc: "Devoirs et projets à rendre",
+                send_settings: "Paramètres d'envoi", auto_reminders: "Rappels automatiques",
+                enabled: "Activés", disabled: "Désactivés", reminder_days: "Jours avant rappel",
+                send_time: "Heure d'envoi préférée", retention_days: "Conservation (jours)",
+                appearance: "Apparence", theme_label: "Thème", light: "Clair", dark: "Sombre",
+                language: "Langue", items_per_page: "Éléments par page",
+                primary_color: "Couleur primaire", secondary_color: "Couleur secondaire",
+                display_settings: "Affichage", show_dashboard: "Afficher le tableau de bord",
+                show_calendar: "Afficher le calendrier", toast_notifications: "Notifications toast",
+                parents_permissions: "Permissions Parents", view_grades: "Voir les notes",
+                view_absences: "Voir les absences", contact_teachers: "Contacter les enseignants",
+                teachers_permissions: "Permissions Enseignants", edit_grades: "Modifier les notes",
+                view_other_classes: "Voir autres classes", send_notifications: "Envoyer notifications",
+                students_permissions: "Permissions Élèves", view_averages: "Voir les moyennes",
+                view_ranking: "Voir le classement", maintenance: "Maintenance",
+                maintenance_mode: "Mode maintenance", maintenance_message: "Message de maintenance",
+                data_settings: "Données", auto_backup: "Sauvegarde automatique", daily: "Quotidienne",
+                weekly: "Hebdomadaire", monthly: "Mensuelle", never: "Jamais", backup_time: "Heure de sauvegarde",
+                clean_notifications: "Nettoyer les anciennes notifications", reset: "Réinitialiser",
+                system_info: "Informations système", app_version: "Version de l'application",
+                latest: "Dernière version", last_update_label: "Dernière mise à jour",
+                environment_label: "Environnement", cancel: "Annuler", save: "Enregistrer les modifications",
+                import_config: "Importer la configuration", import_btn: "Importer"
+            },
+            en: {
+                title: "Application Settings", export: "Export", import: "Import",
+                version: "Version", last_update: "Last update", school_year: "School year", mode: "Mode",
+                tab_ecole: "School", tab_notifications: "Notifications", tab_interface: "Interface",
+                tab_permissions: "Permissions", tab_avance: "Advanced", general_info: "General Information",
+                school_name: "School name", school_year_label: "School year", address: "Address",
+                phone: "Phone", email: "Email", website: "Website", schedules: "School Schedules",
+                morning_start: "Morning start", morning_end: "Morning end", afternoon_start: "Afternoon start",
+                afternoon_end: "Afternoon end", slot_duration: "Slot duration (minutes)", lunch_break: "Lunch break",
+                notification_channels: "Notification Channels", email_notif: "Email notifications",
+                email_desc: "Send notifications by email", push_notif: "Push notifications",
+                push_desc: "Mobile and browser notifications", sms_notif: "SMS notifications",
+                sms_desc: "SMS for important alerts", notification_types: "Notification Types",
+                notes_notif: "Grades", notes_desc: "Notification when a grade is added",
+                absences_notif: "Absences", absences_desc: "Notification for absences",
+                delays_notif: "Delays", delays_desc: "Notification for delays",
+                announcements_notif: "Announcements", announcements_desc: "New school announcements",
+                works_notif: "Assignments", works_desc: "Homework and projects",
+                send_settings: "Send Settings", auto_reminders: "Automatic reminders",
+                enabled: "Enabled", disabled: "Disabled", reminder_days: "Days before reminder",
+                send_time: "Preferred sending time", retention_days: "Retention (days)",
+                appearance: "Appearance", theme_label: "Theme", light: "Light", dark: "Dark",
+                language: "Language", items_per_page: "Items per page",
+                primary_color: "Primary color", secondary_color: "Secondary color",
+                display_settings: "Display", show_dashboard: "Show dashboard",
+                show_calendar: "Show calendar", toast_notifications: "Toast notifications",
+                parents_permissions: "Parents Permissions", view_grades: "View grades",
+                view_absences: "View absences", contact_teachers: "Contact teachers",
+                teachers_permissions: "Teachers Permissions", edit_grades: "Edit grades",
+                view_other_classes: "View other classes", send_notifications: "Send notifications",
+                students_permissions: "Students Permissions", view_averages: "View averages",
+                view_ranking: "View ranking", maintenance: "Maintenance",
+                maintenance_mode: "Maintenance mode", maintenance_message: "Maintenance message",
+                data_settings: "Data", auto_backup: "Auto backup", daily: "Daily",
+                weekly: "Weekly", monthly: "Monthly", never: "Never", backup_time: "Backup time",
+                clean_notifications: "Clean old notifications", reset: "Reset",
+                system_info: "System Information", app_version: "Application version",
+                latest: "Latest version", last_update_label: "Last update",
+                environment_label: "Environment", cancel: "Cancel", save: "Save changes",
+                import_config: "Import configuration", import_btn: "Import"
+            }
+        };
+
+        let currentLang = 'fr';
+        let currentTheme = 'clair';
+        let apiBaseUrl = 'http://localhost:5267';
+        let authToken = null;
+
+        // Configuration par défaut
+        let parametres = {
+            ecole: { nom: "SAGHIRY Academy", anneeScolaire: "2025-2026", adresse: "Tunis, Tunisie", telephone: "+216 71 123 456", email: "contact@saghiry.edu.tn", siteWeb: "https://www.saghiry.edu.tn" },
+            horaires: { heureDebutMatin: "08:00", heureFinMatin: "12:00", heureDebutApresMidi: "14:00", heureFinApresMidi: "17:00", dureeCreneau: 60, pauseDebut: "12:00", pauseFin: "14:00" },
+            notifications: { activerEmail: true, activerPush: true, activerSMS: false, types: { notes: true, absences: true, retards: true, annonces: true, travaux: true }, rappelsAuto: false, joursRappel: 2, heureEnvoi: "08:00", conservationJours: 365 },
+            interface: { theme: "clair", langue: "fr", itemsParPage: 20, couleurPrimaire: "#4ca896", couleurSecondaire: "#ff9466", afficherDashboard: true, afficherCalendrier: true, notificationsToast: true },
+            permissions: { parents: { voirNotes: true, voirAbsences: true, contacter: true }, enseignants: { modifierNotes: true, voirAutresClasses: false, envoyerNotifs: true }, eleves: { voirMoyennes: true, voirClassement: false } },
+            avance: { modeMaintenance: false, messageMaintenance: "Site en maintenance, revenez plus tard.", sauvegardeAuto: "weekly", heureSauvegarde: "02:00", version: "2.0.0", lastUpdate: new Date().toLocaleDateString('fr-FR') }
+        };
+
+        // Éléments DOM
+        const elements = {
+            ecoleNom: document.getElementById('ecoleNom'), anneeScolaire: document.getElementById('anneeScolaire'),
+            ecoleAdresse: document.getElementById('ecoleAdresse'), ecoleTel: document.getElementById('ecoleTel'),
+            ecoleEmail: document.getElementById('ecoleEmail'), ecoleSite: document.getElementById('ecoleSite'),
+            heureDebutMatin: document.getElementById('heureDebutMatin'), heureFinMatin: document.getElementById('heureFinMatin'),
+            heureDebutApresMidi: document.getElementById('heureDebutApresMidi'), heureFinApresMidi: document.getElementById('heureFinApresMidi'),
+            dureeCreneau: document.getElementById('dureeCreneau'), pauseDebut: document.getElementById('pauseDebut'), pauseFin: document.getElementById('pauseFin'),
+            activerEmail: document.getElementById('activerEmail'), activerPush: document.getElementById('activerPush'), activerSMS: document.getElementById('activerSMS'),
+            notifNotes: document.getElementById('notifNotes'), notifAbsences: document.getElementById('notifAbsences'), notifRetards: document.getElementById('notifRetards'),
+            notifAnnonces: document.getElementById('notifAnnonces'), notifTravaux: document.getElementById('notifTravaux'),
+            rappelsAuto: document.getElementById('rappelsAuto'), joursRappel: document.getElementById('joursRappel'), heureEnvoi: document.getElementById('heureEnvoi'),
+            conservationJours: document.getElementById('conservationJours'), themeSelect: document.getElementById('themeSelect'),
+            langueSelect: document.getElementById('langueSelect'), itemsParPage: document.getElementById('itemsParPage'),
+            couleurPrimaire: document.getElementById('couleurPrimaire'), couleurSecondaire: document.getElementById('couleurSecondaire'),
+            afficherDashboard: document.getElementById('afficherDashboard'), afficherCalendrier: document.getElementById('afficherCalendrier'),
+            notificationsToast: document.getElementById('notificationsToast'), parentsVoirNotes: document.getElementById('parentsVoirNotes'),
+            parentsVoirAbsences: document.getElementById('parentsVoirAbsences'), parentsContacter: document.getElementById('parentsContacter'),
+            enseignantsModifierNotes: document.getElementById('enseignantsModifierNotes'), enseignantsVoirAutres: document.getElementById('enseignantsVoirAutres'),
+            enseignantsEnvoyerNotifs: document.getElementById('enseignantsEnvoyerNotifs'), elevesVoirMoyennes: document.getElementById('elevesVoirMoyennes'),
+            elevesVoirClassement: document.getElementById('elevesVoirClassement'), modeMaintenance: document.getElementById('modeMaintenance'),
+            messageMaintenance: document.getElementById('messageMaintenance'), sauvegardeAuto: document.getElementById('sauvegardeAuto'),
+            heureSauvegarde: document.getElementById('heureSauvegarde')
+        };
+
+        // Récupération sécurisée du token
+        function getAuthToken() {
+            try {
+                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                if (token) return token;
+                
+                if (window.parent && window.parent !== window) {
+                    return new Promise((resolve) => {
+                        const handler = (event) => {
+                            if (event.data && event.data.type === 'saghiry-token-response') {
+                                window.removeEventListener('message', handler);
+                                resolve(event.data.token);
+                            }
+                        };
+                        window.addEventListener('message', handler);
+                        window.parent.postMessage({ type: 'saghiry-get-token' }, '*');
+                        setTimeout(() => {
+                            window.removeEventListener('message', handler);
+                            resolve(null);
+                        }, 500);
+                    });
+                }
+                return null;
+            } catch(e) {
+                console.warn('Erreur récupération token:', e);
+                return null;
+            }
+        }
+
+        async function loadParams() {
+            try {
+                const saved = localStorage.getItem('saghiry_params');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    parametres = { ...parametres, ...parsed };
+                }
+                
+                await loadFromServer();
+                
+                elements.ecoleNom.value = parametres.ecole.nom;
+                elements.anneeScolaire.value = parametres.ecole.anneeScolaire;
+                elements.ecoleAdresse.value = parametres.ecole.adresse;
+                elements.ecoleTel.value = parametres.ecole.telephone;
+                elements.ecoleEmail.value = parametres.ecole.email;
+                elements.ecoleSite.value = parametres.ecole.siteWeb;
+                
+                elements.heureDebutMatin.value = parametres.horaires.heureDebutMatin;
+                elements.heureFinMatin.value = parametres.horaires.heureFinMatin;
+                elements.heureDebutApresMidi.value = parametres.horaires.heureDebutApresMidi;
+                elements.heureFinApresMidi.value = parametres.horaires.heureFinApresMidi;
+                elements.dureeCreneau.value = parametres.horaires.dureeCreneau;
+                if (elements.pauseDebut) elements.pauseDebut.value = parametres.horaires.pauseDebut || "12:00";
+                if (elements.pauseFin) elements.pauseFin.value = parametres.horaires.pauseFin || "14:00";
+                
+                elements.activerEmail.checked = parametres.notifications.activerEmail;
+                elements.activerPush.checked = parametres.notifications.activerPush;
+                elements.activerSMS.checked = parametres.notifications.activerSMS;
+                elements.notifNotes.checked = parametres.notifications.types.notes;
+                elements.notifAbsences.checked = parametres.notifications.types.absences;
+                elements.notifRetards.checked = parametres.notifications.types.retards;
+                elements.notifAnnonces.checked = parametres.notifications.types.annonces;
+                elements.notifTravaux.checked = parametres.notifications.types.travaux;
+                elements.rappelsAuto.value = parametres.notifications.rappelsAuto ? "true" : "false";
+                elements.joursRappel.value = parametres.notifications.joursRappel;
+                elements.heureEnvoi.value = parametres.notifications.heureEnvoi;
+                elements.conservationJours.value = parametres.notifications.conservationJours;
+                
+                currentTheme = parametres.interface.theme || "clair";
+                currentLang = parametres.interface.langue || "fr";
+                
+                elements.themeSelect.value = parametres.interface.theme || "clair";
+                elements.langueSelect.value = currentLang;
+                elements.itemsParPage.value = parametres.interface.itemsParPage;
+                elements.couleurPrimaire.value = parametres.interface.couleurPrimaire;
+                elements.couleurSecondaire.value = parametres.interface.couleurSecondaire;
+                elements.afficherDashboard.checked = parametres.interface.afficherDashboard;
+                elements.afficherCalendrier.checked = parametres.interface.afficherCalendrier;
+                elements.notificationsToast.checked = parametres.interface.notificationsToast;
+                
+                elements.parentsVoirNotes.checked = parametres.permissions.parents.voirNotes;
+                elements.parentsVoirAbsences.checked = parametres.permissions.parents.voirAbsences;
+                elements.parentsContacter.checked = parametres.permissions.parents.contacter;
+                elements.enseignantsModifierNotes.checked = parametres.permissions.enseignants.modifierNotes;
+                elements.enseignantsVoirAutres.checked = parametres.permissions.enseignants.voirAutresClasses;
+                elements.enseignantsEnvoyerNotifs.checked = parametres.permissions.enseignants.envoyerNotifs;
+                elements.elevesVoirMoyennes.checked = parametres.permissions.eleves.voirMoyennes;
+                elements.elevesVoirClassement.checked = parametres.permissions.eleves.voirClassement;
+                
+                elements.modeMaintenance.value = parametres.avance.modeMaintenance ? "true" : "false";
+                elements.messageMaintenance.value = parametres.avance.messageMaintenance;
+                elements.sauvegardeAuto.value = parametres.avance.sauvegardeAuto;
+                elements.heureSauvegarde.value = parametres.avance.heureSauvegarde;
+                
+                updateStatsDisplay();
+                applyTheme();
+                translatePage();
+                
+            } catch (e) {
+                console.error('Erreur chargement paramètres:', e);
+            }
+        }
+
+        async function loadFromServer() {
+            try {
+                const token = await getAuthToken();
+                if (!token) return;
+                
+                const response = await fetch(`${apiBaseUrl}/api/Parametre`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        parametres = { ...parametres, ...result.data };
+                        localStorage.setItem('saghiry_params', JSON.stringify(parametres));
+                    }
+                }
+            } catch (e) {
+                console.warn('Impossible de charger depuis le serveur:', e);
+            }
+        }
+
+        async function saveToServer(params) {
+            try {
+                const token = await getAuthToken();
+                if (!token) return;
+                
+                const response = await fetch(`${apiBaseUrl}/api/Parametre`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                });
+                if (!response.ok) console.error('Erreur API:', response.status);
+            } catch (e) {
+                console.error('Erreur sauvegarde serveur:', e);
+            }
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('versionValue').textContent = parametres.avance.version || "2.0.0";
+            const today = new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US');
+            document.getElementById('lastUpdateValue').textContent = today;
+            document.getElementById('lastUpdate').value = today;
+            document.getElementById('anneeValue').textContent = parametres.ecole.anneeScolaire;
+            document.getElementById('modeValue').textContent = parametres.avance.modeMaintenance ? "Maintenance" : "Production";
+        }
+
+        function applyTheme() {
+            const theme = currentTheme;
+            let effectiveTheme = theme;
+            if (theme === "systeme") {
+                effectiveTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'sombre' : 'clair';
+            }
+            document.body.classList.toggle('dark-mode', effectiveTheme === 'sombre');
+            
+            const primaryColor = elements.couleurPrimaire.value;
+            const secondaryColor = elements.couleurSecondaire.value;
+            document.documentElement.style.setProperty('--primary-green', primaryColor);
+            document.documentElement.style.setProperty('--accent-orange', secondaryColor);
+            localStorage.setItem('saghiry_primary_color', primaryColor);
+            localStorage.setItem('saghiry_secondary_color', secondaryColor);
+        }
+
+        function translatePage() {
+            const t = translations[currentLang];
+            const elementsToTranslate = {
+                'pageTitle': t.title, 'exportBtn': t.export, 'importBtn': t.import,
+                'versionLabel': t.version, 'lastUpdateLabel': t.last_update, 'schoolYearLabel': t.school_year, 'modeLabel': t.mode,
+                'tabEcole': t.tab_ecole, 'tabNotifications': t.tab_notifications, 'tabInterface': t.tab_interface,
+                'tabPermissions': t.tab_permissions, 'tabAvance': t.tab_avance, 'generalInfo': t.general_info,
+                'schoolNameLabel': t.school_name, 'schoolYearSelectLabel': t.school_year_label, 'addressLabel': t.address,
+                'phoneLabel': t.phone, 'emailLabel': t.email, 'websiteLabel': t.website, 'schedulesLabel': t.schedules,
+                'morningStartLabel': t.morning_start, 'morningEndLabel': t.morning_end, 'afternoonStartLabel': t.afternoon_start,
+                'afternoonEndLabel': t.afternoon_end, 'slotDurationLabel': t.slot_duration, 'lunchBreakLabel': t.lunch_break,
+                'notificationChannelsLabel': t.notification_channels, 'emailNotifLabel': t.email_notif, 'emailDescLabel': t.email_desc,
+                'pushNotifLabel': t.push_notif, 'pushDescLabel': t.push_desc, 'smsNotifLabel': t.sms_notif, 'smsDescLabel': t.sms_desc,
+                'notificationTypesLabel': t.notification_types, 'notesNotifLabel': t.notes_notif, 'notesDescLabel': t.notes_desc,
+                'absencesNotifLabel': t.absences_notif, 'absencesDescLabel': t.absences_desc, 'delaysNotifLabel': t.delays_notif,
+                'delaysDescLabel': t.delays_desc, 'announcementsNotifLabel': t.announcements_notif, 'announcementsDescLabel': t.announcements_desc,
+                'worksNotifLabel': t.works_notif, 'worksDescLabel': t.works_desc, 'sendSettingsLabel': t.send_settings,
+                'autoRemindersLabel': t.auto_reminders, 'enabledOption': t.enabled, 'disabledOption': t.disabled,
+                'reminderDaysLabel': t.reminder_days, 'sendTimeLabel': t.send_time, 'retentionDaysLabel': t.retention_days,
+                'appearanceLabel': t.appearance, 'themeLabel': t.theme_label, 'lightOption': t.light, 'darkOption': t.dark,
+                'languageLabel': t.language, 'itemsPerPageLabel': t.items_per_page,
+                'primaryColorLabel': t.primary_color, 'secondaryColorLabel': t.secondary_color, 'displaySettingsLabel': t.display_settings,
+                'showDashboardLabel': t.show_dashboard, 'showCalendarLabel': t.show_calendar, 'toastNotificationsLabel': t.toast_notifications,
+                'parentsPermissionsLabel': t.parents_permissions, 'viewGradesLabel': t.view_grades, 'viewAbsencesLabel': t.view_absences,
+                'contactTeachersLabel': t.contact_teachers, 'teachersPermissionsLabel': t.teachers_permissions, 'editGradesLabel': t.edit_grades,
+                'viewOtherClassesLabel': t.view_other_classes, 'sendNotificationsLabel': t.send_notifications,
+                'studentsPermissionsLabel': t.students_permissions, 'viewAveragesLabel': t.view_averages, 'viewRankingLabel': t.view_ranking,
+                'maintenanceLabel': t.maintenance, 'maintenanceModeLabel': t.maintenance_mode, 'disabledMaintenanceLabel': t.disabled,
+                'enabledMaintenanceLabel': t.enabled, 'maintenanceMessageLabel': t.maintenance_message, 'dataSettingsLabel': t.data_settings,
+                'autoBackupLabel': t.auto_backup, 'dailyOption': t.daily, 'weeklyOption': t.weekly, 'monthlyOption': t.monthly,
+                'neverOption': t.never, 'backupTimeLabel': t.backup_time, 'cleanNotificationsLabel': t.clean_notifications,
+                'resetLabel': t.reset, 'systemInfoLabel': t.system_info, 'appVersionLabel': t.app_version, 'latestBadge': t.latest,
+                'lastUpdateSystemLabel': t.last_update_label, 'environmentLabel': t.environment_label, 'cancelLabel': t.cancel,
+                'saveLabel': t.save, 'importConfigLabel': t.import_config, 'importBtnModal': t.import_btn
+            };
+            for (const [id, text] of Object.entries(elementsToTranslate)) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            }
+        }
+
+        async function saveParams() {
+            try {
+                const newParams = {
+                    ecole: { nom: elements.ecoleNom.value, anneeScolaire: elements.anneeScolaire.value, adresse: elements.ecoleAdresse.value, telephone: elements.ecoleTel.value, email: elements.ecoleEmail.value, siteWeb: elements.ecoleSite.value },
+                    horaires: { heureDebutMatin: elements.heureDebutMatin.value, heureFinMatin: elements.heureFinMatin.value, heureDebutApresMidi: elements.heureDebutApresMidi.value, heureFinApresMidi: elements.heureFinApresMidi.value, dureeCreneau: parseInt(elements.dureeCreneau.value), pauseDebut: elements.pauseDebut?.value || "12:00", pauseFin: elements.pauseFin?.value || "14:00" },
+                    notifications: { activerEmail: elements.activerEmail.checked, activerPush: elements.activerPush.checked, activerSMS: elements.activerSMS.checked, types: { notes: elements.notifNotes.checked, absences: elements.notifAbsences.checked, retards: elements.notifRetards.checked, annonces: elements.notifAnnonces.checked, travaux: elements.notifTravaux.checked }, rappelsAuto: elements.rappelsAuto.value === "true", joursRappel: parseInt(elements.joursRappel.value), heureEnvoi: elements.heureEnvoi.value, conservationJours: parseInt(elements.conservationJours.value) },
+                    interface: { theme: elements.themeSelect.value, langue: elements.langueSelect.value, itemsParPage: parseInt(elements.itemsParPage.value), couleurPrimaire: elements.couleurPrimaire.value, couleurSecondaire: elements.couleurSecondaire.value, afficherDashboard: elements.afficherDashboard.checked, afficherCalendrier: elements.afficherCalendrier.checked, notificationsToast: elements.notificationsToast.checked },
+                    permissions: { parents: { voirNotes: elements.parentsVoirNotes.checked, voirAbsences: elements.parentsVoirAbsences.checked, contacter: elements.parentsContacter.checked }, enseignants: { modifierNotes: elements.enseignantsModifierNotes.checked, voirAutresClasses: elements.enseignantsVoirAutres.checked, envoyerNotifs: elements.enseignantsEnvoyerNotifs.checked }, eleves: { voirMoyennes: elements.elevesVoirMoyennes.checked, voirClassement: elements.elevesVoirClassement.checked } },
+                    avance: { modeMaintenance: elements.modeMaintenance.value === "true", messageMaintenance: elements.messageMaintenance.value, sauvegardeAuto: elements.sauvegardeAuto.value, heureSauvegarde: elements.heureSauvegarde.value, version: parametres.avance.version, lastUpdate: new Date().toLocaleDateString() }
+                };
+                
+                parametres = newParams;
+                localStorage.setItem('saghiry_params', JSON.stringify(parametres));
+                localStorage.setItem('saghiry_theme', elements.themeSelect.value);
+                localStorage.setItem('saghiry_langue', elements.langueSelect.value);
+                
+                await saveToServer(parametres);
+                
+                currentTheme = elements.themeSelect.value;
+                currentLang = elements.langueSelect.value;
+                applyTheme();
+                translatePage();
+                updateStatsDisplay();
+                
+                syncSettingsWithParent();
+                
+                showMessage('✅ Paramètres enregistrés avec succès', 'success');
+            } catch (e) {
+                console.error('Erreur sauvegarde:', e);
+                showMessage('❌ Erreur lors de l\'enregistrement', 'error');
+            }
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> ${message}`;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function initTabs() {
+            document.querySelectorAll('.param-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    document.querySelectorAll('.param-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(`tab-${tabName}`).classList.add('active');
+                });
+            });
+        }
+
+        function annulerModifications() { loadParams(); showMessage('Modifications annulées', 'info'); }
+        function resetParams() { if (confirm('⚠️ Voulez-vous vraiment réinitialiser tous les paramètres ?')) { localStorage.removeItem('saghiry_params'); loadParams(); showMessage('✅ Paramètres réinitialisés', 'success'); } }
+        function nettoyerNotifications() { showMessage(`🧹 Suppression des anciennes notifications...`, 'info'); setTimeout(() => showMessage(`✅ Notifications supprimées`, 'success'), 1000); }
+        function exportConfig() { const dataStr = JSON.stringify(parametres, null, 2); const link = document.createElement('a'); link.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr); link.download = `saghiry-config-${new Date().toISOString().slice(0,19)}.json`; link.click(); showMessage('📥 Configuration exportée', 'success'); }
+        function importConfig() { document.getElementById('importModal').classList.add('active'); }
+        function closeImportModal() { document.getElementById('importModal').classList.remove('active'); }
+        function processImport() { const file = document.getElementById('importFile').files[0]; if (!file) { showMessage('Veuillez sélectionner un fichier', 'error'); return; } const reader = new FileReader(); reader.onload = function(e) { try { const imported = JSON.parse(e.target.result); parametres = { ...parametres, ...imported }; localStorage.setItem('saghiry_params', JSON.stringify(parametres)); loadParams(); closeImportModal(); showMessage('✅ Configuration importée', 'success'); } catch(err) { showMessage('❌ Fichier invalide', 'error'); } }; reader.readAsText(file); }
+
+        // Synchronisation avec le parent
+        function syncSettingsWithParent() {
+            const settingsToSync = {
+                type: 'saghiry-settings-update',
+                settings: {
+                    theme: elements.themeSelect.value,
+                    langue: elements.langueSelect.value,
+                    couleurPrimaire: elements.couleurPrimaire.value,
+                    couleurSecondaire: elements.couleurSecondaire.value,
+                    itemsParPage: parseInt(elements.itemsParPage.value),
+                    afficherDashboard: elements.afficherDashboard.checked,
+                    afficherCalendrier: elements.afficherCalendrier.checked,
+                    notificationsToast: elements.notificationsToast.checked
+                }
+            };
+            
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage(settingsToSync, '*');
+            }
+            
+            localStorage.setItem('saghiry_global_settings', JSON.stringify(settingsToSync.settings));
+        }
+
+        function requestSettingsFromParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'saghiry-get-settings' }, '*');
+            } else {
+                const saved = localStorage.getItem('saghiry_global_settings');
+                if (saved) {
+                    try {
+                        const settings = JSON.parse(saved);
+                        if (settings.theme && elements.themeSelect) elements.themeSelect.value = settings.theme;
+                        if (settings.langue && elements.langueSelect) elements.langueSelect.value = settings.langue;
+                        if (settings.couleurPrimaire && elements.couleurPrimaire) elements.couleurPrimaire.value = settings.couleurPrimaire;
+                        if (settings.couleurSecondaire && elements.couleurSecondaire) elements.couleurSecondaire.value = settings.couleurSecondaire;
+                        if (settings.itemsParPage && elements.itemsParPage) elements.itemsParPage.value = settings.itemsParPage;
+                        if (settings.afficherDashboard !== undefined && elements.afficherDashboard) elements.afficherDashboard.checked = settings.afficherDashboard;
+                        if (settings.afficherCalendrier !== undefined && elements.afficherCalendrier) elements.afficherCalendrier.checked = settings.afficherCalendrier;
+                        if (settings.notificationsToast !== undefined && elements.notificationsToast) elements.notificationsToast.checked = settings.notificationsToast;
+                        
+                        currentTheme = settings.theme || 'clair';
+                        currentLang = settings.langue || 'fr';
+                        applyTheme();
+                        translatePage();
+                    } catch(e) {}
+                }
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'saghiry-settings-response') {
+                const settings = event.data.settings;
+                if (settings.theme && elements.themeSelect) elements.themeSelect.value = settings.theme;
+                if (settings.langue && elements.langueSelect) elements.langueSelect.value = settings.langue;
+                if (settings.couleurPrimaire && elements.couleurPrimaire) elements.couleurPrimaire.value = settings.couleurPrimaire;
+                if (settings.couleurSecondaire && elements.couleurSecondaire) elements.couleurSecondaire.value = settings.couleurSecondaire;
+                if (settings.itemsParPage && elements.itemsParPage) elements.itemsParPage.value = settings.itemsParPage;
+                
+                currentTheme = settings.theme || 'clair';
+                currentLang = settings.langue || 'fr';
+                applyTheme();
+                translatePage();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadParams();
+            initTabs();
+            document.getElementById('btnEnregistrer').addEventListener('click', saveParams);
+            document.getElementById('btnAnnuler').addEventListener('click', annulerModifications);
+            document.getElementById('btnResetParams')?.addEventListener('click', resetParams);
+            document.getElementById('btnNettoyerNotifications')?.addEventListener('click', nettoyerNotifications);
+            
+            if (elements.themeSelect) elements.themeSelect.addEventListener('change', () => { 
+                currentTheme = elements.themeSelect.value; 
+                applyTheme(); 
+                syncSettingsWithParent();
+            });
+            if (elements.langueSelect) elements.langueSelect.addEventListener('change', () => { 
+                currentLang = elements.langueSelect.value; 
+                translatePage(); 
+                updateStatsDisplay();
+                syncSettingsWithParent();
+            });
+            if (elements.couleurPrimaire) elements.couleurPrimaire.addEventListener('change', () => {
+                applyTheme();
+                syncSettingsWithParent();
+            });
+            if (elements.couleurSecondaire) elements.couleurSecondaire.addEventListener('change', () => {
+                applyTheme();
+                syncSettingsWithParent();
+            });
+            if (elements.itemsParPage) elements.itemsParPage.addEventListener('change', syncSettingsWithParent);
+            if (elements.afficherDashboard) elements.afficherDashboard.addEventListener('change', syncSettingsWithParent);
+            if (elements.afficherCalendrier) elements.afficherCalendrier.addEventListener('change', syncSettingsWithParent);
+            if (elements.notificationsToast) elements.notificationsToast.addEventListener('change', syncSettingsWithParent);
+            
+            setTimeout(requestSettingsFromParent, 100);
+        });
+
+        window.closeImportModal = closeImportModal;
+        window.processImport = processImport;
+        window.exportConfig = exportConfig;
+        window.importConfig = importConfig;
+    </script>
+</body>
+</html>

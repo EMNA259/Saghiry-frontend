@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mon emploi du temps</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            
+            --status-active-bg: #e0f2f1;
+            --status-active-color: var(--primary-deep);
+            --status-inactive-bg: #f1f3f5;
+            --status-inactive-color: #868e96;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .emploi-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .page-title h1 span:first-child {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            padding: 0.5rem;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            margin-top: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+            width: fit-content;
+            border: 1px solid var(--gray-border);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-green);
+        }
+
+        .status-dot.checking {
+            background: #f59e0b;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .info-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .total-heures {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-deep));
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+
+        .total-heures span {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .classes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .classe-tag {
+            background: #e0f2f1;
+            padding: 0.3rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: var(--primary-deep);
+            border: 1px solid var(--primary-green);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.2rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .jour-legend {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-border);
+            justify-content: center;
+        }
+
+        .jour-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text-dark);
+        }
+
+        .jour-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .jour-color.lundi { background: var(--accent-orange); }
+        .jour-color.mardi { background: var(--primary-green); }
+        .jour-color.mercredi { background: #8b5cf6; }
+        .jour-color.jeudi { background: #3b82f6; }
+        .jour-color.vendredi { background: #f59e0b; }
+        .jour-color.samedi { background: #ef4444; }
+
+        .emploi-grid {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-lg);
+            overflow-x: auto;
+        }
+
+        .grid-table {
+            display: grid;
+            gap: 0;
+            min-width: 900px;
+            border: 1px solid var(--gray-border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .grid-header {
+            font-weight: 700;
+            color: white;
+            padding: 1rem 0.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-deep));
+            border-right: 1px solid rgba(255,255,255,0.1);
+            font-size: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .grid-header:last-child {
+            border-right: none;
+        }
+
+        .time-slot {
+            padding: 0.8rem 0.5rem;
+            text-align: center;
+            font-weight: 700;
+            color: var(--accent-orange);
+            background: linear-gradient(135deg, #fef9e6, #fff4e6);
+            border-right: 1px solid var(--gray-border);
+            border-bottom: 1px solid var(--gray-border);
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .cours-cell {
+            padding: 0.6rem;
+            background: #fff7ed;
+            border-right: 1px solid var(--gray-border);
+            border-bottom: 1px solid var(--gray-border);
+            border-left: 4px solid var(--accent-orange);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .cours-cell:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-md);
+            background: #ffedd5;
+            z-index: 5;
+            position: relative;
+        }
+
+        .cours-matiere {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .cours-classe {
+            font-size: 0.7rem;
+            color: var(--primary-deep);
+            font-weight: 500;
+            margin-bottom: 0.2rem;
+        }
+
+        .cours-salle {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            background: rgba(76, 168, 150, 0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .cours-duree {
+            font-size: 0.6rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        .empty-cell {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 0.8rem 0.3rem;
+            background: #fefefe;
+            border-right: 1px solid var(--gray-border);
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .legende-cours {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+            border: 1px solid var(--gray-border);
+        }
+
+        .legende-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .legende-couleur {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: #fff7ed;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .loading, .error-message, .no-data {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            font-size: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .loading {
+            color: var(--text-light);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .no-data {
+            color: var(--text-light);
+        }
+
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-deep);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #dc2626;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cours-matiere {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="emploi-container">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>
+                    <span>📋</span>
+                    Mon emploi du temps
+                    <span id="anneeScolaire" style="background: #e0f2f1; color: #2d6b63; font-size: 1rem; padding: 0.2rem 1rem; border-radius: 30px;">2025-2026</span>
+                </h1>
+                <p>Visualisez et gérez vos cours de la semaine</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="chargerEmploi()">
+                    <span>🔄</span> Actualiser
+                </button>
+                <button class="btn-pdf" onclick="exporterEmploiPDF()">
+                    <span>📄</span> Exporter PDF
+                </button>
+            </div>
+        </div>
+
+        <div class="system-status" id="systemStatus">
+            <div class="status-dot" id="statusDot"></div>
+            <div class="status-text" id="statusText">Système prêt</div>
+        </div>
+
+        <div class="info-bar" id="infoBar" style="display: none;">
+            <div class="total-heures" id="totalHeuresDisplay">
+                <span>0</span> heures au total
+            </div>
+            <div class="classes-list" id="classesList"></div>
+        </div>
+
+        <div id="statsContainer" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-value" id="statTotalHeures">0</div>
+                    <div class="stat-label">Total heures</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="statJours">0</div>
+                    <div class="stat-label">Jours travaillés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏫</div>
+                    <div class="stat-value" id="statClasses">0</div>
+                    <div class="stat-label">Classes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value" id="statMatieres">0</div>
+                    <div class="stat-label">Matières</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🪑</div>
+                    <div class="stat-value" id="statSalles">0</div>
+                    <div class="stat-label">Salles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value" id="statScore">0</div>
+                    <div class="stat-label">Score compacité</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="jour-legend">
+            <div class="jour-legend-item"><span class="jour-color lundi"></span> Lundi</div>
+            <div class="jour-legend-item"><span class="jour-color mardi"></span> Mardi</div>
+            <div class="jour-legend-item"><span class="jour-color mercredi"></span> Mercredi</div>
+            <div class="jour-legend-item"><span class="jour-color jeudi"></span> Jeudi</div>
+            <div class="jour-legend-item"><span class="jour-color vendredi"></span> Vendredi</div>
+            <div class="jour-legend-item"><span class="jour-color samedi"></span> Samedi</div>
+        </div>
+
+        <div id="emploiContent">
+            <div class="loading">⏳ Chargement de votre emploi du temps...</div>
+        </div>
+
+        <div class="legende-cours" id="legendeCours" style="display: none;">
+            <div class="legende-item">
+                <div class="legende-couleur"></div>
+                <span>Cours programmé</span>
+            </div>
+            <div class="legende-item">
+                <span>⏱️ Durée réelle des cours</span>
+            </div>
+            <div class="legende-item">
+                <span>📌 Cliquez sur un cours pour plus de détails</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        
+        let enseignantId = null;
+        let enseignantNom = '';
+        let userRole = null;
+        let emploiActuel = null;
+
+        const jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+        const joursFr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+
+        function decalerHeure(heureStr) {
+            if (!heureStr || typeof heureStr !== 'string') return null;
+            const match = heureStr.match(/^(\d{1,2}):(\d{2})$/);
+            if (!match) return null;
+            let heure = parseInt(match[1], 10);
+            const minute = match[2];
+            heure = heure + 2;
+            return `${heure.toString().padStart(2, '0')}:${minute}`;
+        }
+
+        function heureEnMinutes(heureStr) {
+            if (!heureStr) return 0;
+            const match = heureStr.match(/^(\d{1,2}):(\d{2})$/);
+            if (!match) return 0;
+            return parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+        }
+
+        function extraireHeureBrute(dateTimeValue) {
+            if (!dateTimeValue) return null;
+            try {
+                if (typeof dateTimeValue === 'string') {
+                    if (dateTimeValue.includes('T')) {
+                        const date = new Date(dateTimeValue);
+                        if (!isNaN(date.getTime())) {
+                            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                        }
+                    } else if (dateTimeValue.includes(':')) {
+                        const match = dateTimeValue.match(/(\d{2}):(\d{2})/);
+                        if (match) return `${match[1]}:${match[2]}`;
+                    }
+                } else if (dateTimeValue instanceof Date) {
+                    return `${dateTimeValue.getHours().toString().padStart(2, '0')}:${dateTimeValue.getMinutes().toString().padStart(2, '0')}`;
+                } else if (dateTimeValue && typeof dateTimeValue === 'object' && dateTimeValue.$date) {
+                    const date = new Date(dateTimeValue.$date);
+                    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                }
+            } catch(e) {}
+            return null;
+        }
+function normaliserEmploi(emploi) {
+    if (!emploi) return null;
+    
+    const normalise = {
+        id: emploi.Id || emploi.id,
+        enseignantId: emploi.EnseignantId || emploi.enseignantId,
+        enseignantNom: emploi.EnseignantNom || emploi.enseignantNom || emploi.enseignantRemplaceNom,
+        anneeScolaire: emploi.AnneeScolaire || emploi.anneeScolaire,
+        version: emploi.Version || emploi.version || 1,
+        statut: emploi.Statut || emploi.statut || 'final',
+        statistiques: emploi.Statistiques || emploi.statistiques || {},
+        emploiParJour: { lundi: [], mardi: [], mercredi: [], jeudi: [], vendredi: [], samedi: [] }
+    };
+    
+    // ✅ CAS 1: Pour les vacataires - les créneaux sont déjà dans emploiParJour
+    if (emploi.emploiParJour) {
+        console.log('📋 Format vacataire détecté - emploiParJour direct');
+        Object.entries(emploi.emploiParJour).forEach(([jour, creneaux]) => {
+            if (Array.isArray(creneaux) && creneaux.length > 0) {
+                creneaux.forEach(c => {
+                    if (normalise.emploiParJour[jour]) {
+                        // ✅ Décaler les heures comme pour les enseignants
+                        const heureDebutDecalee = decalerHeure(c.heureDebut);
+                        const heureFinDecalee = decalerHeure(c.heureFin);
+                        
+                        // Si le décalage échoue, utiliser les heures originales
+                        const heureDebut = heureDebutDecalee || c.heureDebut;
+                        const heureFin = heureFinDecalee || c.heureFin;
+                        
+                        const debutMinutes = heureEnMinutes(heureDebut);
+                        const finMinutes = heureEnMinutes(heureFin);
+                        const dureeHeures = (finMinutes - debutMinutes) / 60;
+                        
+                        normalise.emploiParJour[jour].push({
+                            id: c.id || `${jour}_${c.heureDebut}`,
+                            jour: jour,
+                            heureDebut: heureDebut,
+                            heureFin: heureFin,
+                            debutMinutes: debutMinutes,
+                            finMinutes: finMinutes,
+                            dureeHeures: dureeHeures,
+                            classeId: c.classeId,
+                            classeNom: c.classeNom,
+                            niveau: c.niveau,
+                            matiereId: c.matiereId,
+                            matiereNom: c.matiereNom,
+                            salle: c.salle,
+                            typeCours: c.typeCours || 'cours'
+                        });
+                    }
+                });
+            }
+        });
+    }
+    // ✅ CAS 2: Pour les enseignants - les créneaux sont dans Creneaux
+    else if (emploi.Creneaux || emploi.creneaux) {
+        console.log('📋 Format enseignant détecté - Creneaux');
+        const creneaux = emploi.Creneaux || emploi.creneaux || [];
+        
+        creneaux.forEach(c => {
+            if (!c) return;
+            
+            let heureDebutBrute = c.HeureDebut || c.heureDebut;
+            let heureFinBrute = c.HeureFin || c.heureFin;
+            
+            if (heureDebutBrute && typeof heureDebutBrute !== 'string') {
+                heureDebutBrute = extraireHeureBrute(heureDebutBrute);
+            }
+            if (heureFinBrute && typeof heureFinBrute !== 'string') {
+                heureFinBrute = extraireHeureBrute(heureFinBrute);
+            }
+            
+            if (!heureDebutBrute || !heureFinBrute) return;
+            
+            const debutMinutes = heureEnMinutes(heureDebutBrute);
+            const finMinutes = heureEnMinutes(heureFinBrute);
+            const dureeHeures = (finMinutes - debutMinutes) / 60;
+            
+            const heureDebutDecalee = decalerHeure(heureDebutBrute);
+            const heureFinDecalee = decalerHeure(heureFinBrute);
+            
+            if (!heureDebutDecalee || !heureFinDecalee) return;
+            
+            const jour = (c.Jour || c.jour || '').toLowerCase();
+            
+            if (normalise.emploiParJour[jour]) {
+                normalise.emploiParJour[jour].push({
+                    id: c._id || c.Id || c.id || `${jour}_${heureDebutBrute}`,
+                    jour: jour,
+                    heureDebutBrute: heureDebutBrute,
+                    heureFinBrute: heureFinBrute,
+                    heureDebut: heureDebutDecalee,
+                    heureFin: heureFinDecalee,
+                    debutMinutes: heureEnMinutes(heureDebutDecalee),
+                    finMinutes: heureEnMinutes(heureFinDecalee),
+                    dureeHeures: dureeHeures,
+                    classeId: c.ClasseId || c.classeId,
+                    classeNom: c.ClasseNom || c.classeNom,
+                    niveau: c.Niveau || c.niveau,
+                    matiereId: c.MatiereId || c.matiereId,
+                    matiereNom: c.MatiereNom || c.matiereNom,
+                    salle: c.Salle || c.salle,
+                    typeCours: c.TypeCours || c.typeCours || 'cours'
+                });
+            }
+        });
+    }
+    
+    // Trier les créneaux par heure
+    Object.keys(normalise.emploiParJour).forEach(jour => {
+        normalise.emploiParJour[jour].sort((a, b) => a.debutMinutes - b.debutMinutes);
+    });
+    
+    console.log('📊 Emploi normalisé:', normalise);
+    return normalise;
+}
+
+        function genererTranchesHoraires() {
+            const tranches = [];
+            for (let h = 8; h <= 18; h++) {
+                tranches.push(`${h.toString().padStart(2, '0')}:00`);
+            }
+            return tranches;
+        }
+
+        function calculerSpan(cours, tranchesHoraires) {
+            let span = 0;
+            for (const tranche of tranchesHoraires) {
+                const trancheMinutes = heureEnMinutes(tranche);
+                if (trancheMinutes >= cours.debutMinutes && trancheMinutes < cours.finMinutes) {
+                    span++;
+                }
+            }
+            return Math.max(1, span);
+        }
+
+function afficherEmploi(emploi) {
+    if (!emploi || !emploi.emploiParJour) {
+        document.getElementById('emploiContent').innerHTML = 
+            '<div class="no-data">Données d\'emploi du temps incomplètes</div>';
+        return;
+    }
+
+    const emploiParJour = emploi.emploiParJour;
+    const tranchesHoraires = genererTranchesHoraires();
+    
+    // Debug: Afficher les données pour vérifier
+    console.log('📊 Données à afficher:', emploiParJour);
+    console.log('📊 Tranches horaires:', tranchesHoraires);
+    
+    let html = `<div class="grid-table" style="grid-template-columns: 100px repeat(6, 1fr);">`;
+    html += '<div class="grid-header">Horaire</div>';
+    joursFr.forEach(j => html += `<div class="grid-header">${j}</div>`);
+    
+    for (let i = 0; i < tranchesHoraires.length; i++) {
+        const heure = tranchesHoraires[i];
+        html += `<div class="time-slot">${heure}</div>`;
+        
+        for (let j = 0; j < jours.length; j++) {
+            const jour = jours[j];
+            const creneaux = emploiParJour[jour] || [];
+            
+            // ✅ Chercher un cours qui commence à cette heure exacte
+            const cours = creneaux.find(c => c.heureDebut === heure);
+            
+            if (cours) {
+                const span = calculerSpan(cours, tranchesHoraires);
+                const classeDisplay = cours.niveau ? `${cours.classeNom} (${cours.niveau})` : (cours.classeNom || 'Classe');
+                const coursData = JSON.stringify(cours).replace(/"/g, '&quot;');
+                
+                html += `<div class="cours-cell" style="grid-row: span ${span};" onclick="afficherDetailCours(${coursData})">
+                            <div class="cours-matiere">📖 ${cours.matiereNom || 'Cours'}</div>
+                            <div class="cours-classe">👥 ${classeDisplay}</div>
+                            <div class="cours-salle">📍 ${cours.salle || 'Salle'}</div>
+                            <div class="cours-duree">⏱️ ${cours.dureeHeures.toFixed(1)}h (${cours.heureDebut} - ${cours.heureFin})</div>
+                        </div>`;
+            } else {
+                // Vérifier si cette cellule est couverte par un cours qui a commencé plus tôt
+                let isCovered = false;
+                for (let k = i - 1; k >= 0; k--) {
+                    const heurePrec = tranchesHoraires[k];
+                    const coursPrec = creneaux.find(c => c.heureDebut === heurePrec);
+                    if (coursPrec) {
+                        // Si le cours précédent finit après l'heure actuelle
+                        if (coursPrec.finMinutes > heureEnMinutes(heure)) {
+                            isCovered = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!isCovered) {
+                    html += `<div class="empty-cell">—</div>`;
+                }
+            }
+        }
+    }
+    
+    html += '</div>';
+    document.getElementById('emploiContent').innerHTML = `<div class="emploi-grid">${html}</div>`;
+}
+
+        function afficherDetailCours(cours) {
+            const msg = `📖 ${cours.matiereNom || 'Cours'}\n` +
+                       `👥 ${cours.classeNom || 'Classe'} ${cours.niveau ? `(${cours.niveau})` : ''}\n` +
+                       `📍 Salle: ${cours.salle || 'Non spécifiée'}\n` +
+                       `⏱️ Horaire: ${cours.heureDebut} - ${cours.heureFin}\n` +
+                       `⏱️ Durée: ${cours.dureeHeures.toFixed(1)}h\n` +
+                       `📋 Type: ${cours.typeCours || 'cours'}`;
+            alert(msg);
+        }
+
+        function afficherInfoBar(emploi) {
+            if (!emploi?.statistiques) return;
+            const stats = emploi.statistiques;
+            const total = stats.totalHeures || stats.TotalHeures || 0;
+            document.getElementById('totalHeuresDisplay').innerHTML = `<span>${total}</span> heures au total`;
+            const classes = stats.classes || stats.Classes || [];
+            document.getElementById('classesList').innerHTML = classes.map(c => `<span class="classe-tag">${c}</span>`).join('');
+            document.getElementById('infoBar').style.display = 'flex';
+        }
+
+function afficherStatistiques(emploi) {
+    if (!emploi?.emploiParJour) {
+        document.getElementById('statsContainer').style.display = 'none';
+        return;
+    }
+    
+    // ✅ Calculer les statistiques à partir des cours
+    const emploiParJour = emploi.emploiParJour;
+    
+    // Compter les jours travaillés (jours avec au moins un cours)
+    let joursTravail = 0;
+    const classesSet = new Set();
+    const matieresSet = new Set();
+    const sallesSet = new Set();
+    let totalHeures = 0;
+    let totalCours = 0;
+    
+    Object.entries(emploiParJour).forEach(([jour, creneaux]) => {
+        if (creneaux && creneaux.length > 0) {
+            joursTravail++;
+            totalCours += creneaux.length;
+            creneaux.forEach(c => {
+                totalHeures += c.dureeHeures || 0;
+                if (c.classeNom) classesSet.add(c.classeNom);
+                if (c.matiereNom) matieresSet.add(c.matiereNom);
+                if (c.salle) sallesSet.add(c.salle);
+            });
+        }
+    });
+    
+    // Score de compacité simplifié (moyenne des heures par jour)
+    const scoreCompacite = joursTravail > 0 ? Math.round((totalHeures / joursTravail) * 10) / 10 : 0;
+    
+    // Afficher les statistiques
+    document.getElementById('statTotalHeures').textContent = Math.round(totalHeures * 10) / 10;
+    document.getElementById('statJours').textContent = joursTravail;
+    document.getElementById('statClasses').textContent = classesSet.size;
+    document.getElementById('statMatieres').textContent = matieresSet.size;
+    document.getElementById('statSalles').textContent = sallesSet.size;
+    document.getElementById('statScore').textContent = scoreCompacite;
+    
+    document.getElementById('statsContainer').style.display = 'block';
+    
+    // Mettre à jour aussi la barre d'info
+    const classesList = Array.from(classesSet);
+    document.getElementById('classesList').innerHTML = classesList.map(c => `<span class="classe-tag">${c}</span>`).join('');
+    document.getElementById('totalHeuresDisplay').innerHTML = `<span>${Math.round(totalHeures * 10) / 10}</span> heures au total`;
+    document.getElementById('infoBar').style.display = 'flex';
+}
+        async function chargerProfil() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    enseignantId = data.id || data.Id;
+                    userRole = (data.role || data.Role || '').toLowerCase();
+                    enseignantNom = `${data.prenom || data.Prenom || ''} ${data.nom || data.Nom || ''}`.trim() || 'Enseignant';
+                    console.log(`📋 Utilisateur: ${enseignantNom}, Rôle: ${userRole}, ID: ${enseignantId}`);
+                    return true;
+                }
+                return false;
+            } catch(e) { 
+                console.error('Erreur chargement profil:', e); 
+                return false;
+            }
+        }
+
+        async function chargerEmploi() {
+            if (!enseignantId) {
+                const profilOk = await chargerProfil();
+                if (!profilOk || !enseignantId) {
+                    document.getElementById('emploiContent').innerHTML = 
+                        '<div class="error-message">❌ Impossible de vous identifier. Veuillez vous reconnecter.</div>';
+                    return;
+                }
+            }
+
+            document.getElementById('emploiContent').innerHTML = '<div class="loading">⏳ Chargement de votre emploi du temps...</div>';
+            document.getElementById('statsContainer').style.display = 'none';
+            document.getElementById('infoBar').style.display = 'none';
+            document.getElementById('legendeCours').style.display = 'none';
+
+            try {
+                let apiUrl = '';
+                let roleMessage = '';
+                
+                // ✅ Détection automatique du rôle : Enseignant ou Vacataire
+                if (userRole === 'permanent') {
+                    apiUrl = `${API_BASE}/EmploiDuTemps/permanent/${enseignantId}?anneeScolaire=2025-2026`;
+                    roleMessage = 'Vacataire - Emploi du temps de remplacement';
+                    console.log('📚 Chargement emploi VACATAIRE:', apiUrl);
+                } else {
+                    apiUrl = `${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`;
+                    roleMessage = 'Enseignant - Emploi du temps personnel';
+                    console.log('📚 Chargement emploi ENSEIGNANT:', apiUrl);
+                }
+                
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+
+                if (!response.ok) {
+                    throw new Error(response.status === 404 ? 'Aucun emploi du temps trouvé' : `Erreur ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('📊 Réponse API:', result);
+
+                let emploiData = null;
+                
+                // Gérer la structure de réponse pour les vacataires (result.Data.emploi)
+                if (userRole === 'permanent' && result.Data && result.Data.emploi) {
+                    emploiData = result.Data.emploi;
+                    console.log('✅ Données vacataire extraites');
+                } 
+                // Gérer la structure standard pour les enseignants
+                else if (result.success && result.data) {
+                    emploiData = result.data;
+                }
+                else if (result.Data && result.Data.Creneaux) {
+                    emploiData = result.Data;
+                }
+                else if (result.Creneaux) {
+                    emploiData = result;
+                }
+                
+                if (emploiData) {
+                    // Ajouter le nom de l'enseignant si manquant
+                    if (!emploiData.EnseignantNom && result.Data?.emploi?.enseignantRemplaceNom) {
+                        emploiData.EnseignantNom = result.Data.emploi.enseignantRemplaceNom;
+                    }
+                    if (!emploiData.EnseignantNom && enseignantNom) {
+                        emploiData.EnseignantNom = enseignantNom;
+                    }
+                    
+                    emploiActuel = normaliserEmploi(emploiData);
+                    afficherEmploi(emploiActuel);
+                    afficherStatistiques(emploiActuel);
+                    afficherInfoBar(emploiActuel);
+                    document.getElementById('legendeCours').style.display = 'flex';
+                    document.getElementById('statusDot').style.background = '#4ca896';
+                    document.getElementById('statusText').innerHTML = roleMessage + ' - Cours chargés';
+                } else {
+                    throw new Error(result.message || 'Aucune donnée reçue');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                document.getElementById('emploiContent').innerHTML = error.message.includes('Aucun emploi')
+                    ? `<div class="no-data">📭 ${error.message}</div>`
+                    : `<div class="error-message">❌ ${error.message}</div>`;
+                document.getElementById('statusDot').style.background = '#ef4444';
+                document.getElementById('statusText').innerHTML = 'Erreur de chargement';
+            }
+        }
+
+        async function exporterEmploiPDF() {
+            if (!emploiActuel) {
+                alert('❌ Aucun emploi du temps à exporter');
+                return;
+            }
+
+            const btnPDF = document.querySelector('.btn-pdf');
+            const originalText = btnPDF.innerHTML;
+            btnPDF.innerHTML = '<span>⏳</span> Génération PDF...';
+            btnPDF.disabled = true;
+
+            try {
+                const elementPDF = document.createElement('div');
+                elementPDF.style.padding = '30px';
+                elementPDF.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+                elementPDF.style.backgroundColor = 'white';
+                elementPDF.style.maxWidth = '1200px';
+                elementPDF.style.margin = '0 auto';
+                
+                elementPDF.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4ca896; padding-bottom: 20px;">
+                        <h1 style="color: #1e3b36; margin: 0; font-size: 28px;">📋 EMPLOI DU TEMPS</h1>
+                        <h2 style="color: #4ca896; margin: 10px 0 5px; font-size: 20px;">${emploiActuel.enseignantNom || 'Enseignant'}</h2>
+                        <p style="color: #5a9d91; margin: 5px 0;">Année scolaire 2025-2026</p>
+                        <p style="color: #868e96; font-size: 11px; margin: 5px 0;">Généré le ${new Date().toLocaleString('fr-FR')}</p>
+                    </div>
+                `;
+
+                const stats = emploiActuel.statistiques || {};
+                elementPDF.innerHTML += `
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: linear-gradient(135deg, #f8fafc, #f0f5f8); padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #ff9466;">
+                            <div style="font-size: 28px; font-weight: bold; color: #ff9466;">${stats.totalHeures || stats.TotalHeures || 0}</div>
+                            <div style="font-size: 12px; color: #5a9d91; font-weight: 600;">Total heures</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f8fafc, #f0f5f8); padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #4ca896;">
+                            <div style="font-size: 28px; font-weight: bold; color: #ff9466;">${stats.joursTravail || stats.JoursTravail || 0}</div>
+                            <div style="font-size: 12px; color: #5a9d91; font-weight: 600;">Jours travaillés</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f8fafc, #f0f5f8); padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #8b5cf6;">
+                            <div style="font-size: 28px; font-weight: bold; color: #ff9466;">${(stats.classes || stats.Classes || []).length}</div>
+                            <div style="font-size: 12px; color: #5a9d91; font-weight: 600;">Classes</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f8fafc, #f0f5f8); padding: 15px; border-radius: 12px; text-align: center; border-left: 4px solid #f59e0b;">
+                            <div style="font-size: 28px; font-weight: bold; color: #ff9466;">${(stats.matieres || stats.Matieres || []).length}</div>
+                            <div style="font-size: 12px; color: #5a9d91; font-weight: 600;">Matières</div>
+                        </div>
+                    </div>
+                `;
+
+                const emploiParJour = emploiActuel.emploiParJour || {};
+                
+                for (let i = 0; i < jours.length; i++) {
+                    const jour = jours[i];
+                    const jourFr = joursFr[i];
+                    const creneaux = emploiParJour[jour] || [];
+                    
+                    const couleursJour = {
+                        lundi: '#ff9466', mardi: '#4ca896', mercredi: '#8b5cf6', jeudi: '#3b82f6', vendredi: '#f59e0b', samedi: '#ef4444'
+                    };
+                    
+                    if (creneaux.length > 0) {
+                        elementPDF.innerHTML += `
+                            <div style="margin-bottom: 25px; page-break-inside: avoid;">
+                                <h3 style="color: ${couleursJour[jour]}; border-left: 4px solid ${couleursJour[jour]}; padding-left: 12px; margin-bottom: 12px; font-size: 18px;">📅 ${jourFr}</h3>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                    <thead>
+                                        <tr style="background: linear-gradient(135deg, #4ca896, #3d8a7f); color: white;">
+                                            <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7; width: 20%;">Horaire</th>
+                                            <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7; width: 30%;">Matière</th>
+                                            <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7; width: 25%;">Classe</th>
+                                            <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7; width: 15%;">Salle</th>
+                                            <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7; width: 10%;">Durée</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        creneaux.sort((a, b) => a.debutMinutes - b.debutMinutes);
+                        let altRow = false;
+                        creneaux.forEach(c => {
+                            const classeDisplay = c.niveau ? `${c.classeNom} (${c.niveau})` : (c.classeNom || 'Classe');
+                            const bgColor = altRow ? '#f9fafb' : '#ffffff';
+                            elementPDF.innerHTML += `
+                                <tr style="background-color: ${bgColor};">
+                                    <td style="padding: 8px 10px; border: 1px solid #e0e9e7;"><strong>${c.heureDebut} - ${c.heureFin}</strong></td>
+                                    <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">📖 ${c.matiereNom || 'Cours'}</td>
+                                    <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">👥 ${classeDisplay}</td>
+                                    <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">📍 ${c.salle || '—'}</td>
+                                    <td style="padding: 8px 10px; border: 1px solid #e0e9e7; text-align: center;">⏱️ ${c.dureeHeures.toFixed(1)}h</td>
+                                </tr>
+                            `;
+                            altRow = !altRow;
+                        });
+                        
+                        elementPDF.innerHTML += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+                }
+
+                const totalCours = Object.values(emploiParJour).flat().length;
+                elementPDF.innerHTML += `
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e9e7; text-align: center;">
+                        <p style="font-size: 13px; color: #1e3b36; font-weight: 600;">📊 TOTAL: ${stats.totalHeures || stats.TotalHeures || 0} heures • ${totalCours} cours</p>
+                        <p style="font-size: 10px; color: #868e96; margin-top: 10px;">SAGHIRY - Système de Gestion d'Emploi du Temps</p>
+                    </div>
+                `;
+
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: `Emploi_du_temps_${(emploiActuel.enseignantNom || 'enseignant').replace(/\s/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+
+                await html2pdf().set(opt).from(elementPDF).save();
+                alert('✅ Emploi du temps exporté en PDF avec succès !');
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'export PDF:', error);
+                alert('❌ Une erreur est survenue lors de la génération du PDF');
+            } finally {
+                btnPDF.innerHTML = originalText;
+                btnPDF.disabled = false;
+            }
+        }
+
+        function decoderToken() {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                enseignantId = payload.sub || payload.id || payload.userId || payload.nameid || payload.Id;
+                enseignantNom = payload.nom || payload.name || payload.unique_name || payload.given_name || 'Enseignant';
+                userRole = payload.role || payload.Role || payload.roles || 'enseignant';
+                if (Array.isArray(userRole)) userRole = userRole[0];
+                if (userRole) userRole = userRole.toLowerCase();
+            } catch (error) {
+                console.error('❌ Erreur décodage token:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!token) {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            decoderToken();
+            await chargerProfil();
+            chargerEmploi();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Calendrier Scolaire Automatique</title>
+    <style>
+        /* ============ STYLES COMPLETS ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --semestre1-bg: #ffe0f0;
+            --semestre1-border: #d44c9c;
+            --semestre2-bg: #e0f0ff;
+            --semestre2-border: #2a6f97;
+            --semestre3-bg: #e0ffe0;
+            --semestre3-border: #2e7d32;
+            --vacance-bg: #e3f2fd;
+            --vacance-border: #1976d2;
+            --ferie-bg: #fff3e0;
+            --ferie-border: #f57c00;
+            --religieux-bg: #e8f5e9;
+            --religieux-border: #2e7d32;
+            --national-bg: #f3e5f5;
+            --national-border: #8e24aa;
+            --ramadan-bg: #fff9c4;
+            --ramadan-border: #ff8f00;
+            --exam-bg: #e0e7ff;
+            --exam-border: #4f46e5;
+            --custom-bg: #fef3c7;
+            --custom-border: #d97706;
+            --today-bg: #e8f0fe;
+            --today-border: var(--primary-green);
+            --personal-bg: #e8e8ff;
+            --personal-border: #6c5ce7;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .stat-card,
+        body.dark-mode .calendar-toolbar,
+        body.dark-mode .filters-section,
+        body.dark-mode .calendar-grid,
+        body.dark-mode .events-card,
+        body.dark-mode .stats-mini-card,
+        body.dark-mode .modal-content {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .header-text h1 {
+            color: #6abfad;
+        }
+
+        body.dark-mode .header-text p span {
+            background: rgba(106, 191, 173, 0.2);
+            color: #6abfad;
+        }
+
+        body.dark-mode .stat-title,
+        body.dark-mode .stat-sub {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .stat-value {
+            color: #6abfad;
+        }
+
+        body.dark-mode .month-nav-btn {
+            background: #1a1a2e;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .month-nav-btn:hover {
+            background: #6abfad;
+            color: white;
+        }
+
+        body.dark-mode .current-month-display {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .year-selector select {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .tag {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .tag:hover,
+        body.dark-mode .tag.active {
+            background: #6abfad;
+            color: #16213e;
+        }
+
+        body.dark-mode .month-name {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .day-header {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .week-number {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+            color: #6abfad;
+        }
+
+        body.dark-mode .day-cell {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .day-number {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .day-cell.today {
+            background: linear-gradient(135deg, #1a3a4a, #0f2a3a);
+            border-color: #6abfad;
+        }
+
+        body.dark-mode .day-cell.personal { background: linear-gradient(135deg, #2a2a4a, #1a1a3a); border-color: #6c5ce7; }
+        body.dark-mode .day-cell.vacance { background: linear-gradient(135deg, #1a3a4a, #0f2a3a); border-color: #339af0; }
+        body.dark-mode .day-cell.ferie { background: linear-gradient(135deg, #3a2a1a, #2a1a0a); border-color: #ff9466; }
+        body.dark-mode .day-cell.religieux { background: linear-gradient(135deg, #1a3a2a, #0f2a1a); border-color: #6abfad; }
+        body.dark-mode .day-cell.national { background: linear-gradient(135deg, #2a1a3a, #1a0a2a); border-color: #b794f4; }
+        body.dark-mode .day-cell.ramadan { background: linear-gradient(135deg, #3a3a1a, #2a2a0a); border-color: #ffb300; }
+        body.dark-mode .day-cell.exam { background: linear-gradient(135deg, #1a1a4a, #0f0f3a); border-color: #818cf8; }
+        body.dark-mode .day-cell.custom { background: linear-gradient(135deg, #3a2a1a, #2a1a0a); border-color: #f59f00; }
+
+        body.dark-mode .legend-item span {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .card-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .event-item {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .event-item:hover {
+            background: #0f0f23;
+        }
+
+        body.dark-mode .event-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .event-day {
+            color: #6abfad;
+        }
+
+        body.dark-mode .event-month {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .stats-mini-item {
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .stats-mini-label {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .stats-mini-value {
+            color: #6abfad;
+        }
+
+        body.dark-mode .progress-bar {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .modal-header {
+            background: linear-gradient(135deg, #2d6b63 0%, #1e4a44 100%);
+        }
+
+        body.dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-group input:focus,
+        body.dark-mode .form-group select:focus,
+        body.dark-mode .form-group textarea:focus {
+            border-color: #6abfad;
+        }
+
+        body.dark-mode .radio-group label {
+            color: #b0b0b0;
+        }
+
+        .calendar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-text h1 {
+            font-size: 2rem;
+            color: var(--primary-deep);
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .header-text p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .header-text p span {
+            background: rgba(76, 168, 150, 0.15);
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .auto-badge {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .current-date-badge {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(76, 168, 150, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-size: 1.2rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            line-height: 1.2;
+        }
+
+        .stat-sub {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        .calendar-toolbar {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            color: var(--text-soft);
+            border: 1px solid var(--gray-border);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 148, 102, 0.3);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(255, 148, 102, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 2px solid var(--primary-green);
+            color: var(--primary-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--gray-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .month-nav-btn {
+            background: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            color: var(--primary-dark);
+        }
+
+        .month-nav-btn:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .current-month-display {
+            font-weight: 700;
+            color: var(--primary-deep);
+            min-width: 180px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .year-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gray-bg);
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+        }
+
+        .year-selector select {
+            background: white;
+            border: 1px solid var(--gray-border);
+            border-radius: 20px;
+            padding: 0.4rem 0.8rem;
+            font-weight: 600;
+            color: var(--primary-deep);
+            cursor: pointer;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tag {
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--gray-bg);
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--gray-border);
+        }
+
+        .tag:hover, .tag.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .calendar-grid {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-border);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .month-header {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: var(--gray-bg);
+            padding: 0.5rem;
+            border-radius: 12px;
+            min-width: 900px;
+        }
+
+        .month-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            display: flex;
+            align-items: center;
+            padding-left: 0.5rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .day-header {
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .week-row {
+            display: grid;
+            grid-template-columns: 80px repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            min-width: 900px;
+        }
+
+        .week-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            border: 1px solid var(--gray-border);
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .day-cell:hover {
+            transform: scale(1.02);
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+
+        .day-cell.today {
+            background: linear-gradient(135deg, #e8f0fe, #d4e4fc);
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 2px rgba(76, 168, 150, 0.3);
+        }
+
+        .day-cell.personal { background: linear-gradient(135deg, #e8e8ff, #d4d4ff); border-color: #6c5ce7; }
+        .day-cell.vacance { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-color: var(--blue-light); }
+        .day-cell.ferie { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-color: var(--accent-orange); }
+        .day-cell.religieux { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-color: var(--primary-green); }
+        .day-cell.national { background: linear-gradient(135deg, #f3e5f5, #e1bee7); border-color: #9c27b0; }
+        .day-cell.ramadan { background: linear-gradient(135deg, #fff9c4, #fff59d); border-color: #ffb300; }
+        .day-cell.rentree { background: linear-gradient(135deg, #ffe0f0, #ffc0e0); border-color: #d44c9c; }
+        .day-cell.exam { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-color: #4f46e5; }
+        .day-cell.custom { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #d97706; }
+
+        .day-number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .day-cell.today .day-number {
+            color: var(--primary-green);
+            font-size: 1.1rem;
+        }
+
+        .day-events {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+            margin-top: auto;
+        }
+
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .event-dot.personal { background: #6c5ce7; }
+        .event-dot.vacance { background: var(--blue-light); }
+        .event-dot.ferie { background: var(--accent-orange); }
+        .event-dot.religieux { background: var(--primary-green); }
+        .event-dot.national { background: #9c27b0; }
+        .event-dot.ramadan { background: #ffb300; }
+        .event-dot.exam { background: #4f46e5; }
+        .event-dot.custom { background: #d97706; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-soft);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        .legend-color.today { background: linear-gradient(135deg, #e8f0fe, #d4e4fc); border: 1px solid var(--primary-green); }
+        .legend-color.personal { background: linear-gradient(135deg, #e8e8ff, #d4d4ff); border: 1px solid #6c5ce7; }
+        .legend-color.vacance { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
+        .legend-color.ferie { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+        .legend-color.religieux { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
+        .legend-color.national { background: linear-gradient(135deg, #f3e5f5, #e1bee7); }
+        .legend-color.ramadan { background: linear-gradient(135deg, #fff9c4, #fff59d); }
+        .legend-color.exam { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); }
+        .legend-color.custom { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .events-card, .stats-mini-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--gray-bg);
+            border-radius: 16px;
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+        }
+        .event-item:hover { transform: translateX(5px); box-shadow: var(--shadow-sm); }
+        .event-item.personal { border-left-color: #6c5ce7; }
+        .event-item.vacance { border-left-color: var(--blue-light); }
+        .event-item.ferie { border-left-color: var(--accent-orange); }
+        .event-item.religieux { border-left-color: var(--primary-green); }
+        .event-item.national { border-left-color: #9c27b0; }
+        .event-item.ramadan { border-left-color: #ffb300; }
+        .event-item.exam { border-left-color: #4f46e5; }
+        .event-item.custom { border-left-color: #d97706; }
+
+        .event-date {
+            min-width: 60px;
+            text-align: center;
+        }
+        .event-day {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            line-height: 1;
+        }
+        .event-month {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+        .event-details { flex: 1; }
+        .event-title { font-weight: 700; color: var(--text-dark); margin-bottom: 0.2rem; }
+        .event-type {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .event-type-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+        .event-type-badge.personal { background: #e8e8ff; color: #6c5ce7; }
+        .event-type-badge.vacance { background: #e3f2fd; color: #1976d2; }
+        .event-type-badge.ferie { background: #fff3e0; color: #f57c00; }
+        .event-type-badge.religieux { background: #e8f5e9; color: #2e7d32; }
+        .event-type-badge.national { background: #f3e5f5; color: #8e24aa; }
+        .event-type-badge.ramadan { background: #fff9c4; color: #ff8f00; }
+        .event-type-badge.exam { background: #e0e7ff; color: #4f46e5; }
+        .event-type-badge.custom { background: #fef3c7; color: #d97706; }
+
+        .event-remaining {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .event-delete {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .event-delete:hover {
+            background: #fee2e2;
+            transform: scale(1.1);
+        }
+
+        .stats-mini-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .stats-mini-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--gray-border);
+        }
+        .stats-mini-label { color: var(--text-soft); font-size: 0.9rem; }
+        .stats-mini-value { font-weight: 700; color: var(--primary-deep); font-size: 1.1rem; }
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-bg);
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+            border-radius: 4px;
+        }
+
+        .semestre-tag {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .semestre1 { background: var(--semestre1-bg); color: var(--semestre1-border); border: 1px solid var(--semestre1-border); }
+        .semestre2 { background: var(--semestre2-bg); color: var(--semestre2-border); border: 1px solid var(--semestre2-border); }
+        .semestre3 { background: var(--semestre3-bg); color: var(--semestre3-border); border: 1px solid var(--semestre3-border); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border-radius: 32px 32px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title { font-size: 1.3rem; font-weight: 700; }
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .date-range-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .event-detail {
+            padding: 0.8rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .text-small { font-size: 0.75rem; color: var(--text-light); }
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary-green);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            max-width: 350px;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        .toast-body { font-size: 0.85rem; color: var(--text-soft); }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .btn-icon:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        body.dark-mode .btn-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .info-cards { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .calendar-container { padding: 1rem; }
+            .month-header, .week-row {
+                grid-template-columns: 60px repeat(7, 1fr);
+                gap: 0.3rem;
+                min-width: 650px;
+            }
+            .stats-grid { grid-template-columns: 1fr; }
+            .date-range-group { grid-template-columns: 1fr; }
+        }
+        @media print {
+            .calendar-toolbar, .filters-section, .legend, .info-cards, .btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="header-title">
+                <div class="header-icon">📅</div>
+                <div class="header-text">
+                    <h1>Calendrier Scolaire</h1>
+                    <p>
+                        <span id="anneeAffichage">2025-2026</span>
+                        <span>🇹🇳 Tunisie</span>
+                        <span class="auto-badge">⚡ Génération automatique</span>
+                    </p>
+                </div>
+            </div>
+            <div class="current-date-badge" id="currentDateBadge">
+                <span>📅</span>
+                <span id="currentDateText">--</span>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card" onclick="scrollToSemestre(1)">
+                <div class="stat-header"><span class="stat-title">Jours de cours</span><span class="stat-icon">📚</span></div>
+                <div class="stat-value" id="joursCours">--</div>
+                <div class="stat-sub">élèves</div>
+            </div>
+            <div class="stat-card" onclick="scrollToFeries()">
+                <div class="stat-header"><span class="stat-title">Jours fériés</span><span class="stat-icon">🎉</span></div>
+                <div class="stat-value" id="joursFeries">--</div>
+                <div class="stat-sub">dont religieux</div>
+            </div>
+            <div class="stat-card" onclick="scrollToVacances()">
+                <div class="stat-header"><span class="stat-title">Vacances</span><span class="stat-icon">🏖️</span></div>
+                <div class="stat-value" id="joursVacances">--</div>
+                <div class="stat-sub">jours</div>
+            </div>
+            <div class="stat-card" onclick="scrollToRamadan()">
+                <div class="stat-header"><span class="stat-title">Ramadan</span><span class="stat-icon">🌙</span></div>
+                <div class="stat-value" id="ramadanDates">--</div>
+                <div class="stat-sub" id="ramadanSub">--</div>
+            </div>
+        </div>
+
+        <div class="calendar-toolbar">
+            <div class="toolbar-left">
+                <button class="btn btn-primary" onclick="exporterCalendrier()"><span>📥</span> Exporter</button>
+                <button class="btn btn-outline" onclick="imprimerCalendrier()"><span>🖨️</span> Imprimer</button>
+                <button class="btn btn-outline" onclick="reinitialiserDonnees()"><span>🔄</span> Réinitialiser</button>
+                <button class="btn btn-accent" onclick="ouvrirModalEvenementPersonnel()"><span>➕</span> Événement personnel</button>
+            </div>
+            <div class="toolbar-right">
+                <div class="month-nav">
+                    <button class="month-nav-btn" onclick="changerMois(-1)">←</button>
+                    <span class="current-month-display" id="currentMonthDisplay">Mars 2026</span>
+                    <button class="month-nav-btn" onclick="changerMois(1)">→</button>
+                    <button class="btn btn-primary" onclick="allerAujourdhui()" style="padding:0.5rem 1rem;">📍 Aujourd'hui</button>
+                </div>
+                <div class="year-selector">
+                    <span>📆</span>
+                    <select id="anneeSelect" onchange="changerAnneeScolaire()">
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="2025-2026" selected>2025-2026</option>
+                        <option value="2026-2027">2026-2027</option>
+                        <option value="2027-2028">2027-2028</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filter-tags">
+                <span class="tag active" onclick="filtrerType('all', this)">Tous</span>
+                <span class="tag" onclick="filtrerType('vacance', this)">Vacances</span>
+                <span class="tag" onclick="filtrerType('ferie', this)">Fériés</span>
+                <span class="tag" onclick="filtrerType('national', this)">Nationaux</span>
+                <span class="tag" onclick="filtrerType('religieux', this)">Religieux</span>
+                <span class="tag" onclick="filtrerType('ramadan', this)">Ramadan</span>
+                <span class="tag" onclick="filtrerType('exam', this)">Examens</span>
+                <span class="tag" onclick="filtrerType('custom', this)">Personnalisé</span>
+            </div>
+        </div>
+
+        <div class="calendar-grid">
+            <div id="calendarBody">
+                <div class="loading"><div class="spinner"></div><span style="margin-left: 1rem;">Génération automatique du calendrier...</span></div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-color today"></div><span>Aujourd'hui</span></div>
+            <div class="legend-item"><div class="legend-color personal"></div><span>Événements personnels</span></div>
+            <div class="legend-item"><div class="legend-color vacance"></div><span>Vacances scolaires</span></div>
+            <div class="legend-item"><div class="legend-color ferie"></div><span>Jours fériés</span></div>
+            <div class="legend-item"><div class="legend-color national"></div><span>Fêtes nationales</span></div>
+            <div class="legend-item"><div class="legend-color religieux"></div><span>Fêtes religieuses</span></div>
+            <div class="legend-item"><div class="legend-color ramadan"></div><span>Ramadan</span></div>
+            <div class="legend-item"><div class="legend-color exam"></div><span>Examens</span></div>
+            <div class="legend-item"><div class="legend-color custom"></div><span>Événements personnalisés</span></div>
+        </div>
+
+        <div class="info-cards">
+            <div class="events-card">
+                <div class="card-title"><span>📅</span> Événements à venir</div>
+                <div class="event-list" id="eventsList">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
+            </div>
+            <div class="stats-mini-card">
+                <div class="card-title"><span>📊</span> Statistiques</div>
+                <div class="stats-mini-list">
+                    <div class="stats-mini-item"><span class="stats-mini-label">Jours écoulés</span><span class="stats-mini-value" id="joursEcoules">--/--</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="progressAnnee" style="width: 0%"></div></div>
+                    <div class="stats-mini-item"><span class="stats-mini-label">Semestre en cours</span><span class="stats-mini-value" id="semestreEnCours">--</span></div>
+                    <div class="stats-mini-item"><span class="stats-mini-label">Prochaines vacances</span><span class="stats-mini-value" id="prochainesVacances">--</span></div>
+                    <div class="stats-mini-item"><span class="stats-mini-label">Prochain férié</span><span class="stats-mini-value" id="prochainFerie">--</span></div>
+                    <div class="stats-mini-item"><span class="stats-mini-label">Ramadan</span><span class="stats-mini-value" id="ramadanCountdown">--</span></div>
+                    <div class="stats-mini-item"><span class="stats-mini-label">Fin des cours</span><span class="stats-mini-value" id="finCours">--</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour les détails du jour -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 Détails de la journée</h2>
+                <button class="modal-close" onclick="fermerModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fermerModal()">Fermer</button>
+                <button class="btn btn-accent" onclick="ajouterRappelDepuisModal()">🔔 Ajouter un rappel</button>
+                <button class="btn btn-primary" onclick="ouvrirAjoutPersonnelDepuisModal()">✏️ Ajouter événement perso</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier un événement personnel -->
+    <div class="modal" id="personnalEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="personnalModalTitle">➕ Ajouter un événement personnel</h2>
+                <button class="modal-close" onclick="fermerModalPersonnel()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="personnalEventForm">
+                    <div class="form-group">
+                        <label>Titre *</label>
+                        <input type="text" id="eventTitre" placeholder="Ex: Rendez-vous médical" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type d'événement</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="eventCategorie" value="personal" checked> 📝 Personnel</label>
+                            <label><input type="radio" name="eventCategorie" value="custom"> 🎨 Personnalisé</label>
+                            <label><input type="radio" name="eventCategorie" value="exam"> 📚 Examen</label>
+                            <label><input type="radio" name="eventCategorie" value="ferie"> 🎉 Férié</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Type de période</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="eventType" value="jour" checked> Jour unique</label>
+                            <label><input type="radio" name="eventType" value="periode"> Période</label>
+                        </div>
+                    </div>
+                    <div class="form-group" id="jourUniqueGroup">
+                        <label>Date *</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group" id="periodeGroup" style="display: none;">
+                        <div class="date-range-group">
+                            <div>
+                                <label>Date début *</label>
+                                <input type="date" id="eventDateDebut">
+                            </div>
+                            <div>
+                                <label>Date fin *</label>
+                                <input type="date" id="eventDateFin">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description (optionnel)</label>
+                        <textarea id="eventDescription" rows="3" placeholder="Détails supplémentaires..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Couleur (optionnel)</label>
+                        <input type="color" id="eventCouleur" value="#6c5ce7">
+                    </div>
+                    <input type="hidden" id="eventId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fermerModalPersonnel()">Annuler</button>
+                <button class="btn btn-danger" id="deleteEventBtn" style="display: none;" onclick="supprimerEvenementPersonnelDepuisModal()">🗑️ Supprimer</button>
+                <button class="btn btn-primary" onclick="sauvegarderEvenementPersonnel()">💾 Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // GÉNÉRATEUR AUTOMATIQUE 100% DYNAMIQUE
+        // AVEC ÉVÉNEMENTS PERSONNELS (LOCAL STORAGE)
+        // ============================================
+        
+        // État global
+        let periodesExamens = [];
+        let periodesVacances = [];
+        let semestres = [];
+        let joursFeries = [];
+        let periodesRamadan = null;
+        let evenementsSpeciaux = [];
+        let evenementsPersonnalises = [];
+        let evenementsPersonnels = [];
+        
+        let state = {
+            currentMonth: null,
+            currentYear: null,
+            filtreType: 'all',
+            anneeScolaire: '2025-2026'
+        };
+
+        const STORAGE_KEY_PERSONNELS = 'saghiri_evenements_personnels';
+
+        // ============================================
+        // CHARGEMENT/SAUVEGARDE DES ÉVÉNEMENTS PERSONNELS
+        // ============================================
+        
+        function chargerEvenementsPersonnels() {
+            const stored = localStorage.getItem(STORAGE_KEY_PERSONNELS);
+            if (stored) {
+                try {
+                    let data = JSON.parse(stored);
+                    evenementsPersonnels = data.map(evt => ({
+                        ...evt,
+                        date: evt.date ? new Date(evt.date) : null,
+                        debut: evt.debut ? new Date(evt.debut) : null,
+                        fin: evt.fin ? new Date(evt.fin) : null
+                    }));
+                } catch(e) {
+                    console.error('Erreur chargement événements personnels:', e);
+                    evenementsPersonnels = [];
+                }
+            } else {
+                evenementsPersonnels = [
+                    {
+                        id: crypto.randomUUID ? crypto.randomUUID() : 'perso_' + Date.now() + '_1',
+                        nom: "Anniversaire",
+                        type: "jour",
+                        categorie: "personal",
+                        date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 7),
+                        description: "Anniversaire à fêter !",
+                        couleur: "#6c5ce7"
+                    }
+                ];
+                sauvegarderEvenementsPersonnels();
+            }
+        }
+        
+        function sauvegarderEvenementsPersonnels() {
+            const aSauvegarder = evenementsPersonnels.map(evt => ({
+                ...evt,
+                date: evt.date ? evt.date.toISOString() : null,
+                debut: evt.debut ? evt.debut.toISOString() : null,
+                fin: evt.fin ? evt.fin.toISOString() : null
+            }));
+            localStorage.setItem(STORAGE_KEY_PERSONNELS, JSON.stringify(aSauvegarder));
+        }
+        
+        function ajouterEvenementPersonnel(evt) {
+            evt.id = crypto.randomUUID ? crypto.randomUUID() : 'perso_' + Date.now() + '_' + Math.random();
+            evt.createdAt = new Date().toISOString();
+            evenementsPersonnels.push(evt);
+            sauvegarderEvenementsPersonnels();
+            return evt.id;
+        }
+        
+        function modifierEvenementPersonnel(id, nouvellesDonnees) {
+            const index = evenementsPersonnels.findIndex(e => e.id === id);
+            if (index !== -1) {
+                evenementsPersonnels[index] = { ...evenementsPersonnels[index], ...nouvellesDonnees };
+                sauvegarderEvenementsPersonnels();
+                return true;
+            }
+            return false;
+        }
+        
+        // Fonction de suppression réelle (interne)
+        function supprimerEvenementPersonnelParId(id) {
+            const index = evenementsPersonnels.findIndex(e => e.id === id);
+            if (index !== -1) {
+                evenementsPersonnels.splice(index, 1);
+                sauvegarderEvenementsPersonnels();
+                return true;
+            }
+            return false;
+        }
+        
+        // Fonction appelée par le bouton de suppression dans la liste des événements
+        function supprimerEvenementPersonnel(id) {
+            if (confirm('Supprimer cet événement personnel ?')) {
+                const success = supprimerEvenementPersonnelParId(id);
+                if (success) {
+                    showToast('🗑️ Supprimé', 'Événement personnel supprimé');
+                    afficherCalendrier();
+                    chargerEvenementsAVenir();
+                } else {
+                    showToast('❌ Erreur', 'Impossible de supprimer l\'événement', 'warning');
+                }
+            }
+        }
+        
+        // Fonction appelée par le bouton de suppression dans la modal
+        function supprimerEvenementPersonnelDepuisModal() {
+            if (currentEditId) {
+                supprimerEvenementPersonnel(currentEditId);
+                fermerModalPersonnel();
+            }
+        }
+        
+        // ============================================
+        // FONCTIONS DE CALCUL DYNAMIQUE (simplifiées)
+        // ============================================
+        
+        function getAnneeDebut() {
+            return parseInt(state.anneeScolaire.split('-')[0]);
+        }
+        
+        function getAnneeFin() {
+            return parseInt(state.anneeScolaire.split('-')[1]);
+        }
+        
+        function calculerDateRentree() {
+            const anneeDebut = getAnneeDebut();
+            let dateRentree = new Date(anneeDebut, 8, 15);
+            if (dateRentree.getDay() === 0) dateRentree.setDate(dateRentree.getDate() + 1);
+            return dateRentree;
+        }
+        
+        function calculerDateFinEleves() {
+            const anneeFin = getAnneeFin();
+            let dateFin = new Date(anneeFin, 4, 30);
+            if (dateFin.getDay() === 0) dateFin.setDate(dateFin.getDate() - 1);
+            return dateFin;
+        }
+        
+        function calculerDateFinEnseignants() {
+            const anneeFin = getAnneeFin();
+            let dateFin = new Date(anneeFin, 5, 30);
+            if (dateFin.getDay() === 0) dateFin.setDate(dateFin.getDate() - 1);
+            return dateFin;
+        }
+        
+        function calculerVacancesPrintemps() {
+            const anneeFin = getAnneeFin();
+            let dateDebut = new Date(anneeFin, 2, 15);
+            if (dateDebut.getDay() !== 0) {
+                while (dateDebut.getDay() !== 0) dateDebut.setDate(dateDebut.getDate() + 1);
+            }
+            let dateFin = new Date(dateDebut);
+            dateFin.setDate(dateFin.getDate() + 14);
+            return { nom: "Vacances de printemps", type: "printemps", dateDebut: new Date(dateDebut), dateFin: new Date(dateFin) };
+        }
+        
+        function calculerVacancesHiver() {
+            const anneeDebut = getAnneeDebut();
+            const anneeFin = getAnneeFin();
+            let dateDebut = new Date(anneeDebut, 11, 20);
+            if (dateDebut.getDay() !== 0) {
+                while (dateDebut.getDay() !== 0) dateDebut.setDate(dateDebut.getDate() + 1);
+            }
+            let dateFin = new Date(dateDebut);
+            dateFin.setDate(dateFin.getDate() + 14);
+            const premierJanvier = new Date(anneeFin, 0, 1);
+            if (dateFin < premierJanvier) {
+                dateDebut = new Date(anneeDebut, 11, 22);
+                while (dateDebut.getDay() !== 0) dateDebut.setDate(dateDebut.getDate() + 1);
+                dateFin = new Date(dateDebut);
+                dateFin.setDate(dateFin.getDate() + 14);
+            }
+            return { nom: "Vacances d'hiver", type: "hiver", dateDebut: new Date(dateDebut), dateFin: new Date(dateFin) };
+        }
+        
+        function genererSemestres() {
+            const dateRentree = calculerDateRentree();
+            const dateFinEleves = calculerDateFinEleves();
+            const vacancesHiver = calculerVacancesHiver();
+            const vacancesPrintemps = calculerVacancesPrintemps();
+            
+            let finSemestre1 = new Date(vacancesHiver.dateDebut);
+            finSemestre1.setDate(finSemestre1.getDate() - 1);
+            let debutSemestre2 = new Date(vacancesHiver.dateFin);
+            debutSemestre2.setDate(debutSemestre2.getDate() + 1);
+            let finSemestre2 = new Date(vacancesPrintemps.dateDebut);
+            finSemestre2.setDate(finSemestre2.getDate() - 1);
+            let debutSemestre3 = new Date(vacancesPrintemps.dateFin);
+            debutSemestre3.setDate(debutSemestre3.getDate() + 1);
+            let finSemestre3 = new Date(dateFinEleves);
+            
+            if (finSemestre1.getDay() === 6) finSemestre1.setDate(finSemestre1.getDate() - 1);
+            if (debutSemestre2.getDay() === 0) debutSemestre2.setDate(debutSemestre2.getDate() + 1);
+            if (finSemestre2.getDay() === 6) finSemestre2.setDate(finSemestre2.getDate() - 1);
+            if (debutSemestre3.getDay() === 0) debutSemestre3.setDate(debutSemestre3.getDate() + 1);
+            
+            return [
+                { numero: 1, nom: "Semestre 1", dateDebut: new Date(dateRentree), dateFin: new Date(finSemestre1) },
+                { numero: 2, nom: "Semestre 2", dateDebut: new Date(debutSemestre2), dateFin: new Date(finSemestre2) },
+                { numero: 3, nom: "Semestre 3", dateDebut: new Date(debutSemestre3), dateFin: new Date(finSemestre3) }
+            ];
+        }
+        
+        function getSemestrePourDate(date) {
+            if (!semestres || semestres.length === 0) return null;
+            const dateTs = new Date(date).setHours(0, 0, 0, 0);
+            for (const semestre of semestres) {
+                const debutTs = new Date(semestre.dateDebut).setHours(0, 0, 0, 0);
+                const finTs = new Date(semestre.dateFin).setHours(0, 0, 0, 0);
+                if (dateTs >= debutTs && dateTs <= finTs) return semestre;
+            }
+            return null;
+        }
+        
+        function genererPeriodesExamens() {
+            const anneeDebut = getAnneeDebut();
+            const anneeFin = getAnneeFin();
+            return [
+                { nom: "Évaluations orales et pratiques", trimestre: 1, type: "oral_pratique", dateDebut: new Date(anneeDebut, 10, 3), dateFin: new Date(anneeDebut, 10, 29), description: "Évaluations orales et pratiques du premier trimestre", classesConcernees: ["Toutes"], estActif: true },
+                { nom: "Épreuves écrites", trimestre: 1, type: "ecrit", dateDebut: new Date(anneeDebut, 11, 1), dateFin: new Date(anneeDebut, 11, 13), description: "Épreuves écrites du premier trimestre", classesConcernees: ["Toutes"], estActif: true },
+                { nom: "Évaluations orales et pratiques - 2ème trimestre", trimestre: 2, type: "oral_pratique", dateDebut: new Date(anneeFin, 1, 10), dateFin: new Date(anneeFin, 1, 28), description: "Évaluations orales et pratiques du deuxième trimestre", classesConcernees: ["Toutes"], estActif: true },
+                { nom: "Épreuves écrites - 2ème trimestre", trimestre: 2, type: "ecrit", dateDebut: new Date(anneeFin, 2, 2), dateFin: new Date(anneeFin, 2, 14), description: "Épreuves écrites du deuxième trimestre", classesConcernees: ["Toutes"], estActif: true },
+                { nom: "Évaluations finales - Orales et pratiques", trimestre: 3, type: "oral_pratique_final", dateDebut: new Date(anneeFin, 4, 19), dateFin: new Date(anneeFin, 4, 24), description: "Évaluations orales et pratiques de fin d'année", classesConcernees: ["Toutes"], estActif: true },
+                { nom: "Épreuves écrites finales - Semaine bloquée", trimestre: 3, type: "ecrit_final_bloque", dateDebut: new Date(anneeFin, 4, 26), dateFin: new Date(anneeFin, 4, 31), description: "Épreuves écrites finales", classesConcernees: ["3ème à 6ème année"], estActif: true }
+            ];
+        }
+        
+        function estFerieNational(date) {
+            const mois = date.getMonth();
+            const jour = date.getDate();
+            const joursFeriesNationaux = [
+                { mois: 9, jour: 15 }, { mois: 11, jour: 17 }, { mois: 0, jour: 1 },
+                { mois: 2, jour: 20 }, { mois: 3, jour: 9 }, { mois: 4, jour: 1 },
+                { mois: 6, jour: 25 }, { mois: 7, jour: 13 }
+            ];
+            return joursFeriesNationaux.some(f => f.mois === mois && f.jour === jour);
+        }
+        
+        function getDatesReligieuses() {
+            return {
+                2024: { ramadan: new Date(2024, 2, 11), aidElFitr: new Date(2024, 3, 10), aidElAdha: new Date(2024, 5, 16), mouled: new Date(2024, 8, 15) },
+                2025: { ramadan: new Date(2025, 2, 1), aidElFitr: new Date(2025, 2, 31), aidElAdha: new Date(2025, 5, 6), mouled: new Date(2025, 8, 4) },
+                2026: { ramadan: new Date(2026, 1, 18), aidElFitr: new Date(2026, 2, 20), aidElAdha: new Date(2026, 4, 27), mouled: new Date(2026, 7, 25) },
+                2027: { ramadan: new Date(2027, 1, 8), aidElFitr: new Date(2027, 2, 10), aidElAdha: new Date(2027, 4, 17), mouled: new Date(2027, 7, 15) },
+                2028: { ramadan: new Date(2028, 0, 28), aidElFitr: new Date(2028, 1, 27), aidElAdha: new Date(2028, 4, 5), mouled: new Date(2028, 7, 3) }
+            };
+        }
+        
+        function genererJoursFeries() {
+            const anneeDebut = getAnneeDebut();
+            const anneeFin = getAnneeFin();
+            const fetes = [];
+            const datesReligieuses = getDatesReligieuses();
+            
+            for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+                for (let mois = 0; mois < 12; mois++) {
+                    for (let jour = 1; jour <= 31; jour++) {
+                        const date = new Date(annee, mois, jour);
+                        if (date.getFullYear() === annee && estFerieNational(date)) {
+                            let finalDate = new Date(date);
+                            if (finalDate.getDay() === 0) finalDate.setDate(finalDate.getDate() + 1);
+                            fetes.push({ date: finalDate, nom: getNomFeteNationale(finalDate), type: 'national' });
+                        }
+                    }
+                }
+            }
+            
+            for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+                if (datesReligieuses[annee]) {
+                    const rel = datesReligieuses[annee];
+                    const ajouterFete = (date, nom) => {
+                        if (date && date.getFullYear() === annee) {
+                            let finalDate = new Date(date);
+                            if (finalDate.getDay() === 0) finalDate.setDate(finalDate.getDate() + 1);
+                            fetes.push({ date: finalDate, nom: nom, type: 'religieux' });
+                        }
+                    };
+                    ajouterFete(rel.ramadan, "Début du Ramadan");
+                    ajouterFete(rel.aidElFitr, "Aïd el-Fitr");
+                    ajouterFete(rel.aidElAdha, "Aïd el-Adha");
+                    ajouterFete(rel.mouled, "Mouled");
+                }
+            }
+            
+            const anneeFinCal = anneeFin;
+            if (datesReligieuses[anneeFinCal] && datesReligieuses[anneeFinCal].ramadan) {
+                const ramadanDebut = new Date(datesReligieuses[anneeFinCal].ramadan);
+                const ramadanFin = new Date(ramadanDebut);
+                ramadanFin.setDate(ramadanFin.getDate() + 29);
+                periodesRamadan = { dateDebut: ramadanDebut, dateFin: ramadanFin };
+            } else if (datesReligieuses[anneeDebut] && datesReligieuses[anneeDebut].ramadan) {
+                const ramadanDebut = new Date(datesReligieuses[anneeDebut].ramadan);
+                const ramadanFin = new Date(ramadanDebut);
+                ramadanFin.setDate(ramadanFin.getDate() + 29);
+                periodesRamadan = { dateDebut: ramadanDebut, dateFin: ramadanFin };
+            }
+            return fetes;
+        }
+        
+        function getNomFeteNationale(date) {
+            const mois = date.getMonth();
+            const jour = date.getDate();
+            if (mois === 9 && jour === 15) return "Fête de l'évacuation";
+            if (mois === 11 && jour === 17) return "Fête de la révolution";
+            if (mois === 0 && jour === 1) return "Nouvel an";
+            if (mois === 2 && jour === 20) return "Fête de l'indépendance";
+            if (mois === 3 && jour === 9) return "Fête des martyrs";
+            if (mois === 4 && jour === 1) return "Fête du travail";
+            if (mois === 6 && jour === 25) return "Fête de la république";
+            if (mois === 7 && jour === 13) return "Fête de la femme";
+            return "Jour férié";
+        }
+        
+        function genererEvenementsSpeciaux() {
+            const evenements = [];
+            const dateRentree = calculerDateRentree();
+            const dateFinEleves = calculerDateFinEleves();
+            const vacancesHiver = calculerVacancesHiver();
+            const vacancesPrintemps = calculerVacancesPrintemps();
+            evenements.push(
+                { titre: "Rentrée scolaire", date: dateRentree, type: "scolaire", description: "Premier jour de l'année scolaire" },
+                { titre: vacancesHiver.nom, date: vacancesHiver.dateDebut, type: "vacances", description: `Début des vacances d'hiver` },
+                { titre: vacancesPrintemps.nom, date: vacancesPrintemps.dateDebut, type: "vacances", description: `Début des vacances de printemps` },
+                { titre: "Fin des cours (élèves)", date: dateFinEleves, type: "scolaire", description: "Dernier jour de cours pour les élèves" }
+            );
+            return evenements;
+        }
+        
+        function genererCalendrierComplet() {
+            periodesVacances = [calculerVacancesHiver(), calculerVacancesPrintemps()];
+            semestres = genererSemestres();
+            periodesExamens = genererPeriodesExamens();
+            const fetes = genererJoursFeries();
+            joursFeries = fetes;
+            evenementsSpeciaux = genererEvenementsSpeciaux();
+            document.getElementById('anneeAffichage').innerText = state.anneeScolaire;
+            mettreAJourStatistiques();
+            afficherCalendrier();
+            chargerEvenementsAVenir();
+            mettreAJourCompteurs();
+        }
+        
+        // ============================================
+        // FONCTIONS UTILITAIRES
+        // ============================================
+        
+        function formatDateToYYYYMMDD(date) {
+            if (!date) return null;
+            const d = new Date(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function showToast(titre, message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast';
+            toast.style.borderLeftColor = type === 'success' ? 'var(--primary-green)' : (type === 'warning' ? 'var(--accent-orange)' : 'var(--blue-light)');
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <strong>${titre}</strong>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;cursor:pointer;">✕</button>
+                </div>
+                <div class="toast-body">${message}</div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+        
+        // ============================================
+        // GESTION DES ÉVÉNEMENTS
+        // ============================================
+        
+        function getEvenementsJour(date) {
+            const evenements = [];
+            const dateCompare = new Date(date);
+            dateCompare.setHours(0, 0, 0, 0);
+            
+            joursFeries.forEach(f => {
+                const fDate = new Date(f.date);
+                if (fDate.getTime() === dateCompare.getTime()) {
+                    evenements.push({ nom: f.nom, type: f.type, date: formatDateToYYYYMMDD(dateCompare), estPersonnel: false });
+                }
+            });
+            
+            periodesVacances.forEach(v => {
+                if (dateCompare >= v.dateDebut && dateCompare <= v.dateFin) {
+                    evenements.push({ nom: v.nom, type: 'vacance', date: formatDateToYYYYMMDD(dateCompare), estPersonnel: false });
+                }
+            });
+            
+            if (periodesRamadan && dateCompare >= periodesRamadan.dateDebut && dateCompare <= periodesRamadan.dateFin) {
+                evenements.push({ nom: 'Ramadan', type: 'ramadan', date: formatDateToYYYYMMDD(dateCompare), estPersonnel: false });
+            }
+            
+            periodesExamens.forEach(examen => {
+                if (dateCompare >= examen.dateDebut && dateCompare <= examen.dateFin && examen.estActif !== false) {
+                    evenements.push({ nom: examen.nom, type: 'exam', date: formatDateToYYYYMMDD(dateCompare), description: examen.description, classes: examen.classesConcernees?.join(', ') || '', estPersonnel: false });
+                }
+            });
+            
+            evenementsSpeciaux.forEach(e => {
+                const eDate = new Date(e.date);
+                if (eDate.getTime() === dateCompare.getTime()) {
+                    evenements.push({ nom: e.titre, type: e.type, date: formatDateToYYYYMMDD(dateCompare), estPersonnel: false });
+                }
+            });
+            
+            evenementsPersonnels.forEach(e => {
+                if (e.type === 'periode' && e.debut && e.fin) {
+                    const debut = new Date(e.debut);
+                    const fin = new Date(e.fin);
+                    if (dateCompare >= debut && dateCompare <= fin) {
+                        evenements.push({ nom: e.nom, type: e.categorie || 'personal', date: formatDateToYYYYMMDD(dateCompare), description: e.description, id: e.id, estPersonnel: true, couleur: e.couleur });
+                    }
+                } else if (e.type === 'jour' && e.date) {
+                    const dateEvent = new Date(e.date);
+                    if (dateEvent.getTime() === dateCompare.getTime()) {
+                        evenements.push({ nom: e.nom, type: e.categorie || 'personal', date: formatDateToYYYYMMDD(dateCompare), description: e.description, id: e.id, estPersonnel: true, couleur: e.couleur });
+                    }
+                }
+            });
+            return evenements;
+        }
+        
+        // ============================================
+        // AFFICHAGE DU CALENDRIER
+        // ============================================
+        
+        function initCurrentMonth() {
+            const today = new Date();
+            state.currentMonth = today.getMonth();
+            state.currentYear = today.getFullYear();
+        }
+        
+        function genererCalendrierMois(month, year) {
+            const today = new Date();
+            const todayStr = formatDateToYYYYMMDD(today);
+            const moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            const joursSemaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            const premierJour = new Date(year, month, 1);
+            const dernierJour = new Date(year, month + 1, 0);
+            const startDayOfWeek = premierJour.getDay() === 0 ? 6 : premierJour.getDay() - 1;
+            const nbJours = dernierJour.getDate();
+            
+            let semestreClass = '';
+            let semestreNum = '';
+            const moisDateStr = new Date(year, month, 1);
+            const semestre = getSemestrePourDate(moisDateStr);
+            if (semestre) {
+                semestreClass = `semestre${semestre.numero}`;
+                semestreNum = semestre.nom || `Semestre ${semestre.numero}`;
+            }
+            
+            let html = `<div class="month-header"><div class="month-name">${moisNoms[month]} ${year}<span class="semestre-tag ${semestreClass}">${semestreNum}</span></div>`;
+            for (let i = 0; i < 7; i++) html += `<div class="day-header">${joursSemaine[i]}</div>`;
+            html += `</div>`;
+            
+            let semaine = 1;
+            let jour = 1;
+            html += `<div class="week-row"><div class="week-number">S${semaine}</div>`;
+            for (let i = 0; i < startDayOfWeek; i++) {
+                html += `<div class="day-cell" style="opacity: 0.3; background: transparent;"></div>`;
+            }
+            
+            while (jour <= nbJours) {
+                const dateObj = new Date(year, month, jour);
+                const dateStr = formatDateToYYYYMMDD(dateObj);
+                const evenements = getEvenementsJour(dateObj);
+                const classes = evenements.map(e => e.type).join(' ');
+                const isToday = (dateStr === todayStr);
+                const aDesPersonnels = evenements.some(e => e.estPersonnel === true);
+                let classesFinales = classes;
+                if (aDesPersonnels && !classes.includes('personal')) classesFinales += ' personal';
+                
+                html += `<div class="day-cell ${classesFinales} ${isToday ? 'today' : ''}" onclick="voirDetailsJour('${dateStr}')">`;
+                html += `<div class="day-number">${jour}</div>`;
+                if (evenements.length > 0) {
+                    html += `<div class="day-events">`;
+                    const typesVus = new Set();
+                    evenements.slice(0, 3).forEach(e => {
+                        if (!typesVus.has(e.type)) {
+                            typesVus.add(e.type);
+                            html += `<span class="event-dot ${e.type}" title="${e.nom}" style="${e.couleur ? `background: ${e.couleur};` : ''}"></span>`;
+                        }
+                    });
+                    if (evenements.length > 3) html += `<span class="text-small">+${evenements.length-3}</span>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+                jour++;
+                const jourSemaineActuel = (startDayOfWeek + jour - 1) % 7;
+                if (jourSemaineActuel === 0 && jour <= nbJours) {
+                    html += `</div><div class="week-row"><div class="week-number">S${++semaine}</div>`;
+                }
+            }
+            const joursRestants = (7 - ((startDayOfWeek + nbJours) % 7)) % 7;
+            for (let i = 0; i < joursRestants; i++) {
+                html += `<div class="day-cell" style="opacity: 0.3; background: transparent;"></div>`;
+            }
+            html += `</div>`;
+            return html;
+        }
+        
+        function afficherCalendrier() {
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = genererCalendrierMois(state.currentMonth, state.currentYear);
+            const moisNoms = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            document.getElementById('currentMonthDisplay').innerHTML = `${moisNoms[state.currentMonth]} ${state.currentYear}`;
+            appliquerFiltre();
+        }
+        
+        function appliquerFiltre() {
+            if (state.filtreType === 'all') {
+                document.querySelectorAll('.day-cell').forEach(cell => cell.style.display = 'flex');
+                return;
+            }
+            document.querySelectorAll('.day-cell').forEach(cell => {
+                if (cell.classList.contains(state.filtreType)) cell.style.display = 'flex';
+                else if (cell.children.length > 0 && !cell.classList.contains(state.filtreType)) cell.style.display = 'none';
+                else if (cell.children.length === 0) cell.style.display = 'flex';
+            });
+        }
+        
+        function changerMois(delta) {
+            let newMonth = state.currentMonth + delta;
+            let newYear = state.currentYear;
+            if (newMonth < 0) { newMonth = 11; newYear--; }
+            if (newMonth > 11) { newMonth = 0; newYear++; }
+            if (newYear < 2024 || newYear > 2028) return;
+            state.currentMonth = newMonth;
+            state.currentYear = newYear;
+            afficherCalendrier();
+        }
+        
+        function allerAujourdhui() {
+            const today = new Date();
+            state.currentMonth = today.getMonth();
+            state.currentYear = today.getFullYear();
+            afficherCalendrier();
+        }
+        
+        // ============================================
+        // STATISTIQUES
+        // ============================================
+        
+        function updateCurrentDateBadge() {
+            const today = new Date();
+            document.getElementById('currentDateText').innerHTML = today.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        
+        function mettreAJourStatistiques() {
+            const nbFeries = joursFeries.length;
+            let nbVacances = 0;
+            periodesVacances.forEach(v => {
+                nbVacances += Math.round((v.dateFin - v.dateDebut) / (1000*60*60*24)) + 1;
+            });
+            const totalJoursCours = Math.max(0, 180 - nbFeries - nbVacances);
+            document.getElementById('joursCours').textContent = totalJoursCours;
+            document.getElementById('joursFeries').textContent = nbFeries;
+            document.getElementById('joursVacances').textContent = nbVacances;
+            if (periodesRamadan) {
+                document.getElementById('ramadanDates').textContent = `${periodesRamadan.dateDebut.getDate()} ${['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'][periodesRamadan.dateDebut.getMonth()]}`;
+                document.getElementById('ramadanSub').textContent = periodesRamadan.dateDebut.getFullYear().toString();
+            }
+        }
+        
+        function getRamadanStatus() {
+            const aujourdhui = new Date(); aujourdhui.setHours(0,0,0,0);
+            if (!periodesRamadan) return 'Non défini';
+            if (aujourdhui < periodesRamadan.dateDebut) return `J-${Math.ceil((periodesRamadan.dateDebut - aujourdhui) / (1000*60*60*24))}`;
+            if (aujourdhui <= periodesRamadan.dateFin) return 'En cours 🌙';
+            return 'Terminé ✓';
+        }
+        
+        function mettreAJourCompteurs() {
+            const aujourdhui = new Date(); aujourdhui.setHours(0,0,0,0);
+            const dateRentree = calculerDateRentree();
+            const joursEcoules = Math.max(0, Math.round((aujourdhui - dateRentree) / (1000*60*60*24)));
+            const totalJours = 180;
+            document.getElementById('joursEcoules').textContent = `${joursEcoules}/${totalJours}`;
+            document.getElementById('progressAnnee').style.width = Math.min(100, (joursEcoules/totalJours)*100) + '%';
+            const semestre = getSemestrePourDate(aujourdhui);
+            document.getElementById('semestreEnCours').textContent = semestre ? (semestre.nom || `Semestre ${semestre.numero}`) : 'Hors période';
+            for (const v of periodesVacances) {
+                if (v.dateDebut > aujourdhui) {
+                    document.getElementById('prochainesVacances').textContent = v.nom.split(' ')[1] || v.type;
+                    break;
+                }
+            }
+            for (const f of joursFeries) {
+                if (f.date > aujourdhui) {
+                    document.getElementById('prochainFerie').textContent = f.nom;
+                    break;
+                }
+            }
+            document.getElementById('ramadanCountdown').textContent = getRamadanStatus();
+            const dateFin = calculerDateFinEleves();
+            document.getElementById('finCours').textContent = `${dateFin.getDate()} ${['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'][dateFin.getMonth()]} ${dateFin.getFullYear()}`;
+        }
+        
+        // ============================================
+        // ÉVÉNEMENTS À VENIR
+        // ============================================
+        
+        function chargerEvenementsAVenir() {
+            const aujourdhui = new Date(); aujourdhui.setHours(0,0,0,0);
+            const evenements = [];
+            
+            joursFeries.forEach(f => { if (f.date >= aujourdhui) evenements.push({ date: f.date, nom: f.nom, type: f.type, estPersonnel: false }); });
+            periodesVacances.forEach(v => { if (v.dateDebut >= aujourdhui) evenements.push({ date: v.dateDebut, nom: v.nom, type: 'vacance', estPersonnel: false }); });
+            periodesExamens.forEach(examen => { if (examen.dateDebut >= aujourdhui && examen.estActif !== false) evenements.push({ date: examen.dateDebut, nom: examen.nom, type: 'exam', fin: examen.dateFin, estPersonnel: false }); });
+            evenementsSpeciaux.forEach(e => { if (e.date >= aujourdhui) evenements.push({ date: e.date, nom: e.titre, type: e.type, estPersonnel: false }); });
+            evenementsPersonnels.forEach(e => {
+                let dateEvent = e.type === 'jour' ? e.date : e.debut;
+                if (dateEvent && dateEvent >= aujourdhui) evenements.push({ date: dateEvent, nom: e.nom, type: e.categorie || 'personal', estPersonnel: true, id: e.id, couleur: e.couleur });
+            });
+            
+            evenements.sort((a,b) => a.date - b.date);
+            let html = '';
+            if (evenements.length === 0) {
+                html = '<p class="no-data">Aucun événement à venir</p>';
+            } else {
+                evenements.slice(0,6).forEach(e => {
+                    const date = new Date(e.date);
+                    const joursRestants = Math.ceil((date - aujourdhui) / (1000*60*60*24));
+                    let typeLabel = '';
+                    if (e.type === 'personal') typeLabel = '👤 Personnel';
+                    else if (e.type === 'vacance') typeLabel = 'Vacances';
+                    else if (e.type === 'ramadan') typeLabel = 'Ramadan';
+                    else if (e.type === 'exam') typeLabel = 'Examens';
+                    else if (e.type === 'ferie' || e.type === 'national') typeLabel = 'Jour férié';
+                    else if (e.type === 'religieux') typeLabel = 'Fête religieuse';
+                    else typeLabel = 'Événement';
+                    const badgeClass = e.estPersonnel ? 'personal' : e.type;
+                    html += `<div class="event-item ${badgeClass}" onclick="${e.estPersonnel ? `modifierEvenementPersonnelDepuisId('${e.id}')` : `voirDetailsJour('${formatDateToYYYYMMDD(date)}')`}" style="${e.couleur ? `border-left-color: ${e.couleur};` : ''}">
+                        <div class="event-date"><div class="event-day">${date.getDate()}</div><div class="event-month">${['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'][date.getMonth()]}</div></div>
+                        <div class="event-details"><div class="event-title">${e.nom} ${e.estPersonnel ? '<span style="font-size:0.7rem;">(perso)</span>' : ''}</div>
+                        <div class="event-type"><span class="event-type-badge ${badgeClass}">${typeLabel}</span>
+                        <span class="event-remaining">${joursRestants > 0 ? `Dans ${joursRestants} j` : "Aujourd'hui"}</span></div></div>
+                        ${e.estPersonnel ? `<div class="event-actions"><button class="event-delete" onclick="event.stopPropagation(); supprimerEvenementPersonnel('${e.id}')">🗑️</button></div>` : ''}
+                    </div>`;
+                });
+            }
+            document.getElementById('eventsList').innerHTML = html;
+        }
+        
+        // ============================================
+        // MODAL DÉTAILS
+        // ============================================
+        
+        function voirDetailsJour(dateStr) {
+            const modal = document.getElementById('eventModal');
+            const modalBody = document.getElementById('modalBody');
+            const date = new Date(dateStr);
+            const evenements = getEvenementsJour(date);
+            let html = `<div style="text-align:center;margin-bottom:1rem;"><h3>${date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</h3></div>`;
+            if (evenements.length === 0) {
+                html += `<p class="no-data">Aucun événement particulier</p>`;
+            } else {
+                const persoEvents = evenements.filter(e => e.estPersonnel);
+                const autresEvents = evenements.filter(e => !e.estPersonnel);
+                if (autresEvents.length > 0) {
+                    html += `<h4 style="margin: 1rem 0 0.5rem 0;">📅 Événements officiels</h4>`;
+                    autresEvents.forEach(e => {
+                        let typeLabel = '';
+                        if (e.type === 'vacance') typeLabel = 'Période de vacances';
+                        else if (e.type === 'ramadan') typeLabel = 'Mois sacré du Ramadan';
+                        else if (e.type === 'exam') typeLabel = 'Examens';
+                        else if (e.type === 'ferie') typeLabel = 'Jour férié';
+                        else if (e.type === 'national') typeLabel = 'Fête nationale';
+                        else if (e.type === 'religieux') typeLabel = 'Fête religieuse';
+                        else typeLabel = 'Événement';
+                        html += `<div class="event-detail" style="background: var(--gray-bg);">
+                            <strong>${e.nom}</strong><br>
+                            <small>${typeLabel}</small>
+                            ${e.description ? `<br><small>📝 ${e.description}</small>` : ''}
+                            ${e.classes ? `<br><small>👥 ${e.classes}</small>` : ''}
+                        </div>`;
+                    });
+                }
+                if (persoEvents.length > 0) {
+                    html += `<h4 style="margin: 1rem 0 0.5rem 0;">👤 Mes événements personnels</h4>`;
+                    persoEvents.forEach(e => {
+                        html += `<div class="event-detail" style="background: #e8e8ff; border-left: 4px solid ${e.couleur || '#6c5ce7'};">
+                            <strong>${e.nom}</strong>
+                            <button class="btn-icon" style="float: right;" onclick="event.stopPropagation(); modifierEvenementPersonnelDepuisId('${e.id}'); fermerModal();">✏️</button>
+                            <br>
+                            <small>${e.description || 'Aucune description'}</small>
+                            <br>
+                            <small style="color: #666;">Personnel</small>
+                        </div>`;
+                    });
+                }
+            }
+            window.currentDetailDate = dateStr;
+            modalBody.innerHTML = html;
+            modal.classList.add('active');
+        }
+        
+        function fermerModal() { document.getElementById('eventModal').classList.remove('active'); }
+        
+        function ajouterRappelDepuisModal() {
+            if (window.currentDetailDate) showToast('🔔 Rappel ajouté', `Rappel pour le ${new Date(window.currentDetailDate).toLocaleDateString('fr-FR')}`);
+            else showToast('🔔 Rappel ajouté', 'Un rappel a été ajouté');
+            fermerModal();
+        }
+        
+        function ouvrirAjoutPersonnelDepuisModal() {
+            fermerModal();
+            ouvrirModalEvenementPersonnel();
+            if (window.currentDetailDate) {
+                document.getElementById('eventDate').value = window.currentDetailDate;
+            }
+        }
+        
+        // ============================================
+        // MODAL ÉVÉNEMENTS PERSONNELS
+        // ============================================
+        
+        let currentEditId = null;
+        
+        function ouvrirModalEvenementPersonnel() {
+            currentEditId = null;
+            document.getElementById('personnalModalTitle').innerText = '➕ Ajouter un événement personnel';
+            document.getElementById('personnalEventForm').reset();
+            document.getElementById('eventId').value = '';
+            document.getElementById('deleteEventBtn').style.display = 'none';
+            document.getElementById('eventDate').valueAsDate = new Date();
+            document.getElementById('jourUniqueGroup').style.display = 'block';
+            document.getElementById('periodeGroup').style.display = 'none';
+            document.getElementById('personnalEventModal').classList.add('active');
+        }
+        
+        function fermerModalPersonnel() {
+            document.getElementById('personnalEventModal').classList.remove('active');
+            currentEditId = null;
+        }
+        
+        function modifierEvenementPersonnelDepuisId(id) {
+            const evt = evenementsPersonnels.find(e => e.id === id);
+            if (!evt) return;
+            currentEditId = id;
+            document.getElementById('personnalModalTitle').innerText = '✏️ Modifier un événement personnel';
+            document.getElementById('eventTitre').value = evt.nom;
+            document.getElementById('eventDescription').value = evt.description || '';
+            document.getElementById('eventCouleur').value = evt.couleur || '#6c5ce7';
+            document.getElementById('eventId').value = id;
+            document.getElementById('deleteEventBtn').style.display = 'block';
+            
+            const categorie = evt.categorie || 'personal';
+            document.querySelectorAll('input[name="eventCategorie"]').forEach(radio => {
+                if (radio.value === categorie) radio.checked = true;
+            });
+            document.querySelectorAll('input[name="eventType"]').forEach(radio => {
+                if (radio.value === evt.type) radio.checked = true;
+            });
+            
+            if (evt.type === 'jour') {
+                document.getElementById('jourUniqueGroup').style.display = 'block';
+                document.getElementById('periodeGroup').style.display = 'none';
+                if (evt.date) document.getElementById('eventDate').value = formatDateToYYYYMMDD(evt.date);
+            } else {
+                document.getElementById('jourUniqueGroup').style.display = 'none';
+                document.getElementById('periodeGroup').style.display = 'block';
+                if (evt.debut) document.getElementById('eventDateDebut').value = formatDateToYYYYMMDD(evt.debut);
+                if (evt.fin) document.getElementById('eventDateFin').value = formatDateToYYYYMMDD(evt.fin);
+            }
+            document.getElementById('personnalEventModal').classList.add('active');
+        }
+        
+        function sauvegarderEvenementPersonnel() {
+            const titre = document.getElementById('eventTitre').value.trim();
+            if (!titre) {
+                showToast('Erreur', 'Le titre est requis', 'warning');
+                return;
+            }
+            const categorie = document.querySelector('input[name="eventCategorie"]:checked').value;
+            const type = document.querySelector('input[name="eventType"]:checked').value;
+            const description = document.getElementById('eventDescription').value;
+            const couleur = document.getElementById('eventCouleur').value;
+            
+            let donnees = { nom: titre, categorie: categorie, type: type, description: description, couleur: couleur };
+            
+            if (type === 'jour') {
+                const date = document.getElementById('eventDate').value;
+                if (!date) { showToast('Erreur', 'La date est requise', 'warning'); return; }
+                donnees.date = new Date(date);
+            } else {
+                const debut = document.getElementById('eventDateDebut').value;
+                const fin = document.getElementById('eventDateFin').value;
+                if (!debut || !fin) { showToast('Erreur', 'Les dates de début et fin sont requises', 'warning'); return; }
+                if (new Date(debut) > new Date(fin)) { showToast('Erreur', 'La date de début doit être antérieure à la date de fin', 'warning'); return; }
+                donnees.debut = new Date(debut);
+                donnees.fin = new Date(fin);
+            }
+            
+            if (currentEditId) {
+                modifierEvenementPersonnel(currentEditId, donnees);
+                showToast('Succès', 'Événement personnel modifié');
+            } else {
+                ajouterEvenementPersonnel(donnees);
+                showToast('Succès', 'Événement personnel ajouté');
+            }
+            fermerModalPersonnel();
+            afficherCalendrier();
+            chargerEvenementsAVenir();
+        }
+        
+        function reinitialiserDonnees() {
+            evenementsPersonnalises = [];
+            afficherCalendrier();
+            chargerEvenementsAVenir();
+            showToast('🔄 Réinitialisation', 'Tous les événements personnalisés ont été supprimés');
+        }
+        
+        // ============================================
+        // UTILITAIRES
+        // ============================================
+        
+        function exporterCalendrier() {
+            const data = { 
+                periodesExamens: periodesExamens.map(e => ({ ...e, dateDebut: e.dateDebut.toISOString(), dateFin: e.dateFin.toISOString() })),
+                semestres: semestres.map(s => ({ ...s, dateDebut: s.dateDebut.toISOString(), dateFin: s.dateFin.toISOString() })),
+                periodesVacances: periodesVacances.map(v => ({ ...v, dateDebut: v.dateDebut.toISOString(), dateFin: v.dateFin.toISOString() })),
+                joursFeries: joursFeries.map(f => ({ ...f, date: f.date.toISOString() })),
+                periodesRamadan: periodesRamadan ? { dateDebut: periodesRamadan.dateDebut.toISOString(), dateFin: periodesRamadan.dateFin.toISOString() } : null,
+                evenementsSpeciaux: evenementsSpeciaux.map(e => ({ ...e, date: e.date.toISOString() })),
+                evenementsPersonnalises: evenementsPersonnalises,
+                evenementsPersonnels: evenementsPersonnels.map(e => ({ ...e, date: e.date ? e.date.toISOString() : null, debut: e.debut ? e.debut.toISOString() : null, fin: e.fin ? e.fin.toISOString() : null })),
+                anneeScolaire: state.anneeScolaire,
+                exportDate: new Date().toISOString() 
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `calendrier-${state.anneeScolaire}-${new Date().toISOString().slice(0,10)}.json`; a.click();
+            URL.revokeObjectURL(url);
+            showToast('📥 Export', 'Calendrier exporté avec succès !');
+        }
+        
+        function imprimerCalendrier() { window.print(); }
+        
+        function filtrerType(type, el) {
+            document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            state.filtreType = type;
+            if (type === 'all') {
+                document.querySelectorAll('.day-cell').forEach(cell => cell.style.display = 'flex');
+            } else {
+                document.querySelectorAll('.day-cell').forEach(cell => {
+                    if (cell.classList.contains(type)) cell.style.display = 'flex';
+                    else if (cell.children.length > 0 && !cell.classList.contains(type)) cell.style.display = 'none';
+                    else if (cell.children.length === 0) cell.style.display = 'flex';
+                });
+            }
+        }
+        
+        function scrollToSemestre(n) { const el = document.querySelector(`.semestre${n}`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function scrollToFeries() { const el = document.querySelector('.ferie'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function scrollToVacances() { const el = document.querySelector('.vacance'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function scrollToRamadan() { const el = document.querySelector('.ramadan'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        
+        function changerAnneeScolaire() {
+            const select = document.getElementById('anneeSelect');
+            state.anneeScolaire = select.value;
+            genererCalendrierComplet();
+        }
+        
+        // Gestion du changement de type d'événement
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeRadios = document.querySelectorAll('input[name="eventType"]');
+            typeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'jour') {
+                        document.getElementById('jourUniqueGroup').style.display = 'block';
+                        document.getElementById('periodeGroup').style.display = 'none';
+                    } else {
+                        document.getElementById('jourUniqueGroup').style.display = 'none';
+                        document.getElementById('periodeGroup').style.display = 'block';
+                    }
+                });
+            });
+        });
+        
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        
+        function initialiser() {
+            chargerEvenementsPersonnels();
+            initCurrentMonth();
+            updateCurrentDateBadge();
+            genererCalendrierComplet();
+            setInterval(() => { updateCurrentDateBadge(); mettreAJourCompteurs(); }, 60000);
+            console.log('📅 Calendrier initialisé pour', state.anneeScolaire);
+            console.log(`👤 ${evenementsPersonnels.length} événement(s) personnel(s) chargé(s)`);
+        }
+        
+        initialiser();
+        
+        // Exposer les fonctions globalement
+        window.voirDetailsJour = voirDetailsJour;
+        window.fermerModal = fermerModal;
+        window.changerMois = changerMois;
+        window.allerAujourdhui = allerAujourdhui;
+        window.filtrerType = filtrerType;
+        window.exporterCalendrier = exporterCalendrier;
+        window.imprimerCalendrier = imprimerCalendrier;
+        window.ajouterRappelDepuisModal = ajouterRappelDepuisModal;
+        window.scrollToSemestre = scrollToSemestre;
+        window.scrollToFeries = scrollToFeries;
+        window.scrollToVacances = scrollToVacances;
+        window.scrollToRamadan = scrollToRamadan;
+        window.reinitialiserDonnees = reinitialiserDonnees;
+        window.changerAnneeScolaire = changerAnneeScolaire;
+        window.ouvrirModalEvenementPersonnel = ouvrirModalEvenementPersonnel;
+        window.fermerModalPersonnel = fermerModalPersonnel;
+        window.sauvegarderEvenementPersonnel = sauvegarderEvenementPersonnel;
+        window.supprimerEvenementPersonnel = supprimerEvenementPersonnel;
+        window.supprimerEvenementPersonnelDepuisModal = supprimerEvenementPersonnelDepuisModal;
+        window.modifierEvenementPersonnelDepuisId = modifierEvenementPersonnelDepuisId;
+        window.ouvrirAjoutPersonnelDepuisModal = ouvrirAjoutPersonnelDepuisModal;
+    </script>
+</body>
+</html>

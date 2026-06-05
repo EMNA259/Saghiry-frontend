@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des Matières</title>
+    <style>
+        /* ============ STYLES INSPIRÉS DE CLASSES.HTML, GESTION-CONGES.HTML ET ENSEIGNANTS.HTML ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --danger: #f03e3e;
+            --danger-dark: #c92a2a;
+            --warning: #f59f00;
+            --success: #37b24d;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* ============ EN-TÊTE INSPIRÉ ============ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .page-title:hover {
+            opacity: 0.8;
+        }
+
+        .dev-tools {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        /* ============ STATISTIQUES INSPIRÉES ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            color: var(--text-dark);
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-badge {
+            font-size: 0.7rem;
+            color: var(--primary-green);
+            background: rgba(76, 168, 150, 0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        /* ============ TABLEAU DES MATIÈRES INSPIRÉ ============ */
+        .table-matiere {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+
+        .table-matiere h2 {
+            color: var(--text-dark);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .table-matiere h2::before {
+            content: '📋';
+            font-size: 1.5rem;
+        }
+
+        .niveaux-fixes {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .niveau-fixe-badge {
+            background: linear-gradient(135deg, rgba(76, 168, 150, 0.1), rgba(76, 168, 150, 0.05));
+            color: var(--primary-dark);
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            border: 1px solid var(--primary-green);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .niveau-fixe-badge:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        .niveau-fixe-badge.active {
+            background: var(--primary-green);
+            color: white;
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.3);
+        }
+
+        .table-matiere table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .table-matiere th {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-matiere td {
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray-border);
+            text-align: center;
+            color: var(--text-soft);
+        }
+
+        .table-matiere tr:hover td {
+            background: rgba(76, 168, 150, 0.05);
+        }
+
+        .matiere-row {
+            font-weight: 600;
+            color: var(--text-dark);
+            background: rgba(76, 168, 150, 0.02);
+        }
+
+        /* ============ GRILLE DES MATIÈRES ============ */
+        .matieres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .matiere-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .matiere-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .matiere-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .matiere-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .matiere-nom {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .matiere-coeff {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--primary-green);
+        }
+
+        .niveaux-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 1rem 0;
+            border-top: 2px dashed var(--gray-border);
+            border-bottom: 2px dashed var(--gray-border);
+        }
+
+        .niveau-badge {
+            background: var(--gray-bg);
+            color: var(--text-soft);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--gray-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .niveau-badge:hover {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        .matiere-stats-mini {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .stat-mini {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* ============ BOUTON RETOUR ============ */
+        .back-button {
+            background: white;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        /* ============ SECTIONS DE DÉTAILS ============ */
+        .matiere-info-header {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .matiere-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .matiere-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: var(--gray-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .meta-label {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* ============ SECTIONS ENSEIGNANTS ============ */
+        .enseignants-section {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .enseignants-section h3 {
+            color: var(--text-dark);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .enseignants-section h3::before {
+            content: '👨‍🏫';
+            font-size: 1.5rem;
+        }
+
+        .enseignants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .enseignant-card {
+            background: var(--gray-bg);
+            border-radius: 16px;
+            padding: 1.2rem;
+            border-left: 4px solid var(--primary-green);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--gray-border);
+        }
+
+        .enseignant-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            background: white;
+            border-left-color: var(--accent-orange);
+        }
+
+        .enseignant-nom {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .enseignant-role {
+            display: inline-block;
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--primary-green);
+        }
+
+        .enseignant-role.permanent {
+            background: rgba(255, 148, 102, 0.1);
+            color: var(--accent-orange-dark);
+            border-color: var(--accent-orange);
+        }
+
+        .enseignant-email {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+        }
+
+        .enseignant-classes {
+            font-size: 0.75rem;
+            color: var(--primary-green);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+        }
+
+        .classe-tag {
+            background: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            font-size: 0.7rem;
+            color: var(--text-soft);
+        }
+
+        /* ============ SECTIONS NIVEAU ET CLASSE ============ */
+        .niveau-section {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .niveau-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .niveau-titre {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .classe-card {
+            background: var(--gray-bg);
+            border-radius: 20px;
+            padding: 1.2rem;
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+        }
+
+        .classe-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            background: white;
+        }
+
+        .classe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .classe-nom {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .classe-effectif {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--primary-green);
+        }
+
+        .classe-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .classe-stat {
+            text-align: center;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .classe-stat-label {
+            color: var(--text-light);
+            font-size: 0.7rem;
+        }
+
+        .classe-stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .btn-details {
+            width: 100%;
+            padding: 0.7rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-details:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(76, 168, 150, 0.3);
+        }
+
+        /* ============ MODAL INSPIRÉ ============ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-header h2 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* ============ DETAILS GRID ============ */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .detail-card {
+            background: var(--gray-bg);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--gray-border);
+        }
+
+        /* ============ ALERTES ============ */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            color: var(--primary-deep);
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: var(--danger-dark);
+            border-left: 4px solid var(--danger);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============ LOADING ============ */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: var(--danger-dark);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px solid #fecaca;
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .matieres-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .enseignants-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .classes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .matiere-meta {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1 class="page-title" onclick="location.reload()">
+            <span>📚</span> Gestion des Matières
+        </h1>
+        <div class="dev-tools">
+            <button class="btn-secondary" onclick="initialiserMatieres()" title="Initialiser les matières">
+                <span>🌱</span> Initialiser
+            </button>
+            <button class="btn-secondary" onclick="refreshData()" title="Rafraîchir les données">
+                <span>🔄</span> Rafraîchir
+            </button>
+    
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total matières</div>
+            <div class="stat-value" id="totalMatieres">13</div>
+            <div class="stat-badge">Programme</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Coefficient moyen</div>
+            <div class="stat-value" id="coeffMoyen">1.0</div>
+            <div class="stat-badge">Standard</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Volume total</div>
+            <div class="stat-value" id="volumeTotal">0h</div>
+            <div class="stat-badge">Hebdo</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Enseignants</div>
+            <div class="stat-value" id="totalEnseignants">0</div>
+            <div class="stat-badge">Spécialistes</div>
+        </div>
+    </div>
+
+    <!-- Tableau récapitulatif des matières par niveau -->
+    <div class="table-matiere">
+        <h2>Programme des matières par niveau</h2>
+        <div class="niveaux-fixes" id="niveauxFixesContainer">
+            <span class="niveau-fixe-badge" onclick="filterByNiveauBadge('1ère année')">1ère année</span>
+            <span class="niveau-fixe-badge" onclick="filterByNiveauBadge('2ème année')">2ème année</span>
+            <span class="niveau-fixe-badge" onclick="filterByNiveauBadge('3ème année')">3ème année</span>
+            <span class="niveau-fixe-badge" onclick="filterByNiveauBadge('4ème année')">4ème année</span>
+            <span class="niveau-fixe-badge" onclick="filterByNiveauBadge('5ème année')">5ème année</span>
+            <span class="niveau-fixe-badge" onclick="filterByNiveauBadge('6ème année')">6ème année</span>
+        </div>
+        <div id="tableauMatieres">Chargement...</div>
+    </div>
+
+    <div id="mainContainer"></div>
+
+    <!-- Modal Détails Classe -->
+    <div class="modal" id="classeDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="classeDetailTitle">Détails de la classe</h2>
+                <button class="modal-close" onclick="closeClasseDetailModal()">&times;</button>
+            </div>
+            <div id="classeDetailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        
+        // Données de la base
+        let allMatieres = [];
+        let allClasses = [];
+        let allEleves = [];
+        let enseignants = [];
+        let affectations = [];
+        
+        // Variables d'état
+        let currentMatiereNom = null;
+        let currentNiveau = null;
+        let currentNiveauFiltre = null;
+
+        // NIVEAUX FIXES
+        const NIVEAUX_FIXES = [
+            '1ère année',
+            '2ème année', 
+            '3ème année',
+            '4ème année',
+            '5ème année',
+            '6ème année'
+        ];
+
+        // MATIÈRES FIXES PAR NIVEAU
+        const MATIERES_PAR_NIVEAU = {
+            "1ère année": [
+                { nom: "Langue arabe", volume: 9, coeff: 1 },
+                { nom: "Mathématiques", volume: 5, coeff: 1 },
+                { nom: "Éveil scientifique", volume: 1, coeff: 1 },
+                { nom: "Éducation islamique", volume: 1, coeff: 1 },
+                { nom: "Éducation technologique", volume: 1, coeff: 1 },
+                { nom: "Éducation musicale", volume: 1, coeff: 1 },
+                { nom: "Éducation artistique", volume: 1, coeff: 1 },
+                { nom: "Éducation physique", volume: 1, coeff: 1 }
+            ],
+            "2ème année": [
+                { nom: "Langue arabe", volume: 9, coeff: 1 },
+                { nom: "Langue française", volume: 2, coeff: 1 },
+                { nom: "Mathématiques", volume: 5, coeff: 1 },
+                { nom: "Éveil scientifique", volume: 1, coeff: 1 },
+                { nom: "Éducation islamique", volume: 1, coeff: 1 },
+                { nom: "Éducation technologique", volume: 1, coeff: 1 },
+                { nom: "Éducation musicale", volume: 1, coeff: 1 },
+                { nom: "Éducation artistique", volume: 1, coeff: 1 },
+                { nom: "Éducation physique", volume: 1, coeff: 1 }
+            ],
+            "3ème année": [
+                { nom: "Langue arabe", volume: 6, coeff: 1 },
+                { nom: "Langue française", volume: 8, coeff: 1 },
+                { nom: "Mathématiques", volume: 5, coeff: 1 },
+                { nom: "Éveil scientifique", volume: 1, coeff: 1 },
+                { nom: "Éducation islamique", volume: 1, coeff: 1 },
+                { nom: "Éducation technologique", volume: 1, coeff: 1 },
+                { nom: "Éducation musicale", volume: 1, coeff: 1 },
+                { nom: "Éducation artistique", volume: 1, coeff: 1 },
+                { nom: "Éducation physique", volume: 1, coeff: 1 }
+            ],
+            "4ème année": [
+                { nom: "Langue arabe", volume: 6, coeff: 1 },
+                { nom: "Langue française", volume: 8, coeff: 1 },
+                { nom: "Langue anglaise", volume: 1, coeff: 1 },
+                { nom: "Mathématiques", volume: 5, coeff: 1 },
+                { nom: "Éveil scientifique", volume: 1, coeff: 1 },
+                { nom: "Éducation islamique", volume: 1, coeff: 1 },
+                { nom: "Éducation technologique", volume: 1, coeff: 1 },
+                { nom: "Éducation musicale", volume: 1, coeff: 1 },
+                { nom: "Éducation artistique", volume: 1, coeff: 1 },
+                { nom: "Éducation physique", volume: 1, coeff: 1 }
+            ],
+            "5ème année": [
+                { nom: "Langue arabe", volume: 6, coeff: 1 },
+                { nom: "Langue française", volume: 8, coeff: 1 },
+                { nom: "Langue anglaise", volume: 2, coeff: 1 },
+                { nom: "Mathématiques", volume: 5, coeff: 1 },
+                { nom: "Éveil scientifique", volume: 1, coeff: 1 },
+                { nom: "Éducation islamique", volume: 1, coeff: 1 },
+                { nom: "Éducation technologique", volume: 1, coeff: 1 },
+                { nom: "Éducation musicale", volume: 1, coeff: 1 },
+                { nom: "Éducation artistique", volume: 1, coeff: 1 },
+                { nom: "Histoire", volume: 1, coeff: 1 },
+                { nom: "Géographie", volume: 1, coeff: 1 },
+                { nom: "Éducation civique", volume: 1, coeff: 1 },
+                { nom: "Éducation physique", volume: 1, coeff: 1 }
+            ],
+            "6ème année": [
+                { nom: "Langue arabe", volume: 6, coeff: 1 },
+                { nom: "Langue française", volume: 8, coeff: 1 },
+                { nom: "Langue anglaise", volume: 2, coeff: 1 },
+                { nom: "Mathématiques", volume: 5, coeff: 1 },
+                { nom: "Éveil scientifique", volume: 1, coeff: 1 },
+                { nom: "Éducation islamique", volume: 1, coeff: 1 },
+                { nom: "Éducation technologique", volume: 1, coeff: 1 },
+                { nom: "Éducation musicale", volume: 1, coeff: 1 },
+                { nom: "Éducation artistique", volume: 1, coeff: 1 },
+                { nom: "Histoire", volume: 1, coeff: 1 },
+                { nom: "Géographie", volume: 1, coeff: 1 },
+                { nom: "Éducation civique", volume: 1, coeff: 1 },
+                { nom: "Éducation physique", volume: 1, coeff: 1 }
+            ]
+        };
+
+        // MATIÈRES UNIQUES
+        const MATIERES_UNIQUES = [
+            'Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques',
+            'Éveil scientifique', 'Éducation islamique', 'Éducation technologique',
+            'Éducation musicale', 'Éducation artistique', 'Éducation physique',
+            'Histoire', 'Géographie', 'Éducation civique'
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!token) {
+                window.parent.location.href = 'saghiry-auth.html';
+                return;
+            }
+            loadAllData();
+        });
+
+        async function loadAllData() {
+            showLoading();
+            try {
+                await loadMatieresReference();
+                await Promise.all([
+                    loadClasses(),
+                    loadEleves(),
+                    loadEnseignants(),
+                    loadAffectations()
+                ]);
+                updateStats();
+                renderTableauMatieresStatique();
+                renderMainContent();
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError("Erreur de chargement des données");
+            }
+        }
+
+        async function loadMatieresReference() {
+            try {
+                const response = await fetch(`${API_BASE}/AffectationMatiere/reference`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    window.matieresReference = data;
+                }
+            } catch (error) {
+                console.error('Erreur chargement matières référence:', error);
+            }
+        }
+
+        async function loadAffectations() {
+            try {
+                const response = await fetch(`${API_BASE}/AffectationMatiere/all-with-details`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) affectations = await response.json();
+                else affectations = [];
+            } catch (error) {
+                console.error('Erreur chargement affectations:', error);
+                affectations = [];
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalMatieres').textContent = MATIERES_UNIQUES.length;
+            document.getElementById('coeffMoyen').textContent = "1.0";
+            let volumeTotal = 0;
+            Object.values(MATIERES_PAR_NIVEAU).forEach(matieres => {
+                matieres.forEach(m => volumeTotal += m.volume || 0);
+            });
+            document.getElementById('volumeTotal').textContent = volumeTotal + 'h';
+            document.getElementById('totalEnseignants').textContent = enseignants.length || 0;
+        }
+
+        async function loadClasses() {
+            try {
+                let response = await fetch(`${API_BASE}/Classe/with-tuteurs`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) response = await fetch(`${API_BASE}/Classe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allClasses = transformClassesData(data);
+                } else allClasses = [];
+            } catch (error) {
+                console.error('Erreur chargement classes:', error);
+                allClasses = [];
+            }
+        }
+
+        function transformClassesData(data) {
+            if (Array.isArray(data)) {
+                return data.map(item => ({
+                    id: item._id || item.id || item.Id || '',
+                    nomClasse: item.nomClasse || item.NomClasse || item.nom || `Classe`,
+                    niveau: item.niveau || item.Niveau || '',
+                    anneeScolaire: item.anneeScolaire || item.AnneeScolaire || '2025-2026',
+                    capaciteMax: item.capaciteMax || item.CapaciteMax || 30,
+                    effectif: item.effectif || item.Effectif || (item.elevesIds?.length || 0)
+                })).filter(c => c.id && c.id !== '');
+            }
+            return [];
+        }
+
+        async function loadEleves() {
+            try {
+                const response = await fetch(`${API_BASE}/Eleve`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allEleves = (Array.isArray(data) ? data : []).map(e => ({
+                        id: e._id || e.id || '',
+                        nom: e.nom || e.Nom || '',
+                        prenom: e.prenom || e.Prenom || '',
+                        classeId: e.classeId || e.ClasseId || ''
+                    }));
+                }
+            } catch (error) {
+                console.error('Erreur chargement élèves:', error);
+                allEleves = [];
+            }
+        }
+
+        async function loadEnseignants() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/intervenants`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    enseignants = (Array.isArray(data) ? data : []).map(e => ({
+                        id: e._id || e.id || e.Id || '',
+                        nom: e.nom || e.Nom || '',
+                        prenom: e.prenom || e.Prenom || '',
+                        email: e.email || e.Email || '',
+                        role: e.role || e.Role || e.Type || 'enseignant',
+                        specialites: e.specialites || e.Specialites || []
+                    }));
+                }
+            } catch (error) {
+                console.error('Erreur chargement intervenants:', error);
+                enseignants = [];
+            }
+        }
+
+        function renderTableauMatieresStatique() {
+            let html = `<table><thead><tr><th>Niveau</th>${MATIERES_UNIQUES.map(m => `<th>${m}</th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+            NIVEAUX_FIXES.forEach(niveau => {
+                html += `<tr><td class="matiere-row"><strong>${niveau}</strong></td>`;
+                let totalNiveau = 0;
+                MATIERES_UNIQUES.forEach(matiere => {
+                    const matiereNiveau = (MATIERES_PAR_NIVEAU[niveau] || []).find(m => m.nom === matiere);
+                    if (matiereNiveau && matiereNiveau.volume > 0) {
+                        html += `<td>${matiereNiveau.volume}h</td>`;
+                        totalNiveau += matiereNiveau.volume;
+                    } else html += `<td>—</td>`;
+                });
+                html += `<td><strong>${totalNiveau}h</strong></td></tr>`;
+            });
+            html += `<tr><td class="matiere-row"><strong>Total</strong></td>`;
+            MATIERES_UNIQUES.forEach(matiere => {
+                let totalMatiere = 0;
+                NIVEAUX_FIXES.forEach(niveau => {
+                    const matiereNiveau = (MATIERES_PAR_NIVEAU[niveau] || []).find(m => m.nom === matiere);
+                    if (matiereNiveau) totalMatiere += matiereNiveau.volume || 0;
+                });
+                html += `<td><strong>${totalMatiere}h</strong></td>`;
+            });
+            let totalGeneral = 0;
+            NIVEAUX_FIXES.forEach(niveau => {
+                (MATIERES_PAR_NIVEAU[niveau] || []).forEach(m => totalGeneral += m.volume || 0);
+            });
+            html += `<td><strong>${totalGeneral}h</strong></td></tr></tbody></table>`;
+            document.getElementById('tableauMatieres').innerHTML = html;
+        }
+
+        function filterByNiveauBadge(niveau) {
+            currentNiveauFiltre = niveau;
+            currentMatiereNom = null;
+            currentNiveau = null;
+            document.querySelectorAll('.niveau-fixe-badge').forEach(badge => {
+                if (badge.textContent === niveau) badge.classList.add('active');
+                else badge.classList.remove('active');
+            });
+            renderMainContent();
+        }
+
+        function renderMainContent() {
+            if (currentMatiereNom) renderMatiereDetail();
+            else if (currentNiveauFiltre) renderNiveauDetail();
+            else renderMatieresGrouped();
+        }
+
+        function renderNiveauDetail() {
+            const container = document.getElementById('mainContainer');
+            const niveau = currentNiveauFiltre;
+            const matieresDuNiveau = MATIERES_PAR_NIVEAU[niveau] || [];
+            container.innerHTML = `
+                <button class="back-button" onclick="resetNiveauFilter()"><span>←</span> Retour à tous les niveaux</button>
+                <div class="matiere-info-header"><h1 class="matiere-title">${niveau}</h1>
+                <div class="matiere-meta"><div class="meta-item"><div class="meta-label">Total matières</div><div class="meta-value">${matieresDuNiveau.length}</div></div>
+                <div class="meta-item"><div class="meta-label">Volume horaire</div><div class="meta-value">${matieresDuNiveau.reduce((sum, m) => sum + (m.volume || 0), 0)}h</div></div></div></div>
+                <div class="enseignants-section"><h3>Matières du ${niveau}</h3><div class="enseignants-grid" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">
+                ${matieresDuNiveau.map(matiere => `<div class="enseignant-card" onclick="selectMatiere('${matiere.nom}')" style="cursor: pointer;"><div class="enseignant-nom" style="font-size: 1.2rem;">${matiere.nom}</div>
+                <div style="display: flex; gap: 1rem; margin: 0.8rem 0;"><span class="enseignant-role">Volume: ${matiere.volume}h</span><span class="enseignant-role">Coef: ${matiere.coeff}</span></div>
+                <div class="enseignant-email">👨‍🏫 ${enseignants.filter(e => e.specialites?.includes(matiere.nom)).length} enseignant(s) disponible(s)</div>
+                <div style="margin-top: 0.8rem; text-align: right;"><span class="classe-tag">Cliquer pour voir les détails</span></div></div>`).join('')}</div></div>
+                <div class="niveau-section"><div class="niveau-header"><h2 class="niveau-titre">Classes du ${niveau}</h2></div><div class="classes-grid">${renderClassesByNiveau(niveau)}</div></div>`;
+        }
+
+        function renderClassesByNiveau(niveau) {
+            const classesDuNiveau = allClasses.filter(c => {
+                if (!c.niveau) return false;
+                const niveauNumero = niveau.match(/\d+/)?.[0];
+                const classeNiveauNumero = c.niveau.match(/\d+/)?.[0];
+                return niveauNumero && classeNiveauNumero && niveauNumero === classeNiveauNumero;
+            });
+            if (classesDuNiveau.length === 0) return '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light);">Aucune classe dans ce niveau</p>';
+            return classesDuNiveau.map(classe => {
+                const elevesClasse = allEleves.filter(e => e.classeId === classe.id).length;
+                return `<div class="classe-card"><div class="classe-header"><span class="classe-nom">${classe.nomClasse}</span><span class="classe-effectif">${elevesClasse || classe.effectif || 0} élèves</span></div>
+                <div class="classe-stats"><div class="classe-stat"><div class="classe-stat-label">Année</div><div class="classe-stat-value">${classe.anneeScolaire || '2025-2026'}</div></div>
+                <div class="classe-stat"><div class="classe-stat-label">Capacité</div><div class="classe-stat-value">${classe.capaciteMax || 30}</div></div></div>
+                <button class="btn-details" onclick="viewClasseDetails('${classe.id}')"><span>🔍</span> Voir détails</button></div>`;
+            }).join('');
+        }
+
+        function resetNiveauFilter() {
+            currentNiveauFiltre = null;
+            currentMatiereNom = null;
+            currentNiveau = null;
+            document.querySelectorAll('.niveau-fixe-badge').forEach(b => b.classList.remove('active'));
+            renderMainContent();
+        }
+
+        function renderMatieresGrouped() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `<div class="matieres-grid">${MATIERES_UNIQUES.map(nom => {
+                const niveaux = NIVEAUX_FIXES.filter(n => (MATIERES_PAR_NIVEAU[n] || []).some(m => m.nom === nom));
+                return `<div class="matiere-card" onclick="selectMatiere('${nom}')"><div class="matiere-header"><span class="matiere-nom">${nom}</span><span class="matiere-coeff">Coef 1</span></div>
+                <div class="niveaux-list">${niveaux.map(n => `<span class="niveau-badge" onclick="event.stopPropagation(); filterByNiveau('${n}', '${nom}')">${n}</span>`).join('')}</div>
+                <div class="matiere-stats-mini"><span class="stat-mini"><span>📚</span> ${niveaux.length} niveau(x)</span></div></div>`;
+            }).join('')}</div>`;
+        }
+
+        function filterByNiveau(niveau, matiereNom) {
+            currentMatiereNom = matiereNom;
+            currentNiveau = niveau;
+            currentNiveauFiltre = null;
+            document.querySelectorAll('.niveau-fixe-badge').forEach(b => b.classList.remove('active'));
+            renderMainContent();
+        }
+
+        function selectMatiere(nom) {
+            currentMatiereNom = nom;
+            currentNiveau = null;
+            currentNiveauFiltre = null;
+            document.querySelectorAll('.niveau-fixe-badge').forEach(b => b.classList.remove('active'));
+            renderMainContent();
+        }
+
+        function renderMatiereDetail() {
+            const container = document.getElementById('mainContainer');
+            const niveaux = currentNiveau ? [currentNiveau] : NIVEAUX_FIXES.filter(n => (MATIERES_PAR_NIVEAU[n] || []).some(m => m.nom === currentMatiereNom));
+            const enseignantsDeLaMatiere = enseignants.filter(e => e.specialites && e.specialites.includes(currentMatiereNom));
+            container.innerHTML = `
+                <button class="back-button" onclick="currentMatiereNom=null; currentNiveau=null; renderMainContent();"><span>←</span> Retour aux matières</button>
+                <div class="matiere-info-header"><h1 class="matiere-title">${currentMatiereNom}</h1>
+                <div class="matiere-meta"><div class="meta-item"><div class="meta-label">Coefficient</div><div class="meta-value">1</div></div>
+                <div class="meta-item"><div class="meta-label">Total niveaux</div><div class="meta-value">${niveaux.length}</div></div>
+                <div class="meta-item"><div class="meta-label">Enseignants</div><div class="meta-value">${enseignantsDeLaMatiere.length}</div></div></div></div>
+                <div class="enseignants-section"><h3>Enseignants de ${currentMatiereNom}</h3>
+                ${enseignantsDeLaMatiere.length === 0 ? '<p style="color: var(--text-light); text-align: center; padding: 2rem;">Aucun enseignant assigné à cette matière</p>' :
+                `<div class="enseignants-grid">${enseignantsDeLaMatiere.map(e => `<div class="enseignant-card" onclick="viewEnseignantAffectations('${e.id}', '${e.nom}', '${e.prenom}')">
+                <div class="enseignant-nom">${e.prenom} ${e.nom}</div><div class="enseignant-role ${e.role === 'permanent' ? 'permanent' : ''}">${e.role === 'permanent' ? 'Permanent' : 'Enseignant'}</div>
+                <div class="enseignant-email">${e.email}</div>${e.specialites?.length ? `<div class="enseignant-classes"><span>Spécialités:</span> ${e.specialites.map(s => `<span class="classe-tag">${s}</span>`).join('')}</div>` : ''}</div>`).join('')}</div>`}</div>
+                ${niveaux.map(niveau => `<div class="niveau-section"><div class="niveau-header"><h2 class="niveau-titre">${niveau}</h2><span class="btn-secondary" style="pointer-events: none;">${allClasses.filter(c => c.niveau?.includes(niveau.match(/\d+/)?.[0] || '')).length} classe(s)</span></div><div class="classes-grid">${renderClassesByNiveau(niveau)}</div></div>`).join('')}`;
+        }
+
+        async function viewClasseDetails(classeId) {
+            const classe = allClasses.find(c => c.id === classeId);
+            if (!classe) return;
+            const elevesClasse = allEleves.filter(e => e.classeId === classeId);
+            document.getElementById('classeDetailTitle').textContent = classe.nomClasse;
+            document.getElementById('classeDetailContent').innerHTML = `<div class="details-grid"><div class="detail-card"><h3 style="margin-bottom: 1rem;">Informations</h3>
+                <div class="info-row"><span>Niveau</span><span><strong>${classe.niveau}</strong></span></div>
+                <div class="info-row"><span>Effectif</span><span><strong>${elevesClasse.length || classe.effectif || 0}</strong></span></div>
+                <div class="info-row"><span>Capacité</span><span><strong>${classe.capaciteMax || 30}</strong></span></div></div></div>`;
+            document.getElementById('classeDetailModal').classList.add('active');
+        }
+
+        async function viewEnseignantAffectations(enseignantId, enseignantNom, enseignantPrenom) {
+            try {
+                const response = await fetch(`${API_BASE}/AffectationMatiere/enseignant/${enseignantId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Erreur chargement');
+                const affectationsEnseignant = await response.json();
+                const modalHtml = `<div class="modal active" id="enseignantAffectationsModal" style="display: flex;"><div class="modal-content" style="max-width: 800px;"><div class="modal-header"><h2>Affectations de ${enseignantPrenom} ${enseignantNom}</h2><button class="modal-close" onclick="document.getElementById('enseignantAffectationsModal').remove()">&times;</button></div>
+                <div style="max-height: 70vh; overflow-y: auto;">${affectationsEnseignant.length === 0 ? '<p style="text-align: center; padding: 2rem;">Aucune affectation</p>' :
+                affectationsEnseignant.map(a => `<div style="background: white; border-radius: 16px; padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--gray-border); border-left: 4px solid var(--primary-green);">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;"><div><strong style="font-size: 1rem;">${a.nomMatiere}</strong></div><span style="background: rgba(76,168,150,0.1); padding: 0.2rem 1rem; border-radius: 30px;">Coef ${a.coefficient}</span></div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;"><div style="background: var(--gray-bg); padding: 0.5rem; border-radius: 8px;"><div style="color: var(--text-light); font-size: 0.7rem;">Classe</div><div style="font-weight: 600;">${a.nomClasse || 'Inconnue'}</div></div>
+                <div style="background: var(--gray-bg); padding: 0.5rem; border-radius: 8px;"><div style="color: var(--text-light); font-size: 0.7rem;">Niveau</div><div style="font-weight: 600;">${a.niveau || 'Non défini'}</div></div>
+                <div style="background: var(--gray-bg); padding: 0.5rem; border-radius: 8px;"><div style="color: var(--text-light); font-size: 0.7rem;">Volume</div><div style="font-weight: 600;">${a.volumeHoraire}h</div></div>
+                <div style="background: var(--gray-bg); padding: 0.5rem; border-radius: 8px;"><div style="color: var(--text-light); font-size: 0.7rem;">Année</div><div style="font-weight: 600;">${a.anneeScolaire}</div></div></div></div>`).join('')}</div></div></div>`;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement des affectations');
+            }
+        }
+
+        async function initialiserMatieres() {
+            try {
+                showLoading();
+                await fetch(`${API_BASE}/AffectationMatiere/seed/reference`, {
+                    method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+                });
+                for (const classe of allClasses) {
+                    await fetch(`${API_BASE}/AffectationMatiere/classe/${classe.id}/creer-affectations`, {
+                        method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ niveau: classe.niveau, anneeScolaire: classe.anneeScolaire || '2025-2026' })
+                    });
+                }
+                await loadAffectations();
+                renderMainContent();
+                showSuccess('Matières initialisées avec succès');
+            } catch (error) {
+                console.error('Erreur initialisation:', error);
+                alert('Erreur lors de l\'initialisation');
+            }
+        }
+
+        async function refreshData() {
+            showLoading();
+            await Promise.all([loadClasses(), loadEleves(), loadEnseignants(), loadAffectations()]);
+            renderMainContent();
+            showSuccess('Données rafraîchies');
+        }
+
+        async function diagnosticAffectations() {
+            console.log('🔍 DIAGNOSTIC DES AFFECTATIONS');
+            console.log(`👨‍🏫 Enseignants: ${enseignants.length}`);
+            enseignants.forEach(e => console.log(`   - ${e.prenom} ${e.nom} (Spécialités: ${e.specialites?.join(', ') || 'Aucune'})`));
+            console.log(`📊 Affectations: ${affectations.length}`);
+            MATIERES_UNIQUES.forEach(matiere => {
+                const count = enseignants.filter(e => e.specialites?.includes(matiere)).length;
+                if (count > 0) console.log(`   ${matiere}: ${count} enseignant(s)`);
+            });
+            showSuccess('Diagnostic affiché dans la console (F12)');
+        }
+
+        function closeClasseDetailModal() { document.getElementById('classeDetailModal').classList.remove('active'); }
+        function showLoading() { document.getElementById('mainContainer').innerHTML = '<div class="loading">Chargement...</div>'; }
+        function showError(message) { document.getElementById('mainContainer').innerHTML = `<div class="error-message">❌ ${message}</div>`; }
+        function showSuccess(message) { const div = document.createElement('div'); div.className = 'alert alert-success'; div.textContent = '✅ ' + message; document.body.appendChild(div); setTimeout(() => div.remove(), 3000); }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('classeDetailModal').classList.contains('active')) closeClasseDetailModal();
+                document.querySelectorAll('.modal').forEach(modal => { if (modal.id !== 'classeDetailModal' && modal.classList.contains('active')) modal.remove(); });
+            }
+        });
+    </script>
+</body>
+</html>

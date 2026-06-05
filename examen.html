@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des Examens Écrits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --blue-light: #339af0;
+            --red-light: #ff6b6b;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+        }
+
+        .exam-container {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-border);
+            padding-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 12px 12px 0 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-green);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-soft);
+            font-size: 0.85rem;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--red-light), #e03131);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9466, #f59f00);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #339af0, #1c7ed6);
+            color: white;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .data-table th {
+            background: var(--gray-bg);
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.85rem;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background: rgba(76, 168, 150, 0.03);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success { background: #e8f5e9; color: #2e7d32; border-left: 4px solid #2e7d32; }
+        .alert-error { background: #ffebee; color: #c62828; border-left: 4px solid #c62828; }
+        .alert-info { background: #e3f2fd; color: #1565c0; border-left: 4px solid #1565c0; }
+        .alert-warning { background: #fff3e0; color: #e65100; border-left: 4px solid #e65100; }
+
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--gray-bg);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .periode-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .periode-card {
+            flex: 1;
+            min-width: 220px;
+            padding: 1rem;
+            background: var(--gray-bg);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            text-align: center;
+            position: relative;
+        }
+
+        .periode-card:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .periode-card.active {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+        }
+
+        .periode-card.active .periode-title {
+            color: white;
+        }
+
+        .periode-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #e0e0e0;
+        }
+
+        .periode-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .periode-dates {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .periode-status {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .status-allowed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-expired {
+            background: #f44336;
+            color: white;
+        }
+
+        .status-future {
+            background: #ff9800;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge-info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .progress-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-green);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-header h3 {
+            color: var(--text-dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-soft);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-border);
+        }
+
+        .calendar-view {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .calendar-nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .calendar-month {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--gray-bg);
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .calendar-weekday {
+            padding: 0.75rem;
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            border: 1px solid var(--gray-border);
+            padding: 0.5rem;
+            position: relative;
+            background: white;
+        }
+
+        .calendar-day.other-month {
+            background: #fafafa;
+            color: #ccc;
+        }
+
+        .calendar-day.today {
+            background: #e8f5e9;
+            border: 2px solid var(--primary-green);
+        }
+
+        .calendar-day-number {
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-exam {
+            background: var(--primary-green);
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .calendar-exam-multiple {
+            background: var(--accent-orange);
+        }
+
+        .calendar-legend {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-top: 1px solid var(--gray-border);
+            font-size: 0.8rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .niveau-accordion {
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .niveau-header {
+            background: linear-gradient(135deg, var(--primary-deep), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .niveau-header .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .niveau-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .niveau-content {
+            padding: 1rem;
+            background: var(--gray-bg);
+            display: block;
+        }
+
+        .niveau-content.collapsed {
+            display: none;
+        }
+
+        .classe-card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .classe-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .classe-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .classe-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .classe-stats span {
+            background: rgba(255,255,255,0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .classe-header .classe-toggle {
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .classe-header.collapsed .classe-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .classe-exams {
+            padding: 1rem;
+            display: block;
+        }
+
+        .classe-exams.collapsed {
+            display: none;
+        }
+
+        .exam-row {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border: 1px solid var(--gray-border);
+            transition: all 0.2s ease;
+        }
+
+        .exam-row:hover {
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-sm);
+            background: #f9f9f9;
+        }
+
+        .exam-date {
+            min-width: 90px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .exam-date .day {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .exam-date .month {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+        }
+
+        .exam-time {
+            min-width: 100px;
+            background: var(--gray-bg);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .exam-subject {
+            flex: 2;
+            min-width: 150px;
+        }
+
+        .exam-subject .subject-name {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        .exam-subject .subject-coef {
+            font-size: 0.7rem;
+            color: var(--text-soft);
+        }
+
+        .exam-duration {
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .duration-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .duration-2h {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .duration-1h {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .exam-room {
+            min-width: 100px;
+        }
+
+        .room-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .exam-supervisors {
+            min-width: 150px;
+            flex: 1;
+        }
+
+        .supervisor-badge {
+            background: #e8f5e9;
+            color: var(--primary-dark);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin: 0.1rem;
+        }
+
+        .exam-actions {
+            min-width: 80px;
+            text-align: center;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon.edit {
+            color: var(--blue-light);
+        }
+
+        .btn-icon.edit:hover {
+            background: #e3f2fd;
+            transform: scale(1.1);
+        }
+
+        .btn-icon.delete {
+            color: var(--red-light);
+        }
+
+        .btn-icon.delete:hover {
+            background: #ffebee;
+            transform: scale(1.1);
+        }
+
+        .empty-exams {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-soft);
+            background: var(--gray-bg);
+            border-radius: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .date-edit {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .date-edit input {
+            padding: 0.3rem 0.5rem;
+            border: 1px solid var(--gray-border);
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .surveillant-accordion {
+            margin-bottom: 1rem;
+            border-radius: 16px;
+            overflow: hidden;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .surveillant-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .surveillant-header .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .surveillant-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .surveillant-content {
+            padding: 1rem;
+            background: var(--gray-bg);
+            display: block;
+        }
+
+        .surveillant-content.collapsed {
+            display: none;
+        }
+
+        .surveillant-stats {
+            background: #e8f5e9;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: inline-block;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .surveillance-switch {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .switch-btn {
+            padding: 0.5rem 1rem;
+            background: var(--gray-bg);
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .switch-btn.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .creneau-card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .creneau-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .creneau-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .creneau-time {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .creneau-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .creneau-stats span {
+            background: rgba(255,255,255,0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .creneau-header .creneau-toggle {
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .creneau-header.collapsed .creneau-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .creneau-exams {
+            padding: 1rem;
+            display: block;
+        }
+
+        .creneau-exams.collapsed {
+            display: none;
+        }
+
+        .exam-card {
+            background: var(--gray-bg);
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+
+        .exam-card:hover {
+            background: #e8f5e9;
+            transform: translateX(4px);
+        }
+
+        .exam-info {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .exam-matiere {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        .exam-classe {
+            font-size: 0.8rem;
+            color: var(--text-soft);
+            margin-top: 0.2rem;
+        }
+
+        .exam-location {
+            min-width: 120px;
+        }
+
+        .salle-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .exam-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .exam-info, .exam-location, .exam-supervisors {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="exam-container">
+        <div class="page-header">
+            <h1>📝 Gestion des Examens Écrits</h1>
+            <p>Génération automatique des examens écrits - Conformément à SeedMatieres.cs</p>
+        </div>
+
+        <div id="alertMessage" style="display: none;"></div>
+
+        <div class="stats-bar">
+            <div class="stat-card"><div class="stat-number" id="statClasses">0</div><div class="stat-label">Classes</div></div>
+            <div class="stat-card"><div class="stat-number" id="statMatieres">0</div><div class="stat-label">Matières</div></div>
+            <div class="stat-card"><div class="stat-number" id="statEnseignants">0</div><div class="stat-label">Surveillants</div></div>
+            <div class="stat-card"><div class="stat-number" id="statSalles">0</div><div class="stat-label">Salles</div></div>
+            <div class="stat-card"><div class="stat-number" id="statExamens">0</div><div class="stat-label">Examens écrits</div></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="generation">🎯 Génération automatique</button>
+            <button class="tab-btn" data-tab="planning">📅 Planning des examens</button>
+            <button class="tab-btn" data-tab="calendrier">📆 Vue Calendrier</button>
+            <button class="tab-btn" data-tab="surveillance">👥 Surveillance</button>
+            <button class="tab-btn" data-tab="periodes">📅 Gestion des périodes</button>
+        </div>
+
+        <div id="tab-generation" class="tab-content active">
+            <div class="card">
+                <div class="card-title">🎯 Sélection de la période d'examens écrits</div>
+                <div class="periode-selector" id="periodeSelector"></div>
+                <div id="periodeInfo"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">⚙️ Actions sur la période</div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button id="btnGenerer" class="btn btn-primary">🔄 Générer automatiquement les examens écrits</button>
+                    <button id="btnRegenerer" class="btn btn-info">🔄 Forcer la régénération (supprime puis recrée)</button>
+                    <button id="btnSupprimer" class="btn btn-danger">🗑️ Supprimer tous les examens de cette période</button>
+                    <button id="btnVerifier" class="btn btn-secondary">🔍 Vérifier les données</button>
+                </div>
+                <div id="generationResult" style="margin-top: 1rem;"></div>
+                <div id="regenerationInfo" class="alert alert-info" style="margin-top: 1rem; display: none;">
+                    <strong>📌 Information :</strong> Si vous avez ajouté de nouvelles classes ou de nouveaux enseignants, utilisez le bouton <strong>"Forcer la régénération"</strong> pour supprimer les examens existants et les recréer avec les nouvelles données.
+                </div>
+            </div>
+        
+        </div>
+
+        <div id="tab-planning" class="tab-content">
+            <div class="card">
+                <div class="card-title">
+                    📋 Planning des examens écrits par niveau et classe
+                    <span class="badge badge-success" id="examsCountBadge">0 examen(s)</span>
+                </div>
+                <div id="planningParNiveau"></div>
+            </div>
+        </div>
+
+        <div id="tab-calendrier" class="tab-content">
+            <div class="card">
+                <div class="card-title">📆 Vue Calendrier des Examens</div>
+                <div class="calendar-view" id="calendarView"></div>
+                <div class="calendar-legend">
+                    <div><span class="legend-color" style="background: var(--primary-green);"></span> 1 examen</div>
+                    <div><span class="legend-color" style="background: var(--accent-orange);"></span> 2 examens</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-surveillance" class="tab-content">
+            <div class="card">
+                <div class="card-title">👥 Affectation des surveillants</div>
+                <div class="surveillance-switch">
+                    <button id="switchParCreneau" class="switch-btn active">📅 Par créneau horaire</button>
+                    <button id="switchParEnseignant" class="switch-btn">👨‍🏫 Par enseignant</button>
+                </div>
+                <div id="surveillanceList"></div>
+            </div>
+        </div>
+
+        <div id="tab-periodes" class="tab-content">
+            <div class="card">
+                <div class="card-title">
+                    📅 Gestion des périodes d'examens
+                    <span class="badge badge-info" style="margin-left: auto;">Modifiez les dates pour avancer ou retarder les examens</span>
+                </div>
+                <div id="periodesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE POUR MODIFIER LES DATES DES PÉRIODES -->
+    <div id="periodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">✏️ Modifier les dates de la période</h3>
+                <button class="modal-close" onclick="closePeriodeModal()">&times;</button>
+            </div>
+            <form id="periodeForm">
+                <input type="hidden" id="periodeId" value="">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>📛 Période</label>
+                        <input type="text" id="periodeNom" readonly style="background:#f5f5f5;">
+                    </div>
+                    <div class="form-group">
+                        <label>📅 Date début *</label>
+                        <input type="date" id="periodeDateDebut" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📅 Date fin *</label>
+                        <input type="date" id="periodeDateFin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>📝 Note (optionnelle)</label>
+                        <textarea id="periodeDescription" rows="2" placeholder="Raison du décalage (ex: Annonce officielle, jours fériés...)"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePeriodeModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">💾 Enregistrer les nouvelles dates</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODALE POUR MODIFIER UN EXAMEN -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Modifier l'examen</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm" onsubmit="event.preventDefault(); saveAllModifications();">
+                <input type="hidden" id="editExamenId">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>📚 Matière</label>
+                        <input type="text" id="editMatiereNom" readonly style="background:#f5f5f5;">
+                    </div>
+                    <div class="form-group">
+                        <label>🏫 Classe</label>
+                        <input type="text" id="editClasseNom" readonly style="background:#f5f5f5;">
+                    </div>
+                    <div class="form-group">
+                        <label>📅 Date *</label>
+                        <input type="date" id="editDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>⏰ Heure début *</label>
+                        <input type="time" id="editHeureDebut" required>
+                    </div>
+                    <div class="form-group">
+                        <label>⏰ Heure fin *</label>
+                        <input type="time" id="editHeureFin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>🏛️ Salle</label>
+                        <select id="editSalle">
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>👨‍🏫 Surveillant</label>
+                        <select id="editSurveillant">
+                            <option value="">-- Sélectionner --</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" style="margin-top: 1rem; font-size: 0.85rem;">
+                    <strong>⚠️ Note importante :</strong> Toute modification sera automatiquement vérifiée pour éviter les conflits de planning (classe déjà occupée, salle déjà réservée, surveillant déjà assigné à un autre examen).
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="progressContainer" class="progress-container"><span id="progressMessage">🔄 Génération en cours...</span></div>
+
+    <script>
+    (function() {
+        const API_BASE_URL = 'http://localhost:5267/api';
+        
+        let exams = [], classes = [], matieres = [], enseignants = [], salles = [], periodes = [];
+        let periodesConfig = [];
+        let selectedPeriode = null, currentCalendarDate = new Date();
+        let periodeValidation = {};
+        let surveillanceMode = 'creneau';
+
+        const PERIODES_ECRITS = ['ecrit', 'ecrit_final_bloque'];
+        
+        // ============ CONFIGURATION SEEDMATIERES.CS ============
+        const SEED_MATIERES = {
+            MATIERES_EXCLUES: ['education physique', 'éducation physique', 'eps', 'sport', 'sports'],
+            
+            MATIERES_2H: [
+                'langue arabe', 'arabe', 'langue française', 'française', 'francais', 'français',
+                'langue anglaise', 'anglaise', 'anglais', 'mathématiques', 'mathematiques', 'math'
+            ],
+            
+            getMatieresForNiveau: function(niveau) {
+                const matieresParNiveau = {
+                    '1ère année': ['Langue arabe', 'Mathématiques', 'Éveil scientifique', 'Éducation islamique',
+                        'Éducation technologique', 'Éducation musicale', 'Éducation artistique', 'Éducation physique'],
+                    '2ème année': ['Langue arabe', 'Langue française', 'Mathématiques', 'Éveil scientifique',
+                        'Éducation islamique', 'Éducation technologique', 'Éducation musicale', 'Éducation artistique', 'Éducation physique'],
+                    '3ème année': ['Langue arabe', 'Langue française', 'Mathématiques', 'Éveil scientifique',
+                        'Éducation islamique', 'Éducation technologique', 'Éducation musicale', 'Éducation artistique', 'Éducation physique'],
+                    '4ème année': ['Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques', 'Éveil scientifique',
+                        'Éducation islamique', 'Éducation technologique', 'Éducation musicale', 'Éducation artistique', 'Éducation physique'],
+                    '5ème année': ['Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques', 'Éveil scientifique',
+                        'Éducation islamique', 'Éducation technologique', 'Éducation musicale', 'Éducation artistique',
+                        'Histoire', 'Géographie', 'Éducation civique', 'Éducation physique'],
+                    '6ème année': ['Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques', 'Éveil scientifique',
+                        'Éducation islamique', 'Éducation technologique', 'Éducation musicale', 'Éducation artistique',
+                        'Histoire', 'Géographie', 'Éducation civique', 'Éducation physique']
+                };
+                return matieresParNiveau[niveau] || [];
+            },
+            
+            isExclue: function(nomMatiere) {
+                if (!nomMatiere) return false;
+                const nomLower = nomMatiere.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return this.MATIERES_EXCLUES.some(exclue => nomLower.includes(exclue.toLowerCase()));
+            },
+            
+            getDuree: function(nomMatiere) {
+                if (!nomMatiere) return 60;
+                const nomLower = nomMatiere.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (this.MATIERES_2H.some(m => nomLower.includes(m.toLowerCase()))) return 120;
+                return 60;
+            },
+            
+            formatDuree: function(duree) { return duree === 120 ? '2h' : '1h'; }
+        };
+        
+        function isMatiereExclue(nomMatiere) { return SEED_MATIERES.isExclue(nomMatiere); }
+        function getDureeForMatiere(nomMatiere) { return SEED_MATIERES.getDuree(nomMatiere); }
+        function formatDuree(duree) { return SEED_MATIERES.formatDuree(duree); }
+        function getDureeClass(duree) { return duree === 120 ? 'duration-2h' : 'duration-1h'; }
+        
+        // Formatage des classes: "3 A 5" (niveau + A + numéro)
+        function formatClasseDisplay(niveau, nomClasse) {
+            if (!niveau && !nomClasse) return 'Classe inconnue';
+            
+            // Extraire le numéro du niveau (1,2,3,4,5,6)
+            let niveauNum = null;
+            if (niveau) {
+                if (niveau.includes('1ère') || niveau.includes('1ere')) niveauNum = 1;
+                else if (niveau.includes('2ème') || niveau.includes('2eme')) niveauNum = 2;
+                else if (niveau.includes('3ème') || niveau.includes('3eme')) niveauNum = 3;
+                else if (niveau.includes('4ème') || niveau.includes('4eme')) niveauNum = 4;
+                else if (niveau.includes('5ème') || niveau.includes('5eme')) niveauNum = 5;
+                else if (niveau.includes('6ème') || niveau.includes('6eme')) niveauNum = 6;
+                else {
+                    const match = niveau.match(/\d+/);
+                    if (match) niveauNum = parseInt(match[0]);
+                }
+            }
+            
+            // Extraire le numéro de la classe
+            let numeroClasse = null;
+            if (nomClasse) {
+                const match = nomClasse.match(/\d+/);
+                if (match) numeroClasse = match[0];
+            }
+            
+            // Format: "3 A 5"
+            if (niveauNum && numeroClasse) {
+                return `${niveauNum} A ${numeroClasse}`;
+            }
+            if (niveauNum) {
+                return `${niveauNum} ${nomClasse || ''}`;
+            }
+            return nomClasse || 'Classe inconnue';
+        }
+        
+        function normalizePeriode(p) {
+            return {
+                id: p.id || p._id || p.Id,
+                nom: p.nom || p.Nom || p.name || 'Période sans nom',
+                trimestre: p.trimestre || p.Trimestre || 1,
+                type: p.type || p.Type || p.typeExamen || 'oral_pratique',
+                dateDebut: p.dateDebut || p.DateDebut,
+                dateFin: p.dateFin || p.DateFin,
+                description: p.description || p.Description || '',
+                classesConcernees: p.classesConcernees || p.ClassesConcernees || [],
+                estActif: p.estActif !== undefined ? p.estActif : (p.EstActif !== undefined ? p.EstActif : true)
+            };
+        }
+        
+        function isPeriodeGenerable(periode) {
+            if (!periode || !periode.dateDebut) return { allowed: false, reason: 'Période invalide' };
+            
+            const periodeComplete = periodesConfig.find(p => p.id === periode.id);
+            const periodeType = periodeComplete?.type || periode.type;
+            
+            if (periodeType && !PERIODES_ECRITS.includes(periodeType)) {
+                let typeLabel = periodeType === 'oral_pratique' ? 'orales/pratiques' : 
+                               periodeType === 'oral_pratique_final' ? 'orales finales' : periodeType;
+                return { allowed: false, reason: `❌ Période d'examens ${typeLabel} - La génération automatique ne concerne que les examens écrits.`, status: 'not_written' };
+            }
+            
+            const aujourdhui = new Date(); aujourdhui.setHours(0, 0, 0, 0);
+            const dateDebut = new Date(periode.dateDebut); dateDebut.setHours(0, 0, 0, 0);
+            const dateFin = new Date(periode.dateFin); dateFin.setHours(0, 0, 0, 0);
+            
+            if (dateFin < aujourdhui) return { allowed: false, reason: `❌ Période terminée (fin le ${dateFin.toLocaleDateString('fr-FR')})`, status: 'expired' };
+            const joursAvantDebut = Math.ceil((dateDebut - aujourdhui) / (1000 * 60 * 60 * 24));
+            if (joursAvantDebut > 60) return { allowed: false, reason: `⏰ Période trop lointaine (début dans ${joursAvantDebut} jours)`, status: 'future' };
+            
+            let statusMessage = dateDebut > aujourdhui ? `✅ Période à venir (début dans ${joursAvantDebut} jour(s))` : `✅ Période en cours (jusqu'au ${dateFin.toLocaleDateString('fr-FR')})`;
+            return { allowed: true, reason: statusMessage, status: 'allowed' };
+        }
+        
+        function updateGenerationButton() {
+            const btnGenerer = document.getElementById('btnGenerer');
+            const btnRegenerer = document.getElementById('btnRegenerer');
+            if (!btnGenerer) return;
+            if (!selectedPeriode) {
+                btnGenerer.disabled = true; btnRegenerer.disabled = true;
+                btnGenerer.title = 'Sélectionnez une période'; btnRegenerer.title = 'Sélectionnez une période';
+                return;
+            }
+            const validation = isPeriodeGenerable(selectedPeriode);
+            btnGenerer.disabled = !validation.allowed;
+            btnRegenerer.disabled = !validation.allowed;
+            btnGenerer.title = validation.allowed ? 'Générer les examens écrits' : validation.reason;
+            btnRegenerer.title = validation.allowed ? 'Forcer la régénération (supprime puis recrée)' : validation.reason;
+        }
+
+        function addLog(message, type = 'info') { console.log(`[${type.toUpperCase()}] ${message}`); }
+
+        function getId(obj) {
+            if (!obj) return null;
+            if (typeof obj === 'string') return obj;
+            if (obj._id) return typeof obj._id === 'string' ? obj._id : obj._id.$oid;
+            return obj.id || obj.Id || null;
+        }
+
+        function getHeaders() {
+            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            return { 'Content-Type': 'application/json', ...(token && { 'Authorization': `Bearer ${token}` }) };
+        }
+
+        function extractData(data) {
+            if (!data) return [];
+            if (Array.isArray(data)) return data;
+            if (data.data && Array.isArray(data.data)) return data.data;
+            if (data.$values && Array.isArray(data.$values)) return data.$values;
+            if (data.Data && Array.isArray(data.Data)) return data.Data;
+            return [];
+        }
+
+        function formatDateDisplay(dateInput) {
+            if (!dateInput) return 'Non définie';
+            const d = new Date(dateInput);
+            return isNaN(d.getTime()) ? 'Date invalide' : d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+async function loadPeriodesConfig() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/PeriodesExamens`, { headers: getHeaders() });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("📡 API Response:", data);  // 🔍 DEBUG
+            let rawPeriodes = extractData(data);
+            console.log("📋 Raw periodes:", rawPeriodes);  // 🔍 DEBUG
+            periodesConfig = rawPeriodes.map(p => normalizePeriode(p));
+            console.log("✅ Normalized periodes:", periodesConfig);  // 🔍 DEBUG
+        } else {
+            console.error("API error:", response.status);
+            periodesConfig = [];
+        }
+    } catch (error) {
+        console.error("Fetch error:", error);
+        periodesConfig = [];
+    }
+    renderPeriodesList();
+}
+
+        function renderPeriodesList() {
+            const container = document.getElementById('periodesList');
+            if (!container) return;
+            if (!periodesConfig.length) { container.innerHTML = '<div class="empty-exams">📭 Aucune période configurée.</div>'; return; }
+            
+            let html = `<div class="table-wrapper"><table class="data-table"><thead><tr><th>Période</th><th>Trimestre</th><th>Type</th><th>Dates actuelles</th><th>Jours</th><th>Actions</th></tr></thead><tbody>`;
+            for (const p of periodesConfig) {
+                const debut = p.dateDebut ? new Date(p.dateDebut) : null;
+                const fin = p.dateFin ? new Date(p.dateFin) : null;
+                const nbJours = (debut && fin) ? Math.ceil((fin - debut) / (1000 * 60 * 60 * 24)) + 1 : 0;
+                let typeLabel = '', typeClass = '', isEcrit = false;
+                if (p.type === 'ecrit') { typeLabel = '📝 Écrits'; typeClass = 'badge-success'; isEcrit = true; }
+                else if (p.type === 'oral_pratique') { typeLabel = '🎤 Oraux/Pratiques'; typeClass = 'badge-warning'; isEcrit = false; }
+                else if (p.type === 'ecrit_final_bloque') { typeLabel = '📝 Écrits finaux (bloqués)'; typeClass = 'badge-success'; isEcrit = true; }
+                else if (p.type === 'oral_pratique_final') { typeLabel = '🎤 Oraux finaux'; typeClass = 'badge-warning'; isEcrit = false; }
+                else { typeLabel = p.type || 'Non défini'; typeClass = 'badge-info'; isEcrit = false; }
+                
+                const dateDebutStr = debut ? debut.toLocaleDateString('fr-FR') : 'Date invalide';
+                const dateFinStr = fin ? fin.toLocaleDateString('fr-FR') : 'Date invalide';
+                html += `<tr>
+                    <td><strong>${p.nom || 'Période sans nom'}</strong><br><small class="badge ${typeClass}">${typeLabel}</small>${isEcrit ? '<span class="badge badge-success" style="margin-left:5px;">✓ Générable</span>' : '<span class="badge badge-warning" style="margin-left:5px;">⛔ Non générable</span>'}</td>
+                    <td>${p.trimestre || '?'}ème trimestre</td>
+                    <td>${typeLabel}</td>
+                        <td class="date-edit"><span>📅 ${dateDebutStr} → ${dateFinStr}</span></td>
+                    <td>${nbJours} jours</td>
+                    <td class="action-buttons"><button class="btn-icon edit" onclick="editPeriodeDates('${p.id}')" title="Modifier les dates">✏️</button></td>
+                </tr>`;
+            }
+            html += `</tbody></table></div>`;
+            html += `<div class="alert alert-info" style="margin-top: 1rem;"><strong>ℹ️ Information - Conformément à SeedMatieres.cs :</strong> 
+                <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                    <li>✅ Seule l'<strong>Éducation physique</strong> est exclue des examens écrits.</li>
+                    <li>✅ <strong>Langue arabe, française, anglaise, Mathématiques</strong> durent 2h.</li>
+                    <li>✅ Les autres matières durent 1h.</li>
+                    <li>✅ Maximum 3 examens par jour par classe.</li>
+                </ul></div>`;
+            container.innerHTML = html;
+        }
+
+        window.editPeriodeDates = async function(id) {
+            const periode = periodesConfig.find(p => p.id === id);
+            if (!periode) return;
+            document.getElementById('modalTitle').innerText = `✏️ Modifier les dates - ${periode.nom}`;
+            document.getElementById('periodeId').value = periode.id;
+            document.getElementById('periodeNom').value = periode.nom;
+            const dateDebutStr = periode.dateDebut ? periode.dateDebut.split('T')[0] : '';
+            const dateFinStr = periode.dateFin ? periode.dateFin.split('T')[0] : '';
+            document.getElementById('periodeDateDebut').value = dateDebutStr;
+            document.getElementById('periodeDateFin').value = dateFinStr;
+            document.getElementById('periodeDescription').value = periode.description || '';
+            document.getElementById('periodeModal').classList.add('active');
+        };
+
+        async function updatePeriodeDates(periodeData) {
+            const url = `${API_BASE_URL}/PeriodeExamen/${periodeData.id}`;
+            const body = { dateDebut: periodeData.dateDebut, dateFin: periodeData.dateFin, description: periodeData.description };
+            try {
+                const response = await fetch(url, { method: 'PUT', headers: getHeaders(), body: JSON.stringify(body) });
+                if (response.ok) {
+                    showAlert('✅ Dates modifiées avec succès', 'success');
+                    await loadPeriodesConfig();
+                    await loadPeriodes();
+                    closePeriodeModal();
+                } else { const error = await response.text(); showAlert(`❌ Erreur: ${error}`, 'error'); }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); }
+        }
+
+        function closePeriodeModal() {
+            document.getElementById('periodeModal').classList.remove('active');
+            document.getElementById('periodeForm').reset();
+            document.getElementById('periodeId').value = '';
+        }
+
+        async function loadPeriodes() {
+            addLog('Chargement des périodes...', 'info');
+            try {
+                if (periodesConfig.length > 0) {
+                    const periodesEcrits = periodesConfig.filter(p => PERIODES_ECRITS.includes(p.type));
+                    periodes = periodesEcrits.map(p => ({ id: p.id, nom: p.nom, dateDebut: p.dateDebut, dateFin: p.dateFin, type: p.type,
+                        joursDisponibles: p.dateDebut && p.dateFin ? Math.ceil((new Date(p.dateFin) - new Date(p.dateDebut)) / (1000 * 60 * 60 * 24)) + 1 : 0 }));
+                    addLog(`📅 ${periodes.length} périodes d'écrits chargées`, 'success');
+                } else { periodes = []; }
+            } catch (error) { addLog(`Erreur chargement périodes: ${error.message}`, 'error'); periodes = []; }
+            
+            periodes.forEach(p => { periodeValidation[p.id] = isPeriodeGenerable(p); });
+            const premiereGenerable = periodes.find(p => periodeValidation[p.id]?.allowed === true);
+            if (premiereGenerable) selectedPeriode = premiereGenerable;
+            else if (periodes.length) selectedPeriode = periodes[0];
+            renderPeriodeSelector();
+            updateGenerationButton();
+        }
+
+        function renderPeriodeSelector() {
+            const container = document.getElementById('periodeSelector');
+            if (!container) return;
+            if (!periodes.length) { container.innerHTML = '<div class="alert alert-warning">📭 Aucune période d\'examens écrits disponible.</div>'; return; }
+            
+            container.innerHTML = periodes.map(p => {
+                const isActive = selectedPeriode?.id === p.id;
+                const validation = periodeValidation[p.id] || { allowed: false, reason: 'Validation en cours', status: 'unknown' };
+                const debut = p.dateDebut ? new Date(p.dateDebut).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '?';
+                const fin = p.dateFin ? new Date(p.dateFin).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '?';
+                let statusClass = '', statusText = '';
+                if (validation.status === 'allowed') { statusClass = 'status-allowed'; statusText = '✓ Générable'; }
+                else if (validation.status === 'expired') { statusClass = 'status-expired'; statusText = '✗ Période terminée'; }
+                else if (validation.status === 'future') { statusClass = 'status-future'; statusText = '⏰ Trop lointaine'; }
+                else if (validation.status === 'not_written') { statusClass = 'status-expired'; statusText = '⛔ Période orale'; }
+                else { statusClass = 'status-expired'; statusText = '✗ Non disponible'; }
+                const disabledClass = !validation.allowed ? 'disabled' : '';
+                return `<div class="periode-card ${isActive ? 'active' : ''} ${disabledClass}" data-periode-id="${p.id}">
+                    <div class="periode-title">${p.nom}</div>
+                    <div class="periode-dates">📅 ${debut} → ${fin}</div>
+                    <div class="periode-dates">📊 ${p.joursDisponibles || 0} jours</div>
+                    <div class="periode-status ${statusClass}">${statusText}</div>
+                    ${!validation.allowed ? `<div style="font-size:0.65rem; margin-top:0.5rem; color:#666;">${validation.reason}</div>` : ''}
+                </div>`;
+            }).join('');
+            
+            document.querySelectorAll('.periode-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const found = periodes.find(p => p.id === card.dataset.periodeId);
+                    if (found && periodeValidation[found.id]?.allowed) {
+                        selectedPeriode = found;
+                        renderPeriodeSelector();
+                        updateRecapParClasse();
+                        updateGenerationButton();
+                    } else if (found && !periodeValidation[found.id]?.allowed) {
+                        showAlert(periodeValidation[found.id]?.reason || 'Cette période ne peut pas être générée', 'warning');
+                    }
+                });
+            });
+            
+            const infoContainer = document.getElementById('periodeInfo');
+            if (infoContainer && selectedPeriode) {
+                const validation = periodeValidation[selectedPeriode.id];
+                const infoClass = validation?.allowed ? 'alert-success' : 'alert-warning';
+                infoContainer.innerHTML = `<div class="alert ${infoClass}">
+                    <strong>📅 Période active :</strong> ${selectedPeriode.nom}<br>
+                    <strong>📆 Dates :</strong> du ${formatDateDisplay(selectedPeriode.dateDebut)} au ${formatDateDisplay(selectedPeriode.dateFin)}<br>
+                    <strong>📌 Statut :</strong> ${validation?.reason || 'En attente de validation'}
+                </div>`;
+            }
+        }
+
+        async function loadClasses() {
+            addLog('Chargement des classes...', 'info');
+            try {
+                const response = await fetch(`${API_BASE_URL}/Classe/public`, { headers: getHeaders() });
+                if (response.ok) {
+                    const data = await response.json();
+                    let items = extractData(data);
+                    classes = items.map(c => ({ 
+                        id: getId(c), 
+                        nomClasse: c.nomClasse || c.nom || c.name || c.NomClasse || 'Classe sans nom', 
+                        niveau: c.niveau || c.Niveau || '',
+                        formatAffichage: null
+                    }));
+                    classes.forEach(c => {
+                        c.formatAffichage = formatClasseDisplay(c.niveau, c.nomClasse);
+                    });
+                    addLog(`📚 ${classes.length} classes chargées`, 'success');
+                    classes.slice(0, 5).forEach(c => addLog(`  - ${c.formatAffichage}`, 'info'));
+                } else throw new Error('API error');
+            } catch (error) {
+                addLog(`Erreur classes: ${error.message}`, 'error');
+                classes = [];
+            }
+            updateStat('statClasses', classes.length);
+        }
+
+        async function loadMatieres() {
+            addLog('Chargement des matières depuis SeedMatieres.cs...', 'info');
+            try {
+                const classesResponse = await fetch(`${API_BASE_URL}/Classe/public`, { headers: getHeaders() });
+                if (!classesResponse.ok) throw new Error('Impossible de charger les classes');
+                const classesData = await classesResponse.json();
+                const classesItems = extractData(classesData);
+                
+                const allMatieresTemp = [];
+                for (const classe of classesItems) {
+                    const classeId = getId(classe);
+                    let niveau = classe.niveau || classe.Niveau || '';
+                    if (!niveau && classe.nomClasse) {
+                        if (classe.nomClasse.includes('1ère') || classe.nomClasse.includes('1ere')) niveau = '1ère année';
+                        else if (classe.nomClasse.includes('2ème') || classe.nomClasse.includes('2eme')) niveau = '2ème année';
+                        else if (classe.nomClasse.includes('3ème') || classe.nomClasse.includes('3eme')) niveau = '3ème année';
+                        else if (classe.nomClasse.includes('4ème') || classe.nomClasse.includes('4eme')) niveau = '4ème année';
+                        else if (classe.nomClasse.includes('5ème') || classe.nomClasse.includes('5eme')) niveau = '5ème année';
+                        else if (classe.nomClasse.includes('6ème') || classe.nomClasse.includes('6eme')) niveau = '6ème année';
+                    }
+                    const matieresNames = SEED_MATIERES.getMatieresForNiveau(niveau);
+                    for (const matiereName of matieresNames) {
+                        const duree = SEED_MATIERES.getDuree(matiereName);
+                        const estExclue = SEED_MATIERES.isExclue(matiereName);
+                        allMatieresTemp.push({
+                            id: `${classeId}_${matiereName.replace(/\s/g, '_')}`,
+                            nomMatiere: matiereName,
+                            coefficient: 1,
+                            dureeEnMinutes: duree,
+                            niveau: niveau,
+                            classeId: classeId,
+                            estExclue: estExclue
+                        });
+                    }
+                }
+                matieres = allMatieresTemp.filter(m => !m.estExclue);
+                addLog(`📚 ${matieres.length} matières chargées`, 'success');
+            } catch (error) {
+                addLog(`Erreur matières: ${error.message}`, 'error');
+                matieres = [];
+            }
+            updateStat('statMatieres', matieres.length);
+        }
+
+        async function loadEnseignants() {
+            addLog('Chargement des surveillants...', 'info');
+            try {
+                const responseEns = await fetch(`${API_BASE_URL}/utilisateurs/role/enseignant`, { headers: getHeaders() });
+                let enseignantsList = [];
+                if (responseEns.ok) {
+                    const data = await responseEns.json();
+                    let items = extractData(data);
+                    enseignantsList = items.map(e => ({ id: getId(e), nom: e.nom || e.Nom || '', prenom: e.prenom || e.Prenom || '', email: e.email || e.Email || '' }));
+                }
+                const responsePerm = await fetch(`${API_BASE_URL}/utilisateurs/role/permanent`, { headers: getHeaders() });
+                let permanentsList = [];
+                if (responsePerm.ok) {
+                    const data = await responsePerm.json();
+                    let items = extractData(data);
+                    permanentsList = items.map(p => ({ id: getId(p), nom: p.nom || p.Nom || '', prenom: p.prenom || p.Prenom || '', email: p.email || p.Email || '' }));
+                }
+                enseignants = [...enseignantsList, ...permanentsList];
+                addLog(`👨‍🏫 ${enseignants.length} surveillants chargés`, 'success');
+            } catch (error) {
+                addLog(`Erreur chargement surveillants: ${error.message}`, 'error');
+                enseignants = [];
+            }
+            updateStat('statEnseignants', enseignants.length);
+        }
+
+        async function loadSalles() {
+            addLog('Chargement des salles...', 'info');
+            try {
+                const response = await fetch(`${API_BASE_URL}/Salle/public`, { headers: getHeaders() });
+                if (response.ok) {
+                    const data = await response.json();
+                    let items = extractData(data);
+                    salles = items.map(s => ({ id: getId(s), nomSalle: s.nomSalle || s.nom || s.NomSalle }));
+                    addLog(`🏫 ${salles.length} salles chargées`, 'success');
+                } else throw new Error('API error');
+            } catch (error) {
+                addLog(`Erreur salles: ${error.message}`, 'error');
+                salles = [];
+            }
+            updateStat('statSalles', salles.length);
+        }
+
+        async function loadExams() {
+            addLog('Chargement des examens...', 'info');
+            try {
+                const response = await fetch(`${API_BASE_URL}/Examen/public`, { headers: getHeaders() });
+                if (response.ok) {
+                    const data = await response.json();
+                    let items = extractData(data);
+                    exams = items.map(e => {
+                        let classeId = e.classeId || e.classe_Id || e.ClasseId || e.Classe_Id;
+                        let classeNom = e.classeNom || e.classe_Nom || e.ClasseNom || e.Classe_Nom;
+                        let matiereId = e.matiereId || e.matiere_Id || e.MatiereId;
+                        let matiereNom = e.matiereNom || e.matiere_Nom || e.MatiereNom;
+                        let salleId = e.salle || e.Salle || e.salleId || e.SalleId;
+                        let surveillantsIds = e.surveillantsIds || e.SurveillantsIds || [];
+                        let duree = getDureeForMatiere(matiereNom);
+                        let heureDebut = e.heureDebut || e.HeureDebut;
+                        let heureFin = e.heureFin || e.HeureFin;
+                        let dateStr = e.date ? new Date(e.date).toISOString().split('T')[0] : (e.Date ? new Date(e.Date).toISOString().split('T')[0] : null);
+                        if (!heureDebut) {
+                            if (duree === 120) { heureDebut = '08:00'; heureFin = '10:00'; }
+                            else { heureDebut = '08:00'; heureFin = '09:00'; }
+                        }
+                        return {
+                            id: e.id || e._id || getId(e),
+                            matiereId: matiereId, matiereNom: matiereNom,
+                            classeId: classeId, classeNom: classeNom,
+                            date: dateStr, heureDebut: heureDebut, heureFin: heureFin,
+                            salle: salleId, surveillantsIds: Array.isArray(surveillantsIds) ? surveillantsIds : [],
+                            periodeId: e.periodeId || e.PeriodeId,
+                            coefficient: e.coefficient || e.Coefficient || 1,
+                            duree: duree
+                        };
+                    });
+                    addLog(`✅ ${exams.length} examens chargés`, 'success');
+                } else { exams = []; }
+            } catch (error) { addLog(`Erreur chargement examens: ${error.message}`, 'error'); exams = []; }
+            updateStat('statExamens', exams.length);
+            const badge = document.getElementById('examsCountBadge');
+            if (badge) badge.textContent = `${exams.length} examen(s)`;
+            renderPlanningParNiveau();
+            renderCalendar();
+            renderSurveillanceList();
+            updateRecapParClasse();
+            const regenInfo = document.getElementById('regenerationInfo');
+            if (regenInfo) regenInfo.style.display = exams.length > 0 ? 'block' : 'none';
+        }
+        
+        async function genererExamens() {
+            if (!selectedPeriode) { showAlert('❌ Sélectionnez une période', 'error'); return; }
+            const validation = isPeriodeGenerable(selectedPeriode);
+            if (!validation.allowed) { showAlert(validation.reason, 'error'); return; }
+            const progressDiv = document.getElementById('progressContainer');
+            progressDiv.style.display = 'block';
+            document.getElementById('progressMessage').innerHTML = '🔄 Génération des examens écrits en cours...';
+            try {
+                const response = await fetch(`${API_BASE_URL}/ExamenGeneration/generer/${selectedPeriode.id}?anneeScolaire=2025-2026`, { method: 'POST', headers: getHeaders() });
+                if (response.ok) {
+                    showAlert('✅ Examens écrits générés avec succès', 'success');
+                    await loadExams();
+                } else { const errorText = await response.text(); showAlert(`❌ Erreur génération: ${errorText}`, 'error'); }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); }
+            finally { progressDiv.style.display = 'none'; }
+        }
+
+        async function regenererExamens() {
+            if (!selectedPeriode) { showAlert('❌ Sélectionnez une période', 'error'); return; }
+            const validation = isPeriodeGenerable(selectedPeriode);
+            if (!validation.allowed) { showAlert(validation.reason, 'error'); return; }
+            if (!confirm(`⚠️ ATTENTION : Cette action va supprimer TOUS les examens existants de la période "${selectedPeriode.nom}" puis les régénérer complètement.\n\nVoulez-vous continuer ?`)) return;
+            const progressDiv = document.getElementById('progressContainer');
+            progressDiv.style.display = 'block';
+            document.getElementById('progressMessage').innerHTML = '🗑️ Suppression des examens existants...';
+            try {
+                const deleteResponse = await fetch(`${API_BASE_URL}/ExamenGeneration/periode/${selectedPeriode.id}`, { method: 'DELETE', headers: getHeaders() });
+                if (deleteResponse.ok) {
+                    document.getElementById('progressMessage').innerHTML = '🔄 Regénération des examens en cours...';
+                    const generateResponse = await fetch(`${API_BASE_URL}/ExamenGeneration/generer/${selectedPeriode.id}?anneeScolaire=2025-2026`, { method: 'POST', headers: getHeaders() });
+                    if (generateResponse.ok) {
+                        showAlert('✅ Examens régénérés avec succès', 'success');
+                        await loadExams();
+                    } else { const errorText = await generateResponse.text(); showAlert(`❌ Erreur: ${errorText}`, 'error'); }
+                } else { showAlert('❌ Erreur lors de la suppression', 'error'); }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); }
+            finally { progressDiv.style.display = 'none'; }
+        }
+
+        async function supprimerExamensPeriode() {
+            if (!selectedPeriode) { showAlert('❌ Sélectionnez une période', 'error'); return; }
+            if (!confirm(`Supprimer tous les examens de ${selectedPeriode.nom} ?`)) return;
+            try {
+                const response = await fetch(`${API_BASE_URL}/ExamenGeneration/periode/${selectedPeriode.id}`, { method: 'DELETE', headers: getHeaders() });
+                if (response.ok) { showAlert('✅ Examens supprimés', 'success'); await loadExams(); }
+                else showAlert('❌ Erreur suppression', 'error');
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); }
+        }
+
+        function getClasseNiveau(classeId) {
+            if (!classeId) return 'Non assigné';
+            let c = classes.find(c => c.id === classeId);
+            return c && c.niveau ? c.niveau : 'Niveau inconnu';
+        }
+        
+        function getClasseName(classeId) {
+            if (!classeId) return 'Non assigné';
+            let c = classes.find(c => c.id === classeId);
+            return c && c.formatAffichage ? c.formatAffichage : (classeId.length > 8 ? classeId.substring(0, 8) + '...' : classeId);
+        }
+        
+        function getMatiereName(matiereId) {
+            if (!matiereId) return '—';
+            const m = matieres.find(m => m.id === matiereId);
+            return m ? m.nomMatiere : (matiereId.length > 8 ? matiereId.substring(0, 8) + '...' : matiereId);
+        }
+        
+        function getEnseignantName(id) {
+            if (!id) return 'Non assigné';
+            const idStr = String(id).trim();
+            if (idStr === '') return 'Non assigné';
+            let e = enseignants.find(e => String(e.id) === idStr);
+            if (e) {
+                const nomComplet = `${e.prenom || ''} ${e.nom || ''}`.trim();
+                if (nomComplet && nomComplet !== ' ') return nomComplet;
+                if (e.email) return e.email.split('@')[0];
+                return `Enseignant ${String(e.id).substring(0, 6)}`;
+            }
+            return `ID: ${idStr.substring(0, 10)}${idStr.length > 10 ? '...' : ''}`;
+        }
+        
+        function getSalleName(id) {
+            if (!id) return '—';
+            const s = salles.find(s => s.id === id);
+            if (s) return s.nomSalle;
+            return id.length > 8 ? id.substring(0, 8) + '...' : id;
+        }
+        
+        function formatShortDate(dateStr) {
+            if (!dateStr) return { day: '??', month: '??' };
+            const d = new Date(dateStr);
+            return { day: d.getDate(), month: d.toLocaleDateString('fr-FR', { month: 'short' }) };
+        }
+
+        function renderPlanningParNiveau() {
+            const container = document.getElementById('planningParNiveau');
+            if (!container) return;
+            if (!exams.length) { container.innerHTML = '<div class="empty-exams">📭 Aucun examen écrit planifié pour le moment</div>'; return; }
+            
+            const examsAvecClasse = exams.filter(exam => exam.classeId);
+            if (!examsAvecClasse.length) { container.innerHTML = `<div class="empty-exams">📭 ${exams.length} examen(s) trouvé(s) mais aucun n'a d'ID de classe associé.</div>`; return; }
+            
+            const examsParClasse = new Map();
+            examsAvecClasse.forEach(exam => {
+                const classeId = exam.classeId;
+                if (!classeId) return;
+                if (!examsParClasse.has(classeId)) examsParClasse.set(classeId, { id: classeId, nom: getClasseName(classeId), niveau: getClasseNiveau(classeId), examens: [] });
+                examsParClasse.get(classeId).examens.push(exam);
+            });
+            for (let [_, classeData] of examsParClasse) classeData.examens.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            
+            const parNiveau = new Map();
+            for (let [_, classeData] of examsParClasse) {
+                const niveau = classeData.niveau || 'Non classé';
+                if (!parNiveau.has(niveau)) parNiveau.set(niveau, []);
+                parNiveau.get(niveau).push(classeData);
+            }
+            
+            const niveauxOrdre = ['1ère année', '2ème année', '3ème année', '4ème année', '5ème année', '6ème année', 'Non classé'];
+            const niveauxTries = Array.from(parNiveau.keys()).sort((a, b) => {
+                const ia = niveauxOrdre.indexOf(a), ib = niveauxOrdre.indexOf(b);
+                if (ia === -1 && ib === -1) return (a || '').localeCompare(b || '');
+                if (ia === -1) return 1; if (ib === -1) return -1;
+                return ia - ib;
+            });
+            
+            let html = '';
+            for (const niveau of niveauxTries) {
+                const classesDuNiveau = parNiveau.get(niveau) || [];
+                classesDuNiveau.sort((a, b) => a.nom.localeCompare(b.nom));
+                html += `<div class="niveau-accordion"><div class="niveau-header" data-niveau="${niveau.replace(/ /g, '_')}"><span>📚 ${niveau}</span><span class="toggle-icon">▼</span></div><div class="niveau-content">`;
+                for (const classeData of classesDuNiveau) {
+                    html += `<div class="classe-card"><div class="classe-header" data-classe="${classeData.id}"><h3>🏫 ${classeData.nom}<span class="classe-stats"><span>📝 ${classeData.examens.length} examen(s)</span></span></h3><span class="classe-toggle">▼</span></div><div class="classe-exams">`;
+                    for (const exam of classeData.examens) {
+                        const dateObj = formatShortDate(exam.date);
+                        const matiereNom = exam.matiereNom || getMatiereName(exam.matiereId) || '—';
+                        const dureeText = formatDuree(exam.duree);
+                        const dureeClass = getDureeClass(exam.duree);
+                        const salleNom = getSalleName(exam.salle);
+                        const surveillantsListe = (exam.surveillantsIds || []).filter(id => id && id.trim() !== '');
+                        const surveillantsHtml = surveillantsListe.length ? surveillantsListe.map(id => `<span class="supervisor-badge">👨‍🏫 ${getEnseignantName(id)}</span>`).join('') : '<span class="supervisor-badge" style="background:#e0e0e0;">Non assigné</span>';
+                        html += `<div class="exam-row">
+                            <div class="exam-date"><span class="day">${dateObj.day}</span><span class="month">${dateObj.month}</span></div>
+                            <div class="exam-time">${exam.heureDebut} - ${exam.heureFin}</div>
+                            <div class="exam-subject"><div class="subject-name">${matiereNom}</div><div class="subject-coef">Coefficient: ${exam.coefficient}</div></div>
+                            <div class="exam-duration"><span class="duration-badge ${dureeClass}">${dureeText}</span></div>
+                            <div class="exam-room">${salleNom !== '—' ? `<span class="room-badge">🏛️ ${salleNom}</span>` : '—'}</div>
+                            <div class="exam-supervisors">${surveillantsHtml}</div>
+                            <div class="exam-actions">
+                                <button class="btn-icon edit" onclick="openEditModal('${exam.id}')" title="Modifier">✏️</button>
+                                <button class="btn-icon delete" onclick="window.deleteExamHandler('${exam.id}')" title="Supprimer">🗑️</button>
+                            </div>
+                        </div>`;
+                    }
+                    html += `</div></div>`;
+                }
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.niveau-header').forEach(header => {
+                header.addEventListener('click', () => { const content = header.nextElementSibling; header.classList.toggle('collapsed'); content.classList.toggle('collapsed'); });
+            });
+            document.querySelectorAll('.classe-header').forEach(header => {
+                header.addEventListener('click', (e) => { e.stopPropagation(); const content = header.nextElementSibling; header.classList.toggle('collapsed'); content.classList.toggle('collapsed'); });
+            });
+        }
+
+        window.deleteExamHandler = async function(id) {
+            if (confirm('Supprimer cet examen ?')) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/Examen/${id}`, { method: 'DELETE', headers: getHeaders() });
+                    if (response.ok) { showAlert('✅ Examen supprimé', 'success'); await loadExams(); }
+                    else showAlert('❌ Erreur suppression', 'error');
+                } catch (error) { showAlert(`❌ ${error.message}`, 'error'); }
+            }
+        };
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarView');
+            if (!container) return;
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            let startDayOfWeek = firstDayOfMonth.getDay();
+            startDayOfWeek = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+            const startDate = new Date(firstDayOfMonth);
+            startDate.setDate(firstDayOfMonth.getDate() - startDayOfWeek);
+            const endDate = new Date(lastDayOfMonth);
+            const endDayOfWeek = lastDayOfMonth.getDay();
+            const daysToAdd = endDayOfWeek === 0 ? 0 : 7 - endDayOfWeek;
+            endDate.setDate(lastDayOfMonth.getDate() + daysToAdd);
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            let html = `<div class="calendar-header"><button class="calendar-nav-btn" id="prevMonthBtn">◀</button><span class="calendar-month">${monthNames[month]} ${year}</span><button class="calendar-nav-btn" id="nextMonthBtn">▶</button></div>
+                        <div class="calendar-weekdays">${dayNames.map(d => `<div class="calendar-weekday">${d}</div>`).join('')}</div><div class="calendar-days">`;
+            let current = new Date(startDate);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            while (current <= endDate) {
+                const dateStr = current.toISOString().split('T')[0];
+                const isCurrentMonth = current.getMonth() === month;
+                const isToday = current.toDateString() === today.toDateString();
+                const examsOfDay = exams.filter(e => e.date === dateStr);
+                const examCount = examsOfDay.length;
+                let dayClass = 'calendar-day';
+                if (!isCurrentMonth) dayClass += ' other-month';
+                if (isToday) dayClass += ' today';
+                html += `<div class="${dayClass}"><div class="calendar-day-number">${current.getDate()}</div>`;
+                examsOfDay.slice(0, 3).forEach(e => {
+                    const nom = e.matiereNom || getMatiereName(e.matiereId) || 'Examen';
+                    const classeAbrev = e.classeNom ? ` (${getClasseName(e.classeId)})` : '';
+                    html += `<div class="calendar-exam ${examCount > 1 ? 'calendar-exam-multiple' : ''}" title="${nom}${classeAbrev} - ${e.heureDebut}" onclick="openEditModal('${e.id}')">${nom.substring(0, 10)}${classeAbrev.substring(0, 8)}</div>`;
+                });
+                if (examsOfDay.length > 3) html += `<div class="calendar-exam calendar-exam-multiple">+${examsOfDay.length - 3} autres</div>`;
+                html += `</div>`;
+                current.setDate(current.getDate() + 1);
+            }
+            html += `</div>`;
+            container.innerHTML = html;
+            document.getElementById('prevMonthBtn')?.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); renderCalendar(); });
+            document.getElementById('nextMonthBtn')?.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); });
+        }
+
+        function updateRecapParClasse() {
+            const container = document.getElementById('recapParClasse');
+            if (!container) return;
+            if (!selectedPeriode) { container.innerHTML = '<div class="alert alert-info">Sélectionnez une période</div>'; return; }
+            const examsPeriode = exams.filter(e => e.periodeId === selectedPeriode.id);
+            if (!examsPeriode.length) { container.innerHTML = '<div class="alert alert-info">📭 Aucun examen pour cette période</div>'; return; }
+            const parClasse = new Map();
+            examsPeriode.forEach(e => { const nom = getClasseName(e.classeId); if (nom && nom !== 'Non assigné') { if (!parClasse.has(nom)) parClasse.set(nom, []); parClasse.get(nom).push(e); } });
+            if (parClasse.size === 0) { container.innerHTML = '<div class="alert alert-warning">📭 Examens trouvés mais sans classe associée</div>'; return; }
+            container.innerHTML = `<div class="table-wrapper"><table class="data-table"><thead><tr><th>Classe</th><th>Examens</th><th>Statut</th></tr></thead><tbody>${Array.from(parClasse.entries()).map(([nom, data]) => `<tr><td><strong>${nom}</strong></td><td>${data.length}</div><td><span class="badge badge-success">✅ Planifié</span></td>`).join('')}</tbody>}</div>`;
+        }
+
+        function renderSurveillanceParCreneau() {
+            const container = document.getElementById('surveillanceList');
+            if (!container) return;
+            const withSurv = exams.filter(e => e.surveillantsIds && e.surveillantsIds.length > 0 && e.surveillantsIds.some(id => id && id.trim() !== ''));
+            if (!withSurv.length) { container.innerHTML = '<div class="empty-exams">📭 Aucune surveillance assignée</div>'; return; }
+            const parDateEtCreneau = new Map();
+            withSurv.forEach(exam => {
+                const dateKey = exam.date;
+                if (!parDateEtCreneau.has(dateKey)) parDateEtCreneau.set(dateKey, new Map());
+                const creneauxParDate = parDateEtCreneau.get(dateKey);
+                const heureDebut = exam.heureDebut;
+                if (!creneauxParDate.has(heureDebut)) creneauxParDate.set(heureDebut, []);
+                creneauxParDate.get(heureDebut).push(exam);
+            });
+            const datesTriees = Array.from(parDateEtCreneau.keys()).sort();
+            let html = '';
+            for (const date of datesTriees) {
+                const dateFormatted = new Date(date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                const creneauxParDate = parDateEtCreneau.get(date);
+                const heuresTriees = Array.from(creneauxParDate.keys()).sort();
+                html += `<div style="margin-bottom: 2rem;"><h2 style="color: var(--primary-dark); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--primary-green);">📅 ${dateFormatted}</h2>`;
+                for (const heure of heuresTriees) {
+                    const examensCreneau = creneauxParDate.get(heure);
+                    const premierExam = examensCreneau[0];
+                    const heureFin = premierExam.heureFin;
+                    html += `<div class="creneau-card"><div class="creneau-header" data-creneau="${date}_${heure}"><h3>⏰ ${heure} - ${heureFin}<span class="creneau-stats"><span>📝 ${examensCreneau.length} examen(s)</span></span></h3><span class="creneau-toggle">▼</span></div><div class="creneau-exams">`;
+                    for (const exam of examensCreneau) {
+                        const matiereNom = exam.matiereNom || getMatiereName(exam.matiereId) || '—';
+                        const classeNom = getClasseName(exam.classeId);
+                        const salleNom = getSalleName(exam.salle);
+                        const surveillantsListe = (exam.surveillantsIds || []).filter(id => id && id.trim() !== '');
+                        const surveillantNom = surveillantsListe.length ? getEnseignantName(surveillantsListe[0]) : 'Non assigné';
+                        html += `<div class="exam-card"><div class="exam-info"><div class="exam-matiere">📖 ${matiereNom}</div><div class="exam-classe">🏫 ${classeNom}</div></div>
+                                <div class="exam-location"><span class="salle-badge">🏛️ ${salleNom !== '—' ? salleNom : 'Salle non assignée'}</span></div>
+                                <div class="exam-supervisors"><span class="supervisor-badge">👨‍🏫 ${surveillantNom}</span></div>
+                                <div class="exam-actions"><button class="btn-icon edit" onclick="openEditModal('${exam.id}')" title="Modifier">✏️</button><button class="btn-icon delete" onclick="window.deleteExamHandler('${exam.id}')" title="Supprimer">🗑️</button></div></div>`;
+                    }
+                    html += `</div></div>`;
+                }
+                html += `</div>`;
+            }
+            container.innerHTML = html;
+            document.querySelectorAll('.creneau-header').forEach(header => {
+                header.addEventListener('click', () => { const content = header.nextElementSibling; header.classList.toggle('collapsed'); content.classList.toggle('collapsed'); });
+            });
+        }
+
+        function renderSurveillanceParEnseignant() {
+            const container = document.getElementById('surveillanceList');
+            if (!container) return;
+            const examensParEnseignant = new Map();
+            exams.forEach(exam => {
+                const surveillantsIds = exam.surveillantsIds || [];
+                surveillantsIds.forEach(ensId => {
+                    if (!ensId || ensId.trim() === '') return;
+                    if (!examensParEnseignant.has(ensId)) examensParEnseignant.set(ensId, []);
+                    examensParEnseignant.get(ensId).push(exam);
+                });
+            });
+            if (examensParEnseignant.size === 0) { container.innerHTML = '<div class="empty-exams">📭 Aucune surveillance assignée</div>'; return; }
+            const enseignantsAvecExamens = Array.from(examensParEnseignant.keys()).map(id => ({ id: id, nom: getEnseignantName(id), examens: examensParEnseignant.get(id) })).sort((a, b) => a.nom.localeCompare(b.nom));
+            let html = '';
+            for (const ens of enseignantsAvecExamens) {
+                ens.examens.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+                html += `<div class="surveillant-accordion"><div class="surveillant-header" data-enseignant="${ens.id}"><span>👨‍🏫 ${ens.nom} <span class="badge badge-success" style="background: var(--primary-green); color: white; margin-left:10px;">${ens.examens.length} examen(s)</span></span><span class="toggle-icon">▼</span></div>
+                        <div class="surveillant-content"><div class="surveillant-stats">📊 ${ens.examens.length} examen(s) à surveiller</div>
+                        <div class="table-wrapper"><table class="data-table"><thead><tr><th>📅 Date</th><th>⏰ Créneau</th><th>📚 Matière</th><th>🏫 Classe</th><th>🏛️ Salle</th><th>Actions</th></tr></thead><tbody>`;
+                for (const exam of ens.examens) {
+                    const dateFormatted = exam.date ? new Date(exam.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Date inconnue';
+                    const classeNom = getClasseName(exam.classeId);
+                    html += `<tr><td>${dateFormatted}</td><td>${exam.heureDebut} - ${exam.heureFin}</td><td><strong>${exam.matiereNom || getMatiereName(exam.matiereId) || '—'}</strong></td><td>${classeNom}</td><td>${getSalleName(exam.salle)}</td>
+                            <td class="action-buttons"><button class="btn-icon edit" onclick="openEditModal('${exam.id}')" title="Modifier">✏️</button><button class="btn-icon delete" onclick="window.deleteExamHandler('${exam.id}')" title="Supprimer">🗑️</button></td></tr>`;
+                }
+                html += `</tbody></table></div></div></div>`;
+            }
+            container.innerHTML = html;
+            document.querySelectorAll('.surveillant-header').forEach(header => {
+                header.addEventListener('click', () => { const content = header.nextElementSibling; header.classList.toggle('collapsed'); content.classList.toggle('collapsed'); });
+            });
+        }
+
+        window.openEditModal = function(examenId) {
+            const examen = exams.find(e => e.id === examenId);
+            if (!examen) return;
+            document.getElementById('editExamenId').value = examen.id;
+            document.getElementById('editMatiereNom').value = examen.matiereNom || '';
+            document.getElementById('editClasseNom').value = getClasseName(examen.classeId);
+            document.getElementById('editDate').value = examen.date;
+            document.getElementById('editHeureDebut').value = examen.heureDebut;
+            document.getElementById('editHeureFin').value = examen.heureFin;
+            document.getElementById('editSalle').value = examen.salle || '';
+            document.getElementById('editSurveillant').value = examen.surveillantsIds?.[0] || '';
+            const salleSelect = document.getElementById('editSalle');
+            salleSelect.innerHTML = '<option value="">-- Sélectionner --</option>' + salles.map(s => `<option value="${s.id}" ${examen.salle === s.id ? 'selected' : ''}>${s.nomSalle}</option>`).join('');
+            const surveillantSelect = document.getElementById('editSurveillant');
+            surveillantSelect.innerHTML = '<option value="">-- Sélectionner --</option>' + enseignants.map(e => `<option value="${e.id}" ${examen.surveillantsIds?.[0] === e.id ? 'selected' : ''}>${e.prenom || ''} ${e.nom || ''}</option>`).join('');
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        async function verifierConflitsAvantModification(examenId, modifications) {
+            const examen = exams.find(e => e.id === examenId);
+            if (!examen) return { estDisponible: true, conflits: [] };
+            const classeId = examen.classeId;
+            const date = modifications.date || examen.date;
+            const heureDebut = modifications.heureDebut || examen.heureDebut;
+            const heureFin = modifications.heureFin || examen.heureFin;
+            try {
+                const response = await fetch(`${API_BASE_URL}/Examen/verifier-conflits?classeId=${classeId}&date=${date}&heureDebut=${heureDebut}&heureFin=${heureFin}&examenId=${examenId}`, { headers: getHeaders() });
+                if (response.ok) { const data = await response.json(); return data.data || { estDisponible: true, conflits: [] }; }
+            } catch (error) { console.error('Erreur vérification conflits:', error); }
+            return { estDisponible: true, conflits: [] };
+        }
+
+        async function modifierDateExamen(examenId, nouvelleDate) {
+            const verification = await verifierConflitsAvantModification(examenId, { date: nouvelleDate });
+            if (!verification.estDisponible) { let message = "❌ Impossible de modifier la date :\n"; verification.conflits.forEach(c => message += `- ${c.description}\n`); showAlert(message, 'error'); return false; }
+            try {
+                const response = await fetch(`${API_BASE_URL}/Examen/${examenId}/date`, { method: 'PATCH', headers: getHeaders(), body: JSON.stringify(nouvelleDate) });
+                if (response.ok) { showAlert('✅ Date modifiée avec succès', 'success'); await loadExams(); return true; }
+                else { const error = await response.text(); showAlert(`❌ Erreur: ${error}`, 'error'); return false; }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); return false; }
+        }
+
+        async function modifierHoraireExamen(examenId, heureDebut, heureFin) {
+            const verification = await verifierConflitsAvantModification(examenId, { heureDebut, heureFin });
+            if (!verification.estDisponible) { let message = "❌ Impossible de modifier l'horaire :\n"; verification.conflits.forEach(c => message += `- ${c.description}\n`); showAlert(message, 'error'); return false; }
+            try {
+                const response = await fetch(`${API_BASE_URL}/Examen/${examenId}/horaire`, { method: 'PATCH', headers: getHeaders(), body: JSON.stringify({ heureDebut, heureFin }) });
+                if (response.ok) { showAlert('✅ Horaire modifié avec succès', 'success'); await loadExams(); return true; }
+                else { const error = await response.text(); showAlert(`❌ Erreur: ${error}`, 'error'); return false; }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); return false; }
+        }
+
+        async function modifierSalleExamen(examenId, salleId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Examen/${examenId}/salle`, { method: 'PATCH', headers: getHeaders(), body: JSON.stringify(salleId) });
+                if (response.ok) { showAlert('✅ Salle modifiée avec succès', 'success'); await loadExams(); return true; }
+                else { const error = await response.text(); showAlert(`❌ Erreur: ${error}`, 'error'); return false; }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); return false; }
+        }
+
+        async function modifierSurveillantExamen(examenId, surveillantId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Examen/${examenId}/surveillant`, { method: 'PATCH', headers: getHeaders(), body: JSON.stringify(surveillantId) });
+                if (response.ok) { showAlert('✅ Surveillant modifié avec succès', 'success'); await loadExams(); return true; }
+                else { const error = await response.text(); showAlert(`❌ Erreur: ${error}`, 'error'); return false; }
+            } catch (error) { showAlert(`❌ ${error.message}`, 'error'); return false; }
+        }
+
+        window.saveAllModifications = async function() {
+            const examenId = document.getElementById('editExamenId').value;
+            const nouvelleDate = document.getElementById('editDate').value;
+            const nouvelleHeureDebut = document.getElementById('editHeureDebut').value;
+            const nouvelleHeureFin = document.getElementById('editHeureFin').value;
+            const nouvelleSalle = document.getElementById('editSalle').value;
+            const nouveauSurveillant = document.getElementById('editSurveillant').value;
+            const examenOriginal = exams.find(e => e.id === examenId);
+            if (!examenOriginal) return;
+            let success = true;
+            if (nouvelleDate !== examenOriginal.date) success = await modifierDateExamen(examenId, nouvelleDate) && success;
+            if ((nouvelleHeureDebut !== examenOriginal.heureDebut || nouvelleHeureFin !== examenOriginal.heureFin) && success) success = await modifierHoraireExamen(examenId, nouvelleHeureDebut, nouvelleHeureFin) && success;
+            if (nouvelleSalle !== (examenOriginal.salle || '') && success) success = await modifierSalleExamen(examenId, nouvelleSalle) && success;
+            if (nouveauSurveillant !== (examenOriginal.surveillantsIds?.[0] || '') && success) success = await modifierSurveillantExamen(examenId, nouveauSurveillant) && success;
+            if (success) { closeEditModal(); await loadExams(); }
+        };
+
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+        function renderSurveillanceList() { if (surveillanceMode === 'creneau') renderSurveillanceParCreneau(); else renderSurveillanceParEnseignant(); }
+        function updateStat(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
+        
+        function showAlert(msg, type, duration = 5000) {
+            const alertDiv = document.getElementById('alertMessage');
+            if (!alertDiv) return;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = msg;
+            alertDiv.style.display = 'block';
+            setTimeout(() => alertDiv.style.display = 'none', duration);
+        }
+
+        function attachEvents() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(`tab-${tabId}`)?.classList.add('active');
+                    if (tabId === 'planning') renderPlanningParNiveau();
+                    if (tabId === 'calendrier') renderCalendar();
+                    if (tabId === 'surveillance') renderSurveillanceList();
+                    if (tabId === 'generation') updateRecapParClasse();
+                    if (tabId === 'periodes') renderPeriodesList();
+                });
+            });
+            document.getElementById('switchParCreneau')?.addEventListener('click', () => {
+                surveillanceMode = 'creneau';
+                document.getElementById('switchParCreneau').classList.add('active');
+                document.getElementById('switchParEnseignant').classList.remove('active');
+                renderSurveillanceParCreneau();
+            });
+            document.getElementById('switchParEnseignant')?.addEventListener('click', () => {
+                surveillanceMode = 'enseignant';
+                document.getElementById('switchParEnseignant').classList.add('active');
+                document.getElementById('switchParCreneau').classList.remove('active');
+                renderSurveillanceParEnseignant();
+            });
+            document.getElementById('btnGenerer')?.addEventListener('click', genererExamens);
+            document.getElementById('btnRegenerer')?.addEventListener('click', regenererExamens);
+            document.getElementById('btnSupprimer')?.addEventListener('click', supprimerExamensPeriode);
+            document.getElementById('btnVerifier')?.addEventListener('click', () => { showAlert(`✅ ${classes.length} classes, ${matieres.length} matières, ${exams.length} examens`, 'success', 3000); });
+            document.getElementById('periodeForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const periodeData = { id: document.getElementById('periodeId').value, dateDebut: document.getElementById('periodeDateDebut').value, dateFin: document.getElementById('periodeDateFin').value, description: document.getElementById('periodeDescription').value };
+                await updatePeriodeDates(periodeData);
+            });
+        }
+
+        async function init() {
+            addLog('Initialisation...', 'info');
+            await loadPeriodesConfig();
+            await loadClasses();
+            await loadMatieres();
+            await loadEnseignants();
+            await loadSalles();
+            await loadPeriodes();
+            await loadExams();
+            renderPeriodeSelector();
+            updateRecapParClasse();
+            attachEvents();
+            addLog('Initialisation terminée', 'success');
+        }
+        
+        window.closePeriodeModal = closePeriodeModal;
+        init();
+    })();
+    </script>
+</body>
+</html>

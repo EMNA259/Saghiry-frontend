@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Absences de mes enfants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .enfants-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e9e7;
+        }
+
+        .enfants-tabs {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .enfant-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            background: #f8fafc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .enfant-tab:hover {
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .enfant-tab.active {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            border-color: #4ca896;
+            box-shadow: 0 4px 15px rgba(76, 168, 150, 0.3);
+        }
+
+        .enfant-tab.active .enfant-tab-name {
+            color: white;
+        }
+
+        .enfant-tab.active .enfant-tab-class {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .enfant-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #4ca896, #2d6b63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .enfant-tab-info {
+            text-align: left;
+        }
+
+        .enfant-tab-name {
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .enfant-tab-class {
+            font-size: 0.7rem;
+            background: rgba(76, 168, 150, 0.2);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            color: #1e3b36;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .page-title p {
+            color: #5a9d91;
+            margin-top: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .annee-badge {
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .search-box:focus-within {
+            border-color: #4ca896;
+            box-shadow: 0 4px 20px rgba(76, 168, 150, 0.2);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-button {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: #3d8a7f;
+            transform: scale(1.02);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1.5rem;
+            background: white;
+            border: 1px solid #e0e9e7;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: #4ca896;
+            color: white;
+            border-color: #4ca896;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .search-info {
+            text-align: center;
+            margin: 0.5rem 0 1rem;
+            font-size: 0.9rem;
+            color: #5a9d91;
+        }
+
+        .clear-search {
+            color: #4ca896;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+            margin-left: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e9e7;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #4ca896;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .stat-label {
+            color: #5a9d91;
+            font-size: 0.85rem;
+        }
+
+        /* Styles pour les deux sections (absences + remarques) */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .section-title h2 {
+            color: #1e3b36;
+            font-size: 1.3rem;
+        }
+
+        .absences-table-container,
+        .remarques-table-container {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            border: 1px solid #e0e9e7;
+            margin-bottom: 1.5rem;
+        }
+
+        .absences-table,
+        .remarques-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        .absences-table th,
+        .remarques-table th {
+            background: #f8fafc;
+            color: #1e3b36;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .absences-table td,
+        .remarques-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e9e7;
+            vertical-align: middle;
+        }
+
+        .absences-table tr:hover,
+        .remarques-table tr:hover {
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .absence-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .absence-badge.presence {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .absence-badge.retard {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .absence-badge.absence {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .remarque-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .remarque-badge.positive {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .remarque-badge.neutral {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .remarque-badge.negative {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .remarque-badge.warning {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .gravite-high {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .gravite-medium {
+            color: #f57c00;
+            font-weight: bold;
+        }
+
+        .gravite-low {
+            color: #2e7d32;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            border: 2px dashed #e0e9e7;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .modal-title {
+            color: #1e3b36;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #5a9d91;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        .absence-detail,
+        .remarque-detail {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .absence-detail p,
+        .remarque-detail p {
+            margin-bottom: 0.5rem;
+        }
+
+        .validation-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: #4ca896;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .enfant-tab { padding: 0.5rem 1rem; }
+            .enfant-avatar { width: 35px; height: 35px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContainer">
+        <div class="loading">Chargement des absences et remarques...</div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">📋 Détails</h2>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+            <div class="validation-buttons">
+                <button class="btn-outline" onclick="closeDetailModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        let enfants = [];
+        let currentEnfantId = null;
+        let absencesData = {};
+        let remarquesData = {};
+        let filteredAbsences = [];
+        let filteredRemarques = [];
+        let currentTypeFilter = 'all';
+        let currentRemarqueTypeFilter = 'all';
+        let currentSearchTerm = '';
+        let currentRemarqueSearchTerm = '';
+        let timeoutId = null;
+        let timeoutIdRemarque = null;
+        let enseignantsCache = {};
+
+        const AFFICHER_CLASSE = true;
+        const UTILISER_NIVEAU = true;
+
+        function isMongoId(str) {
+            return typeof str === 'string' && /^[a-f0-9]{24}$/i.test(str);
+        }
+
+        function formatClassName(enfant) {
+            if (!AFFICHER_CLASSE) return '';
+            if (UTILISER_NIVEAU && enfant.niveau) return enfant.niveau;
+            if (enfant.classeNom && !isMongoId(enfant.classeNom)) return enfant.classeNom;
+            if (enfant.classeId && !isMongoId(enfant.classeId)) return enfant.classeId;
+            return '';
+        }
+
+        function cleanChildName(prenom, nom) {
+            let cleanPrenom = prenom || '';
+            let cleanNom = nom || '';
+            
+            if (typeof cleanPrenom === 'object') {
+                cleanPrenom = cleanPrenom.nom || cleanPrenom.prenom || cleanPrenom.value || '';
+            }
+            if (typeof cleanNom === 'object') {
+                cleanNom = cleanNom.nom || cleanNom.prenom || cleanNom.value || '';
+            }
+            
+            let fullName = `${cleanPrenom} ${cleanNom}`.trim();
+            fullName = fullName.replace(/[a-f0-9]{24}/gi, '');
+            fullName = fullName.replace(/6995fdbdaf7c09c380f1e289/gi, '');
+            fullName = fullName.replace(/699aebde9977fd14213a85a7/gi, '');
+            fullName = fullName.replace(/\s+/g, ' ').trim();
+            
+            if (fullName && fullName.length > 0 && fullName !== ' ') {
+                fullName = fullName.split(' ').map(word => {
+                    if (word.length === 0) return '';
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }).join(' ');
+            }
+            
+            return fullName || "Mon enfant";
+        }
+
+        function getAuthToken() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    return window.parent.ParentSpace.getToken();
+                }
+                if (window.ParentSpace && typeof window.ParentSpace.getToken === 'function') {
+                    return window.ParentSpace.getToken();
+                }
+            } catch(e) { console.warn('Cannot access ParentSpace:', e); }
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || localStorage.getItem('parentAuthToken');
+        }
+
+        function requestTokenFromParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'REQUEST_TOKEN' }, '*');
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'SET_TOKEN') {
+                token = event.data.token;
+                console.log('✅ Token reçu du parent');
+                chargerEnfants();
+            }
+        });
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Date inconnue';
+            try {
+                let d;
+                if (dateStr.$date) {
+                    d = new Date(dateStr.$date);
+                } else {
+                    d = new Date(dateStr);
+                }
+                if (isNaN(d.getTime())) return dateStr;
+                return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch(e) {
+                return dateStr;
+            }
+        }
+
+        function getTypeBadge(type) {
+            const types = {
+                'presence': '<span class="absence-badge presence">✅ Présent</span>',
+                'retard': '<span class="absence-badge retard">⏰ Retard</span>',
+                'absence': '<span class="absence-badge absence">❌ Absent</span>'
+            };
+            return types[type] || `<span class="absence-badge">${type}</span>`;
+        }
+
+        function getRemarqueTypeBadge(type) {
+            const types = {
+                'positive': '<span class="remarque-badge positive">⭐ Positive</span>',
+                'neutral': '<span class="remarque-badge neutral">ℹ️ Neutre</span>',
+                'negative': '<span class="remarque-badge negative">⚠️ Négative</span>',
+                'warning': '<span class="remarque-badge warning">⚡ Avertissement</span>'
+            };
+            return types[type] || `<span class="remarque-badge">${type}</span>`;
+        }
+
+        function getGraviteClass(gravite) {
+            if (!gravite) return '';
+            const g = gravite.toLowerCase();
+            if (g === 'haute' || g === 'high' || g === 'elevee') return 'gravite-high';
+            if (g === 'moyenne' || g === 'medium') return 'gravite-medium';
+            return 'gravite-low';
+        }
+
+        function getGraviteText(gravite) {
+            if (!gravite) return 'Non spécifiée';
+            const gravites = {
+                'haute': '🔴 Haute',
+                'high': '🔴 Haute',
+                'elevee': '🔴 Haute',
+                'moyenne': '🟠 Moyenne',
+                'medium': '🟠 Moyenne',
+                'basse': '🟢 Basse',
+                'low': '🟢 Basse'
+            };
+            return gravites[gravite.toLowerCase()] || gravite;
+        }
+
+        function getSuiviBadge(suivi) {
+            if (suivi === true || suivi === 'true') {
+                return '<span style="color: #2e7d32;">✅ Suivi effectué</span>';
+            }
+            return '<span style="color: #f57c00;">⏳ En attente de suivi</span>';
+        }
+
+        function getEnseignantName(enseignantId) {
+            if (!enseignantId) return 'Non spécifié';
+            return enseignantsCache[enseignantId] || `Enseignant (${enseignantId.substring(enseignantId.length - 8)})`;
+        }
+
+        async function loadAllEnseignantsNames() {
+            try {
+                const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enseignants-noms`, { headers });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        enseignantsCache = data.data;
+                        console.log(`✅ ${Object.keys(enseignantsCache).length} enseignant(s) chargé(s)`);
+                        return true;
+                    }
+                }
+            } catch(e) {
+                console.error('Erreur chargement enseignants:', e);
+            }
+            return false;
+        }
+
+        async function chargerEnfants() {
+            if (!token) {
+                token = getAuthToken();
+                if (!token) {
+                    requestTokenFromParent();
+                    setTimeout(() => { if (!token) chargerEnfants(); }, 500);
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enfants`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        requestTokenFromParent();
+                        setTimeout(() => chargerEnfants(), 1000);
+                        return;
+                    }
+                    throw new Error(`Erreur ${response.status}`);
+                }
+
+                const data = await response.json();
+                enfants = data.data || [];
+                console.log(`📊 ${enfants.length} enfant(s) trouvé(s)`);
+
+                if (enfants.length === 0) {
+                    afficherAucunEnfant();
+                    return;
+                }
+
+                await loadAllEnseignantsNames();
+                await chargerAbsencesTousEnfants();
+                await chargerRemarquesTousEnfants();
+                
+                if (enfants.length > 0 && !currentEnfantId) {
+                    currentEnfantId = enfants[0].id;
+                }
+                
+                afficherInterface();
+
+            } catch (error) {
+                console.error('Erreur chargement enfants:', error);
+                afficherErreur('Impossible de charger la liste de vos enfants.');
+            }
+        }
+
+        async function chargerAbsencesEnfant(eleveId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/Absence/eleve/${eleveId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        absencesData[eleveId] = [];
+                        return;
+                    }
+                    throw new Error(`Erreur ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let absences = data.Success ? data.Data : (data.data ? data.data : (Array.isArray(data) ? data : []));
+                
+                absencesData[eleveId] = absences.map(a => ({
+                    id: a.Id || a.id,
+                    type: a.Type || a.type,
+                    motif: a.Motif || a.motif || '-',
+                    date: a.Date || a.date,
+                    duree: a.Duree || a.duree || 1,
+                    enseignantId: a.EnseignantId || a.enseignantId
+                }));
+                
+                console.log(`📊 ${absencesData[eleveId].length} absence(s) pour l'enfant ${eleveId}`);
+
+            } catch (error) {
+                console.error(`Erreur chargement absences pour ${eleveId}:`, error);
+                absencesData[eleveId] = [];
+            }
+        }
+
+        async function chargerRemarquesEnfant(eleveId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/Remarque/eleve/${eleveId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        remarquesData[eleveId] = [];
+                        return;
+                    }
+                    throw new Error(`Erreur ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let remarques = data.Success ? data.Data : (data.data ? data.data : (Array.isArray(data) ? data : []));
+                
+                remarquesData[eleveId] = remarques.map(r => ({
+                    id: r.Id || r.id,
+                    type: r.Type || r.type || 'neutral',
+                    contenu: r.Contenu || r.contenu || r.message || '-',
+                    date: r.Date || r.date || r.CreatedAt || r.createdAt,
+                    gravite: r.Gravite || r.gravite || 'moyenne',
+                    suivi: r.Suivi === true || r.suivi === true,
+                    enseignantId: r.EnseignantId || r.enseignantId,
+                    titre: r.Titre || r.titre || 'Remarque'
+                }));
+                
+                console.log(`📝 ${remarquesData[eleveId].length} remarque(s) pour l'enfant ${eleveId}`);
+
+            } catch (error) {
+                console.error(`Erreur chargement remarques pour ${eleveId}:`, error);
+                remarquesData[eleveId] = [];
+            }
+        }
+
+        async function chargerAbsencesTousEnfants() {
+            for (const enfant of enfants) {
+                await chargerAbsencesEnfant(enfant.id);
+            }
+        }
+
+        async function chargerRemarquesTousEnfants() {
+            for (const enfant of enfants) {
+                await chargerRemarquesEnfant(enfant.id);
+            }
+        }
+
+        async function rafraichirAbsences() {
+            if (currentEnfantId) {
+                await chargerAbsencesEnfant(currentEnfantId);
+                await chargerRemarquesEnfant(currentEnfantId);
+                afficherInterface();
+            }
+        }
+
+        function applyFilters() {
+            const absences = absencesData[currentEnfantId] || [];
+            filteredAbsences = [...absences];
+            
+            if (currentTypeFilter !== 'all') {
+                filteredAbsences = filteredAbsences.filter(a => a.type === currentTypeFilter);
+            }
+            
+            if (currentSearchTerm && currentSearchTerm.trim()) {
+                const term = currentSearchTerm.toLowerCase().trim();
+                filteredAbsences = filteredAbsences.filter(a => {
+                    const motif = (a.motif || '').toLowerCase();
+                    const enseignantNom = getEnseignantName(a.enseignantId).toLowerCase();
+                    return motif.includes(term) || enseignantNom.includes(term);
+                });
+            }
+
+            const remarques = remarquesData[currentEnfantId] || [];
+            filteredRemarques = [...remarques];
+            
+            if (currentRemarqueTypeFilter !== 'all') {
+                filteredRemarques = filteredRemarques.filter(r => r.type === currentRemarqueTypeFilter);
+            }
+            
+            if (currentRemarqueSearchTerm && currentRemarqueSearchTerm.trim()) {
+                const term = currentRemarqueSearchTerm.toLowerCase().trim();
+                filteredRemarques = filteredRemarques.filter(r => {
+                    const contenu = (r.contenu || '').toLowerCase();
+                    const titre = (r.titre || '').toLowerCase();
+                    const enseignantNom = getEnseignantName(r.enseignantId).toLowerCase();
+                    return contenu.includes(term) || titre.includes(term) || enseignantNom.includes(term);
+                });
+            }
+        }
+
+        function clearSearch() {
+            const inp = document.getElementById('searchInput');
+            if (inp) inp.value = '';
+            currentSearchTerm = '';
+            applyFilters();
+            afficherInterface();
+        }
+
+        function clearRemarqueSearch() {
+            const inp = document.getElementById('remarqueSearchInput');
+            if (inp) inp.value = '';
+            currentRemarqueSearchTerm = '';
+            applyFilters();
+            afficherInterface();
+        }
+
+        function handleSearch() {
+            const inp = document.getElementById('searchInput');
+            currentSearchTerm = inp ? inp.value : '';
+            applyFilters();
+            afficherInterface();
+        }
+
+        function handleRemarqueSearch() {
+            const inp = document.getElementById('remarqueSearchInput');
+            currentRemarqueSearchTerm = inp ? inp.value : '';
+            applyFilters();
+            afficherInterface();
+        }
+
+        function filterByType(type, event) {
+            currentTypeFilter = type;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            if (event) event.target.classList.add('active');
+            applyFilters();
+            afficherInterface();
+        }
+
+        function filterRemarqueByType(type, event) {
+            currentRemarqueTypeFilter = type;
+            document.querySelectorAll('.remarque-filter-tab').forEach(t => t.classList.remove('active'));
+            if (event) event.target.classList.add('active');
+            applyFilters();
+            afficherInterface();
+        }
+
+        function debounce(func, delay) {
+            return function() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(func, delay);
+            };
+        }
+
+        function debounceRemarque(func, delay) {
+            return function() {
+                clearTimeout(timeoutIdRemarque);
+                timeoutIdRemarque = setTimeout(func, delay);
+            };
+        }
+
+        function afficherInterface() {
+            const container = document.getElementById('mainContainer');
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const absences = absencesData[currentEnfantId] || [];
+            const remarques = remarquesData[currentEnfantId] || [];
+            
+            const totalAbsences = absences.length;
+            const absencesCount = absences.filter(a => a.type === 'absence').length;
+            const retardsCount = absences.filter(a => a.type === 'retard').length;
+            const presencesCount = absences.filter(a => a.type === 'presence').length;
+            
+            const totalRemarques = remarques.length;
+            const positiveCount = remarques.filter(r => r.type === 'positive').length;
+            const negativeCount = remarques.filter(r => r.type === 'negative').length;
+            const warningCount = remarques.filter(r => r.type === 'warning').length;
+            
+            container.innerHTML = `
+                <div class="enfants-container">
+                    <div class="enfants-tabs" id="enfantsTabs">
+                        ${enfants.map(e => {
+                            const clean = cleanChildName(e.prenom, e.nom);
+                            const initial = clean.charAt(0) || 'E';
+                            const classeDisplay = formatClassName(e);
+                            const classHtml = classeDisplay ? `<div class="enfant-tab-class">${escapeHtml(classeDisplay)}</div>` : '';
+                            return `
+                                <div class="enfant-tab ${e.id === currentEnfantId ? 'active' : ''}" 
+                                     onclick="selectEnfant('${e.id}')">
+                                    <div class="enfant-avatar">
+                                        ${escapeHtml(initial)}
+                                    </div>
+                                    <div class="enfant-tab-info">
+                                        <div class="enfant-tab-name">${escapeHtml(clean)}</div>
+                                        ${classHtml}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                        <button class="enfant-tab" onclick="rafraichirAbsences()" style="background: transparent; border: 1px solid #4ca896;">
+                            <span>🔄</span>
+                            <span>Rafraîchir</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="page-header">
+                    <div class="page-title">
+                        <h1>
+                            <span>📋</span>
+                            Absences & Remarques
+                            <span class="annee-badge">2025-2026</span>
+                        </h1>
+                        <p>${enfant ? `Suivi des absences et remarques de ${escapeHtml(cleanChildName(enfant.prenom, enfant.nom))}` : 'Chargement...'}</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn-secondary" onclick="rafraichirAbsences()">
+                            <span>🔄</span> Actualiser
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${totalAbsences}</div>
+                        <div class="stat-label">📊 Total absences</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: #c62828;">${absencesCount}</div>
+                        <div class="stat-label">❌ Absences</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: #f57c00;">${retardsCount}</div>
+                        <div class="stat-label">⏰ Retards</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: #2e7d32;">${presencesCount}</div>
+                        <div class="stat-label">✅ Présences</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalRemarques}</div>
+                        <div class="stat-label">📝 Total remarques</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: #2e7d32;">${positiveCount}</div>
+                        <div class="stat-label">⭐ Positives</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: #c62828;">${negativeCount + warningCount}</div>
+                        <div class="stat-label">⚠️ Négatives</div>
+                    </div>
+                </div>
+
+                <!-- SECTION ABSENCES -->
+                <div class="section-title">
+                    <h2>📋 Absences et retards</h2>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" 
+                               placeholder="Rechercher par motif, enseignant..." 
+                               oninput="debounce(handleSearch, 300)()">
+                        <button class="search-button" onclick="handleSearch()">Rechercher</button>
+                    </div>
+                    <div id="searchInfo" class="search-info" style="display: none;"></div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="filterByType('all', event)">Tous</button>
+                        <button class="filter-tab" onclick="filterByType('absence', event)">❌ Absences</button>
+                        <button class="filter-tab" onclick="filterByType('retard', event)">⏰ Retards</button>
+                        <button class="filter-tab" onclick="filterByType('presence', event)">✅ Présences</button>
+                    </div>
+                </div>
+
+                <div id="absencesContent">
+                    ${afficherAbsencesEnfant()}
+                </div>
+
+                <!-- SECTION REMARQUES -->
+                <div class="section-title">
+                    <h2>📝 Remarques des enseignants</h2>
+                </div>
+
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="remarqueSearchInput" 
+                               placeholder="Rechercher par titre, contenu, enseignant..." 
+                               oninput="debounceRemarque(handleRemarqueSearch, 300)()">
+                        <button class="search-button" onclick="handleRemarqueSearch()">Rechercher</button>
+                    </div>
+                    <div id="remarqueSearchInfo" class="search-info" style="display: none;"></div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab remarque-filter-tab active" onclick="filterRemarqueByType('all', event)">Toutes</button>
+                        <button class="filter-tab remarque-filter-tab" onclick="filterRemarqueByType('positive', event)">⭐ Positives</button>
+                        <button class="filter-tab remarque-filter-tab" onclick="filterRemarqueByType('neutral', event)">ℹ️ Neutres</button>
+                        <button class="filter-tab remarque-filter-tab" onclick="filterRemarqueByType('negative', event)">⚠️ Négatives</button>
+                        <button class="filter-tab remarque-filter-tab" onclick="filterRemarqueByType('warning', event)">⚡ Avertissements</button>
+                    </div>
+                </div>
+
+                <div id="remarquesContent">
+                    ${afficherRemarquesEnfant()}
+                </div>
+            `;
+            
+            const si = document.getElementById('searchInfo');
+            if (si && currentSearchTerm) {
+                si.style.display = 'block';
+                si.innerHTML = `${filteredAbsences.length} résultat(s) sur ${absences.length} absence(s) <span class="clear-search" onclick="clearSearch()">Effacer</span>`;
+            }
+            
+            const rsi = document.getElementById('remarqueSearchInfo');
+            if (rsi && currentRemarqueSearchTerm) {
+                rsi.style.display = 'block';
+                rsi.innerHTML = `${filteredRemarques.length} résultat(s) sur ${remarques.length} remarque(s) <span class="clear-search" onclick="clearRemarqueSearch()">Effacer</span>`;
+            }
+        }
+
+        function afficherAbsencesEnfant() {
+            if (!currentEnfantId) return '<div class="loading">Chargement...</div>';
+            
+            applyFilters();
+            const absences = filteredAbsences;
+            
+            if (absences.length === 0) {
+                const enfant = enfants.find(e => e.id === currentEnfantId);
+                const cleanName = enfant ? cleanChildName(enfant.prenom, enfant.nom) : "L'élève";
+                return `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>Aucune absence enregistrée</h3>
+                        <p>${escapeHtml(cleanName)} n'a aucune absence ou retard enregistré pour le moment.</p>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="absences-table-container">
+                    <table class="absences-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Motif</th>
+                                <th>Date</th>
+                                <th>Durée</th>
+                                <th>Enseignant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${absences.map(absence => `
+                                <tr onclick="showAbsenceDetail('${absence.id}')">
+                                    <td>${getTypeBadge(absence.type)}</td>
+                                    <td>${escapeHtml(absence.motif.length > 50 ? absence.motif.substring(0, 47) + '...' : absence.motif)}</td>
+                                    <td>${formatDate(absence.date)}</td>
+                                    <td>${absence.duree} h</td>
+                                    <td>${escapeHtml(getEnseignantName(absence.enseignantId))}</td>
+                                  </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function afficherRemarquesEnfant() {
+            if (!currentEnfantId) return '<div class="loading">Chargement...</div>';
+            
+            applyFilters();
+            const remarques = filteredRemarques;
+            
+            if (remarques.length === 0) {
+                const enfant = enfants.find(e => e.id === currentEnfantId);
+                const cleanName = enfant ? cleanChildName(enfant.prenom, enfant.nom) : "L'élève";
+                return `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>Aucune remarque enregistrée</h3>
+                        <p>${escapeHtml(cleanName)} n'a aucune remarque de la part des enseignants pour le moment.</p>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="remarques-table-container">
+                    <table class="remarques-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Titre</th>
+                                <th>Contenu</th>
+                                <th>Date</th>
+                                <th>Gravité</th>
+                                <th>Suivi</th>
+                                <th>Enseignant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${remarques.map(remarque => `
+                                <tr onclick="showRemarqueDetail('${remarque.id}')">
+                                    <td>${getRemarqueTypeBadge(remarque.type)}</td>
+                                    <td><strong>${escapeHtml(remarque.titre.length > 30 ? remarque.titre.substring(0, 27) + '...' : remarque.titre)}</strong></td>
+                                    <td>${escapeHtml(remarque.contenu.length > 50 ? remarque.contenu.substring(0, 47) + '...' : remarque.contenu)}</td>
+                                    <td>${formatDate(remarque.date)}</td>
+                                    <td><span class="${getGraviteClass(remarque.gravite)}">${getGraviteText(remarque.gravite)}</span></td>
+                                    <td>${getSuiviBadge(remarque.suivi)}</td>
+                                    <td>${escapeHtml(getEnseignantName(remarque.enseignantId))}</td>
+                                  </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function selectEnfant(eleveId) {
+            currentEnfantId = eleveId;
+            currentSearchTerm = '';
+            currentRemarqueSearchTerm = '';
+            currentTypeFilter = 'all';
+            currentRemarqueTypeFilter = 'all';
+            if (document.getElementById('searchInput')) {
+                document.getElementById('searchInput').value = '';
+            }
+            if (document.getElementById('remarqueSearchInput')) {
+                document.getElementById('remarqueSearchInput').value = '';
+            }
+            applyFilters();
+            afficherInterface();
+        }
+
+        async function showAbsenceDetail(id) {
+            const absences = absencesData[currentEnfantId] || [];
+            const absence = absences.find(a => a.id === id);
+            if (!absence) return;
+            
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const enfantName = enfant ? cleanChildName(enfant.prenom, enfant.nom) : 'Élève';
+            
+            const detailHtml = `
+                <div class="absence-detail">
+                    <p><strong>👤 Élève :</strong> ${escapeHtml(enfantName)}</p>
+                    <p><strong>📋 Type :</strong> ${getTypeBadge(absence.type)}</p>
+                    <p><strong>📝 Motif :</strong> ${escapeHtml(absence.motif)}</p>
+                    <p><strong>📅 Date :</strong> ${formatDate(absence.date)}</p>
+                    <p><strong>⏱️ Durée :</strong> ${absence.duree} heure(s)</p>
+                    <p><strong>👨‍🏫 Enseignant :</strong> ${escapeHtml(getEnseignantName(absence.enseignantId))}</p>
+                </div>
+            `;
+            document.getElementById('modalTitle').innerHTML = '📋 Détails de l\'absence';
+            document.getElementById('detailContent').innerHTML = detailHtml;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        async function showRemarqueDetail(id) {
+            const remarques = remarquesData[currentEnfantId] || [];
+            const remarque = remarques.find(r => r.id === id);
+            if (!remarque) return;
+            
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const enfantName = enfant ? cleanChildName(enfant.prenom, enfant.nom) : 'Élève';
+            
+            const detailHtml = `
+                <div class="remarque-detail">
+                    <p><strong>👤 Élève :</strong> ${escapeHtml(enfantName)}</p>
+                    <p><strong>📋 Type :</strong> ${getRemarqueTypeBadge(remarque.type)}</p>
+                    <p><strong>📌 Titre :</strong> ${escapeHtml(remarque.titre)}</p>
+                    <p><strong>📝 Contenu :</strong> ${escapeHtml(remarque.contenu)}</p>
+                    <p><strong>📅 Date :</strong> ${formatDate(remarque.date)}</p>
+                    <p><strong>⚠️ Gravité :</strong> <span class="${getGraviteClass(remarque.gravite)}">${getGraviteText(remarque.gravite)}</span></p>
+                    <p><strong>✅ Statut suivi :</strong> ${getSuiviBadge(remarque.suivi)}</p>
+                    <p><strong>👨‍🏫 Enseignant :</strong> ${escapeHtml(getEnseignantName(remarque.enseignantId))}</p>
+                </div>
+            `;
+            document.getElementById('modalTitle').innerHTML = '📝 Détails de la remarque';
+            document.getElementById('detailContent').innerHTML = detailHtml;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function afficherErreur(message) {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <h3>Erreur</h3>
+                    <p>${escapeHtml(message)}</p>
+                    <button class="btn-outline" onclick="location.reload()" style="margin-top: 1rem;">🔄 Réessayer</button>
+                </div>
+            `;
+        }
+
+        function afficherAucunEnfant() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👶</div>
+                    <h3>Aucun enfant associé</h3>
+                    <p>Vous n'avez pas encore d'enfant inscrit dans l'établissement.</p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Si vous pensez que c'est une erreur, veuillez contacter l'administration.</p>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            token = getAuthToken();
+            if (token) {
+                chargerEnfants();
+            } else {
+                requestTokenFromParent();
+                setTimeout(() => {
+                    token = getAuthToken();
+                    if (token) chargerEnfants();
+                    else afficherErreur('Impossible de récupérer votre session. Veuillez vous reconnecter.');
+                }, 1000);
+            }
+        });
+
+        window.selectEnfant = selectEnfant;
+        window.rafraichirAbsences = rafraichirAbsences;
+        window.handleSearch = handleSearch;
+        window.handleRemarqueSearch = handleRemarqueSearch;
+        window.clearSearch = clearSearch;
+        window.clearRemarqueSearch = clearRemarqueSearch;
+        window.filterByType = filterByType;
+        window.filterRemarqueByType = filterRemarqueByType;
+        window.showAbsenceDetail = showAbsenceDetail;
+        window.showRemarqueDetail = showRemarqueDetail;
+        window.closeDetailModal = closeDetailModal;
+        window.debounce = debounce;
+        window.debounceRemarque = debounceRemarque;
+    </script>
+</body>
+</html>

@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Administration des vœux enseignants</title>
+    <style>
+        /* ============ STYLES INSPIRÉS DE MATIERES.HTML ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            
+            /* Nouvelles couleurs pour l'emploi du temps */
+            --dispo-vert: #e8f5e9;
+            --dispo-vert-border: #4ca896;
+            --indispo-rouge: #ffebee;
+            --indispo-rouge-border: #ef5350;
+            --jour-header: #f5f5f5;
+            --pause-jaune: #fff9c4;
+            --pause-jaune-border: #fdd835;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ============ PAGE HEADER ============ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '📋';
+            font-size: 2rem;
+            -webkit-text-fill-color: initial;
+            color: var(--primary-green);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 14px rgba(76, 168, 150, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(76, 168, 150, 0.4);
+        }
+
+        /* ============ STATISTIQUES ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-dark);
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* ============ FILTRES ============ */
+        .filters-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-end;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group label {
+            display: block;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235a9d91' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        /* ============ TABLEAU ============ */
+        .voeux-table {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: left;
+            border: 1px solid var(--primary-dark);
+        }
+
+        td {
+            padding: 1rem;
+            border: 1px solid var(--gray-border);
+            color: var(--text-soft);
+        }
+
+        tr:hover {
+            background: rgba(76, 168, 150, 0.05);
+        }
+
+        /* ============ BADGES ============ */
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeeba;
+        }
+
+        .status-validated {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .pref-badge {
+            display: inline-block;
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        /* ============ BOUTONS D'ACTION SANS ICÔNES ============ */
+        .btn-view {
+            background: var(--blue-light);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view:hover {
+            background: #1e7fd9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(51, 154, 240, 0.3);
+        }
+
+        .btn-validate {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-validate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        /* ============ MODAL ============ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-header h2 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* ============ FORMULAIRES ============ */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* ============ STYLES POUR L'EMPLOI DU TEMPS ============ */
+        .emploi-du-temps {
+            margin-top: 2rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .emploi-header {
+            display: grid;
+            grid-template-columns: 120px repeat(2, 1fr);
+            background: var(--primary-dark);
+            color: white;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .emploi-header-cell {
+            padding: 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .emploi-header-cell:last-child {
+            border-right: none;
+        }
+
+        .emploi-row {
+            display: grid;
+            grid-template-columns: 120px repeat(2, 1fr);
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .emploi-row:last-child {
+            border-bottom: none;
+        }
+
+        .emploi-jour {
+            background: var(--jour-header);
+            font-weight: 600;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--gray-border);
+            text-transform: capitalize;
+        }
+
+        .emploi-cell {
+            padding: 0.5rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-right: 1px solid var(--gray-border);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .emploi-cell:last-child {
+            border-right: none;
+        }
+
+        .emploi-cell.disponible {
+            background-color: var(--dispo-vert);
+            border: 2px solid var(--dispo-vert-border);
+            border-radius: 8px;
+            margin: 4px;
+            box-shadow: 0 2px 4px rgba(76, 168, 150, 0.2);
+        }
+
+        .emploi-cell.indisponible {
+            background-color: var(--indispo-rouge);
+            border: 2px solid var(--indispo-rouge-border);
+            border-radius: 8px;
+            margin: 4px;
+            box-shadow: 0 2px 4px rgba(239, 83, 80, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emploi-cell.indisponible::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(239, 83, 80, 0.1) 10px,
+                rgba(239, 83, 80, 0.1) 20px
+            );
+            pointer-events: none;
+        }
+
+        .emploi-cell.jour-off {
+            background-color: #f5f5f5;
+            border: 2px dashed #999;
+            border-radius: 8px;
+            margin: 4px;
+            opacity: 0.6;
+            position: relative;
+        }
+
+        .emploi-cell.jour-off::after {
+            content: '🌙';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+        }
+
+        .emploi-cell.extra-hours {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            margin: 4px;
+            position: relative;
+        }
+
+        .emploi-cell.extra-hours::after {
+            content: '+2h';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.7rem;
+            background: #ff9800;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .pause-info {
+            background-color: var(--pause-jaune);
+            border: 2px dashed var(--pause-jaune-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #5d4037;
+            position: relative;
+        }
+
+        .pause-info::before {
+            content: '🍽️';
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .emploi-statut {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .emploi-statut.matin {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .emploi-statut.apres-midi {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--gray-bg);
+            border-radius: 16px;
+        }
+
+        .detail-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .detail-section h3::before {
+            font-size: 1.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .info-card-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card-value {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .specialite-tag {
+            display: inline-block;
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 0.2rem;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        /* ============ DÉTAILS MODAL ============ */
+        .detail-row {
+            display: flex;
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .detail-label {
+            width: 150px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .detail-value {
+            flex: 1;
+            color: var(--text-soft);
+        }
+
+        .indispo-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin: 0.3rem 0;
+            border-left: 4px solid var(--accent-orange);
+            border: 1px solid var(--gray-border);
+            font-size: 0.9rem;
+        }
+
+        .specialite-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin: 0.3rem 0;
+            border-left: 4px solid var(--primary-green);
+            border: 1px solid var(--gray-border);
+            font-size: 0.9rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* ============ LOADING ============ */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            margin-left: 0.5rem;
+            border: 2px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ ALERTES ============ */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .alert-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .alert-info {
+            background: var(--blue-light);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .filters-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .btn-view, .btn-validate, .btn-reject {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.7rem;
+                margin: 0.1rem;
+            }
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Administration des vœux enseignants</h1>
+                <p class="page-subtitle">Gérez les demandes de vœux pour l'emploi du temps</p>
+            </div>
+            <button class="btn-secondary" onclick="rafraichir()">
+                Rafraîchir
+            </button>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-grid" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-label">Vœux en attente</div>
+                <div class="stat-value" id="statEnAttente">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Vœux validés</div>
+                <div class="stat-value" id="statValides">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total enseignants</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label>Statut</label>
+                <select id="filtreStatut" onchange="filtrer()">
+                    <option value="tous">Tous les vœux</option>
+                    <option value="en_attente">En attente uniquement</option>
+                    <option value="valides">Validés uniquement</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Année scolaire</label>
+                <select id="filtreAnnee" onchange="filtrer()">
+                    <option value="2025-2026">2025-2026</option>
+                    <option value="2024-2025">2024-2025</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="filtrer()">Appliquer</button>
+        </div>
+
+        <!-- Tableau des vœux -->
+        <div class="voeux-table">
+            <table id="voeuxTable">
+                <thead>
+                    <tr>
+                        <th>Enseignant</th>
+                        <th>Email</th>
+                        <th>Préférence</th>
+                        <th>Heures souh.</th>
+                        <th>Soumis le</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="voeuxTableBody">
+                    <tr>
+                        <td colspan="7" class="loading">Chargement des vœux...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de visualisation -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Détail des vœux</h2>
+                <button class="modal-close" onclick="closeModal('viewModal')">&times;</button>
+            </div>
+            <div id="viewModalContent">
+                <div class="loading">Chargement...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de validation -->
+    <div class="modal" id="validateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Valider les vœux</h2>
+                <button class="modal-close" onclick="closeModal('validateModal')">&times;</button>
+            </div>
+            <p>Êtes-vous sûr de vouloir valider ces vœux ?</p>
+            <p style="color: var(--text-light); margin: 1rem 0;">
+                Une fois validés, l'IA pourra générer des propositions d'emploi du temps.
+            </p>
+            <div class="form-group">
+                <label class="form-label">Notes (optionnel)</label>
+                <textarea id="validateNotes" class="form-input" rows="3" 
+                          placeholder="Ajouter un commentaire..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('validateModal')">Annuler</button>
+                <button class="btn-primary" id="confirmValidateBtn">Confirmer la validation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de refus -->
+    <div class="modal" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Refuser les vœux</h2>
+                <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+            </div>
+            <p>Veuillez indiquer le motif du refus :</p>
+            <div class="form-group">
+                <textarea id="rejectMotif" class="form-input" rows="4" 
+                          placeholder="Expliquez pourquoi ces vœux sont refusés..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('rejectModal')">Annuler</button>
+                <button class="btn-reject" id="confirmRejectBtn">Confirmer le refus</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURATION ====================
+        const API_BASE = 'http://localhost:5267/api';
+        let token = null;
+        let tousLesVoeux = [];
+        let tousLesEnseignants = [];
+        let enseignantsMap = new Map();
+        let adminsMap = new Map();
+        let currentVoeuxId = null;
+        let currentEnseignantId = null;
+
+        // ==================== INITIALISATION ====================
+        document.addEventListener('DOMContentLoaded', async function() {
+            token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            
+            if (!token) {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+
+            await chargerTousLesEnseignants();
+            await chargerTousLesAdmins();
+            await chargerVoeux();
+        });
+
+        // ==================== FONCTION D'EXTRACTION D'ID ====================
+        function extraireId(obj) {
+            if (!obj) return '';
+            if (typeof obj === 'string') return obj;
+            if (typeof obj === 'object' && obj !== null) {
+                if (obj.$oid) return obj.$oid;
+                if (obj._id && typeof obj._id === 'object' && obj._id.$oid) return obj._id.$oid;
+                if (obj.Id && typeof obj.Id === 'object' && obj.Id.$oid) return obj.Id.$oid;
+            }
+            return '';
+        }
+
+        // ==================== CHARGEMENT DES ENSEIGNANTS ====================
+        async function chargerTousLesEnseignants() {
+            try {
+                console.log('📚 Chargement des enseignants...');
+                
+                const response = await fetch(`${API_BASE}/utilisateurs/role/enseignant`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    tousLesEnseignants = Array.isArray(data) ? data : (data.data || []);
+                    
+                    enseignantsMap.clear();
+                    tousLesEnseignants.forEach(e => {
+                        const id = e.Id || e.id || e._id || '';
+                        if (id) {
+                            enseignantsMap.set(id, e);
+                            console.log(`✅ Enseignant: ${id} - ${e.Prenom || ''} ${e.Nom || ''}`);
+                        }
+                    });
+                    
+                    document.getElementById('statTotal').textContent = tousLesEnseignants.length;
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                document.getElementById('statTotal').textContent = '?';
+            }
+        }
+
+        // ==================== CHARGEMENT DES ADMINS ====================
+        async function chargerTousLesAdmins() {
+            try {
+                console.log('👤 Chargement des administrateurs...');
+                
+                const response = await fetch(`${API_BASE}/utilisateurs/role/admin`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const admins = Array.isArray(data) ? data : (data.data || []);
+                    
+                    adminsMap.clear();
+                    admins.forEach(admin => {
+                        const id = admin.Id || admin.id || admin._id || '';
+                        if (id) {
+                            adminsMap.set(id, admin);
+                            console.log(`✅ Admin: ${id} - ${admin.Prenom || ''} ${admin.Nom || ''}`);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Erreur chargement admins:', error);
+            }
+        }
+
+        // ==================== CHARGEMENT DES VŒUX ====================
+        async function chargerVoeux() {
+            try {
+                const annee = document.getElementById('filtreAnnee').value;
+                
+                console.log('📡 Chargement des vœux pour:', annee);
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/voeux/tous?anneeScolaire=${annee}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Données API:', data);
+                    
+                    if (data && data.Data && Array.isArray(data.Data)) {
+                        tousLesVoeux = [];
+                        
+                        for (let i = 0; i < data.Data.length; i++) {
+                            const v = data.Data[i];
+                            
+                            const voeuxId = v.Id || '';
+                            const enseignantId = v.EnseignantId || '';
+                            
+                            console.log(`📦 Vœux ${i}: ID=${voeuxId}, EnseignantID=${enseignantId}`);
+                            
+                            const voeu = {
+                                id: voeuxId,
+                                enseignantId: enseignantId,
+                                anneeScolaire: v.AnneeScolaire || '',
+                                preferenceHoraire: v.PreferenceHoraire || '',
+                                indisponibilites: v.Indisponibilites || [],
+                                niveauxParSpecialite: v.NiveauxParSpecialite || {},
+                                heuresSouhaitees: v.HeuresSouhaitees || 0,
+                                commentaires: v.Commentaires || '',
+                                dateSoumission: v.DateSoumission || new Date().toISOString(),
+                                estValide: v.EstValide === true,
+                                joursOff: v.JoursOff || [],
+                                extraHours: v.ExtraHours || null,
+                                validePar: v.ValidePar || '',
+                                dateValidation: v.DateValidation || null,
+                                notesAdmin: v.NotesAdmin || '',
+                                historique: v.Historique || []
+                            };
+                            
+                            tousLesVoeux.push(voeu);
+                        }
+                        
+                        console.log('📋 Tous les vœux:', tousLesVoeux.map(v => ({
+                            id: v.id,
+                            enseignantId: v.enseignantId
+                        })));
+                        
+                        await afficherVoeux(tousLesVoeux);
+                        await chargerStatistiques();
+                    }
+                } else if (response.status === 401) {
+                    window.location.href = 'saghiry-auth.html';
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                showMessage('Erreur de chargement', 'error');
+            }
+        }
+
+        // ==================== AFFICHAGE DU TABLEAU ====================
+        async function afficherVoeux(voeux) {
+            const tbody = document.getElementById('voeuxTableBody');
+            
+            if (!voeux || voeux.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-light);">
+                            📭 Aucun vœux trouvé
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            
+            for (const v of voeux) {
+                const enseignant = enseignantsMap.get(v.enseignantId) || { 
+                    Prenom: 'Inconnu', 
+                    Nom: 'Inconnu', 
+                    Email: '' 
+                };
+                
+                const dateSoumission = v.dateSoumission ? 
+                    new Date(v.dateSoumission).toLocaleDateString('fr-FR') : 'Inconnue';
+                
+                const statutClass = v.estValide ? 'status-validated' : 'status-waiting';
+                const statutText = v.estValide ? 'Validé' : 'En attente';
+                
+                const prefText = v.preferenceHoraire === 'matin' ? 'Matin' :
+                                 v.preferenceHoraire === 'apres-midi' ? 'Après-midi' : 'Flexible';
+
+                const nomComplet = `${enseignant.Prenom || ''} ${enseignant.Nom || ''}`.trim() || 'Inconnu';
+                const email = enseignant.Email || '';
+
+                html += `
+                    <tr>
+                        <td>
+                            <strong>${nomComplet}</strong>
+                        </td>
+                        <td>${email}</td>
+                        <td><span class="pref-badge">${prefText}</span></td>
+                        <td><strong>${v.heuresSouhaitees || 0}h</strong></td>
+                        <td>${dateSoumission}</td>
+                        <td>
+                            <span class="status-badge ${statutClass}">${statutText}</span>
+                        </td>
+                        <td>
+                            <button class="btn-view" onclick='voirVoeux("${v.id}")'>Voir</button>
+                            ${!v.estValide ? `
+                                <button class="btn-validate" onclick='validerVoeux("${v.enseignantId}", "${v.id}")'>Valider</button>
+                                <button class="btn-reject" onclick='refuserVoeux("${v.enseignantId}", "${v.id}")'>Refuser</button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = html;
+        }
+
+        // ==================== STATISTIQUES ====================
+        async function chargerStatistiques() {
+            try {
+                const enAttente = tousLesVoeux.filter(v => !v.estValide).length;
+                const valides = tousLesVoeux.filter(v => v.estValide).length;
+                
+                document.getElementById('statEnAttente').textContent = enAttente;
+                document.getElementById('statValides').textContent = valides;
+                
+            } catch (error) {
+                console.error('Erreur stats:', error);
+            }
+        }
+
+        // ==================== VOIR DÉTAILS ====================
+        function voirVoeux(voeuxId) {
+            console.log('🔍 Recherche ID reçu:', voeuxId);
+            console.log('📋 IDs disponibles:', tousLesVoeux.map(v => v.id));
+            
+            const voeux = tousLesVoeux.find(v => v.id === voeuxId);
+            
+            if (!voeux) {
+                console.error('❌ Vœux non trouvé pour ID:', voeuxId);
+                showMessage('Erreur: Vœux non trouvé', 'error');
+                return;
+            }
+            
+            console.log('✅ Vœux trouvé:', voeux);
+            
+            const enseignant = enseignantsMap.get(voeux.enseignantId) || {
+                Prenom: 'Inconnu',
+                Nom: 'Inconnu',
+                Email: ''
+            };
+            
+            console.log('✅ Enseignant:', enseignant);
+            
+            afficherDetailVoeux(voeux, enseignant);
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function afficherDetailVoeux(voeux, enseignant) {
+            const nomComplet = `${enseignant.Prenom || ''} ${enseignant.Nom || ''}`.trim() || 'Inconnu';
+            const email = enseignant.Email || '';
+            
+            // Créer l'emploi du temps avec horaires 8h-12h et 13h-17h
+            const jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+            const periodes = ['matin', 'apres-midi'];
+            
+            // Créer un Set des indisponibilités
+            const indispoSet = new Set();
+            voeux.indisponibilites.forEach(i => {
+                const jour = i.Jour || i.jour;
+                const periode = i.Periode || i.periode;
+                if (jour && periode) {
+                    indispoSet.add(`${jour}_${periode}`);
+                }
+            });
+            
+            // Créer un Set des jours off
+            const joursOffSet = new Set(voeux.joursOff || []);
+            
+            // Construire l'HTML de l'emploi du temps
+            let emploiHtml = '';
+            
+            jours.forEach(jour => {
+                emploiHtml += `
+                    <div class="emploi-row">
+                        <div class="emploi-jour">${jour}</div>
+                `;
+                
+                periodes.forEach(periode => {
+                    const key = `${jour}_${periode}`;
+                    let classes = 'emploi-cell';
+                    let contenu = periode === 'matin' ? '8h - 12h' : '13h - 17h';
+                    
+                    if (joursOffSet.has(jour)) {
+                        classes += ' jour-off';
+                        contenu = 'Jour de repos';
+                    } else if (indispoSet.has(key)) {
+                        classes += ' indisponible';
+                        contenu = 'Indisponible';
+                    } else {
+                        classes += ' disponible';
+                        
+                        // Vérifier si c'est une heure supplémentaire
+                        if (voeux.extraHours && 
+                            ((voeux.extraHours.Type === 'work' || voeux.extraHours.type === 'work') && 
+                             (voeux.extraHours.Jour === jour || voeux.extraHours.jour === jour))) {
+                            classes += ' extra-hours';
+                            contenu = periode === 'matin' ? '8h - 12h' : '13h - 17h';
+                        }
+                    }
+                    
+                    emploiHtml += `
+                        <div class="${classes}">
+                            ${contenu}
+                        </div>
+                    `;
+                });
+                
+                emploiHtml += `</div>`;
+            });
+            
+            // Formater les niveaux par spécialité
+            let niveauxHtml = '';
+            const niveauxParSpecialite = voeux.niveauxParSpecialite || {};
+            
+            if (Object.keys(niveauxParSpecialite).length > 0) {
+                niveauxHtml = '<div class="specialites-grid">';
+                Object.keys(niveauxParSpecialite).forEach(specialite => {
+                    const niveaux = niveauxParSpecialite[specialite] || [];
+                    niveauxHtml += `
+                        <div class="info-card">
+                            <div class="info-card-label">${specialite}</div>
+                            <div class="info-card-value">
+                                ${niveaux.map(n => `<span class="specialite-tag">${n}</span>`).join(' ')}
+                            </div>
+                        </div>
+                    `;
+                });
+                niveauxHtml += '</div>';
+            }
+            
+            // Formater les informations supplémentaires
+            const prefTexte = voeux.preferenceHoraire === 'matin' ? 'Matin (8h-12h)' :
+                              voeux.preferenceHoraire === 'apres-midi' ? 'Après-midi (13h-17h)' : 'Flexible';
+            
+            const adminNom = adminsMap.get(voeux.validePar) ? 
+                `${adminsMap.get(voeux.validePar).Prenom || ''} ${adminsMap.get(voeux.validePar).Nom || ''}`.trim() : 
+                voeux.validePar;
+            
+            // Calculer les heures totales disponibles
+            const totalCreneauxDispos = 12 - indispoSet.size - (joursOffSet.size * 2);
+            const heuresReelles = totalCreneauxDispos * 4; // 4h par créneau
+            
+            const modalContent = document.getElementById('viewModalContent');
+            modalContent.innerHTML = `
+                <div class="detail-section">
+                    <h3>👤 Enseignant</h3>
+                    <div style="font-size: 1.2rem; font-weight: 600;">${nomComplet}</div>
+                    <div style="color: var(--text-light);">${email}</div>
+                    <div style="font-size: 0.8rem; color: #999; margin-top: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>⏰ Emploi du temps</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-card-label">Heures souhaitées</div>
+                            <div class="info-card-value">${voeux.heuresSouhaitees || 0}h / semaine</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-card-label">Heures réelles disponibles</div>
+                            <div class="info-card-value">${heuresReelles}h / semaine</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-card-label">Préférence</div>
+                            <div class="info-card-value"><span class="emploi-statut ${voeux.preferenceHoraire}">${prefTexte}</span></div>
+                        </div>
+                    </div>
+
+                    <div class="pause-info">
+                        Pause déjeuner flexible entre 12h et 13h (adaptable selon besoins)
+                    </div>
+
+                    <div class="emploi-du-temps">
+                        <div class="emploi-header">
+                            <div class="emploi-header-cell">Jour</div>
+                            <div class="emploi-header-cell">Matin (8h-12h)</div>
+                            <div class="emploi-header-cell">Après-midi (13h-17h)</div>
+                        </div>
+                        ${emploiHtml}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📚 Enseignements souhaités</h3>
+                    ${niveauxHtml || '<p style="color: var(--text-light);">Aucun niveau sélectionné</p>'}
+                </div>
+
+                <div class="detail-section">
+                    <h3>ℹ️ Informations</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-card-label">Date de soumission</div>
+                            <div class="info-card-value">${new Date(voeux.dateSoumission).toLocaleString('fr-FR')}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-card-label">Statut</div>
+                            <div class="info-card-value">
+                                <span class="status-badge ${voeux.estValide ? 'status-validated' : 'status-waiting'}">
+                                    ${voeux.estValide ? 'Validé' : 'En attente'}
+                                </span>
+                            </div>
+                        </div>
+                        ${voeux.estValide && voeux.validePar ? `
+                            <div class="info-card">
+                                <div class="info-card-label">Validé par</div>
+                                <div class="info-card-value">${adminNom}</div>
+                            </div>
+                        ` : ''}
+                        ${voeux.estValide && voeux.dateValidation ? `
+                            <div class="info-card">
+                                <div class="info-card-label">Date validation</div>
+                                <div class="info-card-value">${new Date(voeux.dateValidation).toLocaleString('fr-FR')}</div>
+                            </div>
+                        ` : ''}
+                        ${voeux.commentaires ? `
+                            <div class="info-card">
+                                <div class="info-card-label">Commentaires</div>
+                                <div class="info-card-value">${voeux.commentaires}</div>
+                            </div>
+                        ` : ''}
+                        ${voeux.notesAdmin ? `
+                            <div class="info-card">
+                                <div class="info-card-label">Notes admin</div>
+                                <div class="info-card-value">${voeux.notesAdmin}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn-secondary" onclick="closeModal('viewModal')">Fermer</button>
+                    ${!voeux.estValide ? `
+                        <button class="btn-validate" onclick='validerVoeux("${voeux.enseignantId}", "${voeux.id}")'>Valider</button>
+                        <button class="btn-reject" onclick='refuserVoeux("${voeux.enseignantId}", "${voeux.id}")'>Refuser</button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // ==================== FONCTIONS DE VALIDATION ====================
+        function validerVoeux(enseignantId, voeuxId) {
+            currentEnseignantId = enseignantId;
+            currentVoeuxId = voeuxId;
+            document.getElementById('validateModal').classList.add('active');
+            document.getElementById('confirmValidateBtn').onclick = confirmerValidation;
+        }
+
+        async function confirmerValidation() {
+            const notes = document.getElementById('validateNotes').value;
+            const annee = document.getElementById('filtreAnnee').value;
+            
+            try {
+                showMessage('⚡ Validation...', 'info');
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/voeux/${currentEnseignantId}/valider?anneeScolaire=${annee}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(notes)
+                });
+
+                if (response.ok) {
+                    showMessage('✅ Vœux validés !', 'success');
+                    
+                    fetch(`${API_BASE}/EmploiDuTemps/enseignant/${currentEnseignantId}/generer-propositions?anneeScolaire=${annee}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }).catch(e => console.log('IA lancée'));
+                    
+                    closeModal('validateModal');
+                    closeModal('viewModal');
+                    chargerVoeux();
+                } else {
+                    showMessage('❌ Erreur validation', 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Erreur connexion', 'error');
+            }
+        }
+
+        function refuserVoeux(enseignantId, voeuxId) {
+            currentEnseignantId = enseignantId;
+            currentVoeuxId = voeuxId;
+            document.getElementById('rejectModal').classList.add('active');
+            document.getElementById('confirmRejectBtn').onclick = confirmerRefus;
+        }
+
+        async function confirmerRefus() {
+            const motif = document.getElementById('rejectMotif').value;
+            const annee = document.getElementById('filtreAnnee').value;
+            
+            if (!motif) {
+                alert('Motif requis');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/voeux/${currentEnseignantId}/refuser?anneeScolaire=${annee}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(motif)
+                });
+
+                if (response.ok) {
+                    showMessage('Vœux refusés', 'info');
+                    closeModal('rejectModal');
+                    closeModal('viewModal');
+                    chargerVoeux();
+                }
+            } catch (error) {
+                showMessage('❌ Erreur', 'error');
+            }
+        }
+
+        // ==================== FONCTIONS UTILITAIRES ====================
+        function filtrer() {
+            const statut = document.getElementById('filtreStatut').value;
+            
+            let voeuxFiltres = [...tousLesVoeux];
+            
+            if (statut === 'en_attente') {
+                voeuxFiltres = voeuxFiltres.filter(v => !v.estValide);
+            } else if (statut === 'valides') {
+                voeuxFiltres = voeuxFiltres.filter(v => v.estValide);
+            }
+            
+            afficherVoeux(voeuxFiltres);
+        }
+
+        function rafraichir() {
+            chargerTousLesEnseignants();
+            chargerTousLesAdmins();
+            chargerVoeux();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'validateModal') {
+                document.getElementById('validateNotes').value = '';
+            } else if (modalId === 'rejectModal') {
+                document.getElementById('rejectMotif').value = '';
+            }
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '2000';
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

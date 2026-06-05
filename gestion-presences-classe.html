@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des présences & Remarques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid #ff9466;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .page-header .subtitle {
+            color: #5a9d91;
+            margin-top: 0.3rem;
+        }
+
+        .remplacement-badge {
+            background: #ff9466;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .remplacement-partiel-badge {
+            background: #95a5a6;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .btn-retour {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-retour:hover {
+            background: #5a6268;
+        }
+
+        .tabs-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 60px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.8rem;
+            border: none;
+            background: transparent;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #5a9d91;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(76,168,150,0.3);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e0f2f1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .date-display {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            flex: 1;
+            min-width: 250px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .date-display .date-icon {
+            font-size: 2rem;
+        }
+
+        .date-display .date-info {
+            flex: 1;
+        }
+
+        .date-display .date-info strong {
+            font-size: 1.1rem;
+            color: #1e3b36;
+        }
+
+        .date-display .date-info p {
+            color: #5a9d91;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .seance-selector {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            flex: 2;
+            min-width: 350px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .seance-selector label {
+            font-weight: 600;
+            color: #1e3b36;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .seance-selector select {
+            padding: 0.6rem 1rem;
+            border: 1px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            width: 100%;
+            background: white;
+            cursor: pointer;
+        }
+
+        .seance-selector select:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .seance-info {
+            margin-top: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: #e0f2f1;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #2d6b63;
+            display: inline-block;
+        }
+
+        .refresh-btn {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            height: fit-content;
+            align-self: flex-end;
+        }
+
+        .refresh-btn:hover {
+            background: #3d8a7f;
+        }
+
+        .history-filters {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            color: #1e3b36;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-filter {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-filter:hover {
+            background: #3d8a7f;
+        }
+
+        .btn-export {
+            background: #ff9466;
+        }
+
+        .btn-export:hover {
+            background: #ff7b3d;
+        }
+
+        .stats-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-around;
+        }
+
+        .stat-card {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card .stat-label {
+            color: #5a9d91;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .stat-card.present .stat-value { color: #2e7d32; }
+        .stat-card.retard .stat-value { color: #f57c00; }
+        .stat-card.absent .stat-value { color: #c62828; }
+        .stat-card.total .stat-value { color: #1e3b36; }
+
+        .history-table-container {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .history-table th {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .history-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .history-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .presence-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-present {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-retard {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .badge-absent {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .debug-panel {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            font-family: 'Consolas', monospace;
+            font-size: 0.7rem;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .debug-panel.show {
+            display: block;
+        }
+
+        .debug-toggle {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            margin-left: 1rem;
+        }
+
+        .alert-no-cours {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .eleves-container {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .eleves-header {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            padding: 1rem 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .summary-stats {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .btn-all-present {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-all-present:hover:not(:disabled) {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .btn-all-present:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .eleves-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .eleves-table tr {
+            border-bottom: 1px solid #e0e9e7;
+            transition: all 0.2s;
+        }
+
+        .eleves-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .eleves-table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .eleve-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff9466, #ff7b3d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .eleve-nom {
+            font-weight: 600;
+            color: #1e3b36;
+            font-size: 1rem;
+        }
+
+        .eleve-matricule {
+            font-size: 0.7rem;
+            color: #5a9d91;
+            margin-top: 0.2rem;
+        }
+
+        .parents-info {
+            margin-top: 0.3rem;
+            font-size: 0.7rem;
+            color: #5a9d91;
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .presence-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-presence {
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .btn-presence:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-present {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .btn-present:hover:not(:disabled), .btn-present.active {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .btn-retard {
+            background: #fff8e1;
+            color: #f57c00;
+            border: 1px solid #ffe0b2;
+        }
+
+        .btn-retard:hover:not(:disabled), .btn-retard.active {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+        }
+
+        .btn-absent {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .btn-absent:hover:not(:disabled), .btn-absent.active {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .btn-remarque {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdef5;
+            padding: 0.5rem 1.2rem;
+        }
+
+        .btn-remarque:hover:not(:disabled), .btn-remarque.active {
+            background: #2196f3;
+            color: white;
+        }
+
+        .absence-detail, .remarque-detail {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .remarque-detail {
+            background: #f1f8e9;
+            border-left: 3px solid #8bc34a;
+        }
+
+        .absence-detail.readonly, .remarque-detail.readonly {
+            background: #f0f0f0;
+            opacity: 0.8;
+        }
+
+        .edit-motif, .edit-remarque {
+            background: none;
+            border: none;
+            color: #ff9466;
+            cursor: pointer;
+            font-size: 0.7rem;
+            text-decoration: underline;
+        }
+
+        .edit-motif:disabled, .edit-remarque:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .absence-form-inline, .remarque-form-inline {
+            margin-top: 0.5rem;
+            padding: 0.8rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: flex-end;
+        }
+
+        .remarque-form-inline {
+            background: #f9fbe7;
+        }
+
+        .absence-form-inline .form-group, .remarque-form-inline .form-group {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .absence-form-inline .form-group label, .remarque-form-inline .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1e3b36;
+            margin-bottom: 0.2rem;
+        }
+
+        .absence-form-inline select, .absence-form-inline input,
+        .remarque-form-inline select, .remarque-form-inline input, .remarque-form-inline textarea {
+            width: 100%;
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #e0e9e7;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .btn-submit-inline {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-submit-inline:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            border: 2px dashed #e0e9e7;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e3b36;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .info-consultation {
+            background: #e8f4f1;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #95a5a6;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .controls-container { flex-direction: column; }
+            .eleves-table td { display: block; padding: 0.8rem; }
+            .eleves-table tr { display: block; margin-bottom: 1rem; border: 1px solid #e0e9e7; border-radius: 12px; }
+            .tabs-container { flex-direction: column; border-radius: 16px; background: white; }
+            .tab-btn { border-radius: 12px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div>
+        <h1 id="classeNom">📋 Gestion des présences & Remarques</h1>
+        <div class="subtitle" id="classeInfo"></div>
+    </div>
+    <button class="btn-retour" onclick="retour()">← Retour aux classes</button>
+</div>
+
+<div id="infoConsultation" style="display: none;" class="info-consultation"></div>
+
+<div id="debugPanel" class="debug-panel">
+    <strong>📊 Logs de débogage:</strong><br>
+    <div id="debugLogs"></div>
+</div>
+
+<div class="tabs-container">
+    <button class="tab-btn active" onclick="switchTab('presences')">📝 Présences du jour</button>
+    <button class="tab-btn" onclick="switchTab('history')">📊 Historique des présences</button>
+</div>
+
+<div id="tab-presences" class="tab-content active">
+    <div class="controls-container">
+        <div class="date-display" id="dateDisplay">
+            <div class="date-icon">📅</div>
+            <div class="date-info">
+                <strong id="currentDateText"></strong>
+                <p id="currentDayText"></p>
+            </div>
+        </div>
+        
+        <div class="seance-selector" id="seanceSelector" style="display: none;">
+            <label>⏰ Séance (cours à partir de 8h)</label>
+            <select id="seanceSelect">
+                <option value="">Sélectionner une séance</option>
+            </select>
+            <div id="seanceInfo" class="seance-info"></div>
+        </div>
+        
+        <button class="refresh-btn" onclick="rechargerToutesDonnees()">
+            🔄 Recharger
+        </button>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div id="elevesContainer">
+        <div class="loading">Chargement des élèves...</div>
+    </div>
+</div>
+
+<div id="tab-history" class="tab-content">
+    <div class="history-filters">
+        <div class="filter-group">
+            <label>📅 Période</label>
+            <select id="periodSelect" onchange="toggleDateInputs()">
+                <option value="today">Aujourd'hui</option>
+                <option value="yesterday">Hier</option>
+                <option value="week">Cette semaine</option>
+                <option value="lastWeek">Semaine dernière</option>
+                <option value="month">Ce mois</option>
+                <option value="custom">Personnalisé</option>
+            </select>
+        </div>
+        <div class="filter-group" id="dateDebutGroup" style="display: none;">
+            <label>Date début</label>
+            <input type="date" id="dateDebut">
+        </div>
+        <div class="filter-group" id="dateFinGroup" style="display: none;">
+            <label>Date fin</label>
+            <input type="date" id="dateFin">
+        </div>
+        <div class="filter-group">
+            <label>👨‍🎓 Élève</label>
+            <select id="eleveFilter">
+                <option value="all">Tous les élèves</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>📊 Statut</label>
+            <select id="statusFilter">
+                <option value="all">Tous</option>
+                <option value="present">Présent</option>
+                <option value="retard">Retard</option>
+                <option value="absent">Absent</option>
+            </select>
+        </div>
+        <button class="btn-filter" onclick="chargerHistorique()">🔍 Filtrer</button>
+        <button class="btn-filter btn-export" onclick="exporterHistorique()">📥 Exporter</button>
+    </div>
+
+    <div id="historyStats" class="stats-summary"></div>
+
+    <div class="history-table-container">
+        <table class="history-table" id="historyTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Élève</th>
+                    <th>Matricule</th>
+                    <th>Statut</th>
+                    <th>Motif</th>
+                    <th>Durée</th>
+                    <th>Enseignant</th>
+                </tr>
+            </thead>
+            <tbody id="historyTableBody">
+                <tr><td colspan="7" style="text-align: center;">Sélectionnez une période pour voir l'historique</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:5267';
+    let token = null;
+    let enseignantId = null;
+    let enseignantOriginalId = null;
+    let enseignantNom = null;
+    let enseignantPrenom = null;
+    let classe = null;
+    let eleves = [];
+    let presencesData = {};
+    let remarquesData = {};
+    let seanceActuelle = null;
+    let seancesDuJour = [];
+    let allAbsences = [];
+    
+    let userRole = null;
+    let remplacementComplet = true;
+    let isReadOnly = false;
+
+    const HEURE_MINIMUM = 8;
+    const joursSemaine = {
+        "Monday": "Lundi",
+        "Tuesday": "Mardi", 
+        "Wednesday": "Mercredi",
+        "Thursday": "Jeudi",
+        "Friday": "Vendredi",
+        "Saturday": "Samedi",
+        "Sunday": "Dimanche"
+    };
+
+    // ✅ Fonction pour formater le nom de la classe: niveau + " A " + nom
+    function formatClasseName(classe) {
+        const niveau = classe.niveau || '';
+        const nom = classe.nomClasse || '';
+        
+        // Extraire le numéro de la classe du nom (ex: "3" de "6ème A 3")
+        let classeNumber = '';
+        if (nom) {
+            // Chercher un nombre à la fin du nom
+            const match = nom.match(/\d+$/);
+            if (match) {
+                classeNumber = match[0];
+            } else {
+                // Si pas de nombre, utiliser le nom complet
+                classeNumber = nom;
+            }
+        }
+        
+        // Formater: niveau + " A " + numéro
+        if (niveau && classeNumber) {
+            return `${niveau} A ${classeNumber}`;
+        } else if (niveau) {
+            return niveau;
+        } else if (classeNumber) {
+            return classeNumber;
+        }
+        return nom || 'Classe';
+    }
+
+    function extractId(obj) {
+        if (!obj) return null;
+        if (typeof obj === 'string') return obj;
+        if (obj.$oid) return obj.$oid;
+        if (obj._id) return extractId(obj._id);
+        if (obj.Id) return obj.Id;
+        if (obj.id) return obj.id;
+        return null;
+    }
+
+    function addDebugLog(message, data = null) {
+        const debugDiv = document.getElementById('debugLogs');
+        const timestamp = new Date().toLocaleTimeString();
+        let logMessage = `[${timestamp}] ${message}`;
+        if (data) {
+            try {
+                logMessage += `\n📦 ${JSON.stringify(data, null, 2)}`;
+            } catch(e) {
+                logMessage += `\n📦 ${data}`;
+            }
+        }
+        debugDiv.innerHTML += `<div style="border-bottom:1px solid #333; padding:4px 0; font-family:monospace; font-size:11px; white-space:pre-wrap;">${logMessage.replace(/\n/g, '<br>')}</div>`;
+        debugDiv.scrollTop = debugDiv.scrollHeight;
+        console.log(message, data);
+    }
+
+    function toggleDebug() {
+        document.getElementById('debugPanel').classList.toggle('show');
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        if (tab === 'presences') {
+            document.querySelector('.tab-btn:first-child').classList.add('active');
+            document.getElementById('tab-presences').classList.add('active');
+            rechargerToutesDonnees();
+        } else {
+            document.querySelector('.tab-btn:last-child').classList.add('active');
+            document.getElementById('tab-history').classList.add('active');
+            chargerListeElevesPourFiltre();
+            chargerHistorique();
+        }
+    }
+
+    function toggleDateInputs() {
+        const period = document.getElementById('periodSelect').value;
+        const dateDebutGroup = document.getElementById('dateDebutGroup');
+        const dateFinGroup = document.getElementById('dateFinGroup');
+        
+        if (period === 'custom') {
+            dateDebutGroup.style.display = 'block';
+            dateFinGroup.style.display = 'block';
+        } else {
+            dateDebutGroup.style.display = 'none';
+            dateFinGroup.style.display = 'none';
+        }
+    }
+
+    function chargerListeElevesPourFiltre() {
+        const eleveFilter = document.getElementById('eleveFilter');
+        eleveFilter.innerHTML = '<option value="all">Tous les élèves</option>';
+        
+        for (const eleve of eleves) {
+            const eleveId = extractId(eleve);
+            const nom = `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() || 'Élève';
+            eleveFilter.innerHTML += `<option value="${eleveId}">${escapeHtml(nom)}</option>`;
+        }
+    }
+
+    function getDateRange() {
+        const period = document.getElementById('periodSelect').value;
+        const today = new Date();
+        let debut, fin;
+        
+        switch(period) {
+            case 'today':
+                debut = new Date(today);
+                debut.setHours(0,0,0,0);
+                fin = new Date(today);
+                fin.setHours(23,59,59,999);
+                break;
+            case 'yesterday':
+                debut = new Date(today);
+                debut.setDate(debut.getDate() - 1);
+                debut.setHours(0,0,0,0);
+                fin = new Date(debut);
+                fin.setHours(23,59,59,999);
+                break;
+            case 'week':
+                const startOfWeek = new Date(today);
+                const dayOfWeek = today.getDay();
+                const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                startOfWeek.setDate(today.getDate() - diffToMonday);
+                startOfWeek.setHours(0,0,0,0);
+                debut = startOfWeek;
+                fin = new Date(today);
+                fin.setHours(23,59,59,999);
+                break;
+            case 'lastWeek':
+                const lastWeekStart = new Date(today);
+                const lastWeekDay = today.getDay();
+                const lastWeekDiff = lastWeekDay === 0 ? 13 : lastWeekDay + 6;
+                lastWeekStart.setDate(today.getDate() - lastWeekDiff);
+                lastWeekStart.setHours(0,0,0,0);
+                debut = lastWeekStart;
+                fin = new Date(debut);
+                fin.setDate(fin.getDate() + 6);
+                fin.setHours(23,59,59,999);
+                break;
+            case 'month':
+                debut = new Date(today.getFullYear(), today.getMonth(), 1);
+                debut.setHours(0,0,0,0);
+                fin = new Date(today);
+                fin.setHours(23,59,59,999);
+                break;
+            case 'custom':
+                debut = new Date(document.getElementById('dateDebut').value);
+                debut.setHours(0,0,0,0);
+                fin = new Date(document.getElementById('dateFin').value);
+                fin.setHours(23,59,59,999);
+                break;
+            default:
+                debut = new Date(today);
+                debut.setHours(0,0,0,0);
+                fin = new Date(today);
+                fin.setHours(23,59,59,999);
+        }
+        
+        return { debut, fin };
+    }
+
+    async function chargerHistorique() {
+        const { debut, fin } = getDateRange();
+        const eleveFilter = document.getElementById('eleveFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        addDebugLog(`📊 Chargement historique du ${debut.toLocaleDateString()} au ${fin.toLocaleDateString()}`);
+        
+        try {
+            const response = await fetch(`${API_BASE}/api/Absence`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                addDebugLog(`❌ Erreur chargement absences: ${response.status}`);
+                return;
+            }
+            
+            const result = await response.json();
+            addDebugLog("📦 Réponse brute API absences:", result);
+            
+            let absences = [];
+            
+            if (result.Success && result.Data) {
+                absences = result.Data;
+            } else if (result.success && result.data) {
+                absences = result.data;
+            } else if (Array.isArray(result)) {
+                absences = result;
+            } else if (result.$values) {
+                absences = result.$values;
+            } else if (result.data && Array.isArray(result.data)) {
+                absences = result.data;
+            }
+            
+            addDebugLog(`📊 ${absences.length} absences trouvées au total`);
+            
+            const filteredAbsences = [];
+            
+            let enseignantsIdsAFiltrer = [enseignantId];
+            
+            let originalId = null;
+            if (enseignantOriginalId) originalId = enseignantOriginalId;
+            if (!originalId) originalId = localStorage.getItem('enseignantRemplaceId');
+            if (!originalId && classe && classe.enseignantRemplaceId) originalId = classe.enseignantRemplaceId;
+            
+            if (originalId && originalId !== enseignantId) {
+                enseignantsIdsAFiltrer.push(originalId);
+                addDebugLog(`✅ Ajout de l'enseignant original à filtrer: ${originalId}`);
+            }
+            
+            addDebugLog(`🔍 Filtrage des absences pour les enseignants: ${enseignantsIdsAFiltrer.join(', ')}`);
+            
+            for (const absence of absences) {
+                let absenceDate = absence.date || absence.Date;
+                if (!absenceDate) {
+                    continue;
+                }
+                
+                if (absenceDate.$date) {
+                    absenceDate = new Date(absenceDate.$date);
+                } else {
+                    absenceDate = new Date(absenceDate);
+                }
+                
+                if (absenceDate >= debut && absenceDate <= fin) {
+                    let enseignantRef = absence.enseignant || absence.EnseignantId || absence.enseignantId;
+                    const enseignantIdExtracted = extractId(enseignantRef);
+                    
+                    if (enseignantsIdsAFiltrer.includes(enseignantIdExtracted)) {
+                        let eleveRef = absence.eleve || absence.EleveId || absence.eleveId;
+                        const eleveIdExtracted = extractId(eleveRef);
+                        
+                        if (!eleveIdExtracted) continue;
+                        
+                        if (eleveFilter !== 'all' && eleveIdExtracted !== eleveFilter) continue;
+                        
+                        let type = absence.type || absence.Type;
+                        if (type === 'retard') type = 'retard';
+                        else if (type === 'absence') type = 'absent';
+                        else if (type === 'presence' || type === 'present') type = 'present';
+                        
+                        if (statusFilter !== 'all' && type !== statusFilter) continue;
+                        
+                        const eleve = eleves.find(e => extractId(e) === eleveIdExtracted);
+                        const nomEleve = eleve ? `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() : 'Inconnu';
+                        const matricule = eleve ? (eleve.identifiantEcole || eleve.IdentifiantEcole || 'N/A') : 'N/A';
+                        
+                        let enseignantSaisie = enseignantNom || 'Enseignant';
+                        if (enseignantIdExtracted !== enseignantId && originalId === enseignantIdExtracted) {
+                            enseignantSaisie = 'Enseignant original (avant remplacement)';
+                        } else if (enseignantIdExtracted !== enseignantId) {
+                            enseignantSaisie = 'Autre enseignant';
+                        }
+                        
+                        filteredAbsences.push({
+                            id: absence._id || absence.id,
+                            date: absenceDate,
+                            eleveId: eleveIdExtracted,
+                            eleveNom: nomEleve,
+                            matricule: matricule,
+                            type: type,
+                            motif: absence.motif || absence.Motif || '',
+                            duree: absence.duree || absence.Duree || 1,
+                            enseignant: enseignantSaisie
+                        });
+                    }
+                }
+            }
+            
+            filteredAbsences.sort((a, b) => b.date - a.date);
+            allAbsences = filteredAbsences;
+            addDebugLog(`📊 ${filteredAbsences.length} absences filtrées pour la période`);
+            afficherHistorique(filteredAbsences);
+            
+        } catch (error) {
+            addDebugLog(`❌ Erreur: ${error.message}`);
+            afficherToast("Erreur de chargement de l'historique", "error");
+        }
+    }
+
+    function afficherHistorique(absences) {
+        const tbody = document.getElementById('historyTableBody');
+        const statsDiv = document.getElementById('historyStats');
+        
+        const presents = absences.filter(a => a.type === 'present').length;
+        const retards = absences.filter(a => a.type === 'retard').length;
+        const absents = absences.filter(a => a.type === 'absent').length;
+        const total = absences.length;
+        
+        statsDiv.innerHTML = `
+            <div class="stat-card present">
+                <div class="stat-value">${presents}</div>
+                <div class="stat-label">✅ Présents</div>
+            </div>
+            <div class="stat-card retard">
+                <div class="stat-value">${retards}</div>
+                <div class="stat-label">⏰ Retards</div>
+            </div>
+            <div class="stat-card absent">
+                <div class="stat-value">${absents}</div>
+                <div class="stat-label">❌ Absents</div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-value">${total}</div>
+                <div class="stat-label">📊 Total enregistrements</div>
+            </div>
+        `;
+        
+        if (absences.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aucune donnée trouvée pour cette période</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        for (const absence of absences) {
+            const badgeClass = absence.type === 'present' ? 'badge-present' : (absence.type === 'retard' ? 'badge-retard' : 'badge-absent');
+            const badgeText = absence.type === 'present' ? 'Présent' : (absence.type === 'retard' ? 'Retard' : 'Absent');
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td>${absence.date.toLocaleDateString('fr-FR')}</td>
+                    <td><strong>${escapeHtml(absence.eleveNom)}</strong></td>
+                    <td>${escapeHtml(absence.matricule)}</td>
+                    <td><span class="presence-badge ${badgeClass}">${badgeText}</span></td>
+                    <td>${escapeHtml(absence.motif.substring(0, 60))}${absence.motif.length > 60 ? '...' : ''}</td>
+                    <td>${absence.duree} h</td>
+                    <td>${escapeHtml(absence.enseignant)}</td>
+                </tr>
+            `;
+        }
+    }
+
+    function exporterHistorique() {
+        if (allAbsences.length === 0) {
+            afficherToast("Aucune donnée à exporter", "error");
+            return;
+        }
+        
+        let csv = "Date;Élève;Matricule;Statut;Motif;Durée;Enseignant\n";
+        
+        for (const absence of allAbsences) {
+            const status = absence.type === 'present' ? 'Présent' : (absence.type === 'retard' ? 'Retard' : 'Absent');
+            csv += `"${absence.date.toLocaleDateString('fr-FR')}";"${absence.eleveNom}";"${absence.matricule}";"${status}";"${absence.motif.replace(/"/g, '""')}";${absence.duree};"${absence.enseignant}"\n`;
+        }
+        
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute("download", `historique_presences_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        afficherToast("Export CSV effectué avec succès");
+    }
+
+    function getCurrentDateInfo() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        const jourAnglais = now.toLocaleDateString('en-US', { weekday: 'long' });
+        const jourFrancais = joursSemaine[jourAnglais] || jourAnglais;
+        return { dateStr, jourFrancais, dateObj: now };
+    }
+
+    function updateDateDisplay() {
+        const { dateStr, jourFrancais, dateObj } = getCurrentDateInfo();
+        const formattedDate = dateObj.toLocaleDateString('fr-FR', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        });
+        document.getElementById('currentDateText').textContent = formattedDate;
+        document.getElementById('currentDayText').textContent = `${jourFrancais}`;
+        return { dateStr, jourFrancais };
+    }
+
+    async function chargerInfosUtilisateur() {
+        try {
+            const response = await fetch(`${API_BASE}/api/utilisateurs/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                userRole = (data.role || data.Role || '').toLowerCase();
+                remplacementComplet = data.remplacementComplet !== false;
+                
+                enseignantPrenom = data.prenom || data.Prenom || '';
+                enseignantNom = data.nom || data.Nom || '';
+                if (enseignantPrenom && enseignantNom) {
+                    enseignantNom = `${enseignantPrenom} ${enseignantNom}`;
+                }
+                
+                if (userRole === 'permanent' || userRole === 'vacataire') {
+                    if (data.enseignantRemplaceId) {
+                        enseignantOriginalId = data.enseignantRemplaceId;
+                        addDebugLog(`✅ Vacataire - ID enseignant remplacé (API): ${enseignantOriginalId}`);
+                        localStorage.setItem('enseignantRemplaceId', enseignantOriginalId);
+                    } else {
+                        const storedEnseignantId = localStorage.getItem('enseignantRemplaceId');
+                        if (storedEnseignantId) {
+                            enseignantOriginalId = storedEnseignantId;
+                            addDebugLog(`✅ Vacataire - ID enseignant remplacé (localStorage): ${enseignantOriginalId}`);
+                        } else {
+                            enseignantOriginalId = enseignantId;
+                            addDebugLog(`⚠️ Vacataire - Aucun enseignantRemplaceId trouvé, utilisation de l'ID du vacataire: ${enseignantOriginalId}`);
+                        }
+                    }
+                } else {
+                    enseignantOriginalId = enseignantId;
+                }
+                
+                isReadOnly = (userRole === 'permanent' || userRole === 'vacataire') && !remplacementComplet;
+                
+                const headerTitle = document.getElementById('classeNom');
+                const infoConsultation = document.getElementById('infoConsultation');
+                
+                if (isReadOnly) {
+                    const badge = document.createElement('span');
+                    badge.className = 'remplacement-partiel-badge';
+                    badge.textContent = '🔒 Mode consultation seule';
+                    if (headerTitle) headerTitle.appendChild(badge);
+                    
+                    infoConsultation.style.display = 'flex';
+                    infoConsultation.innerHTML = `
+                        <i>🔒</i>
+                        <div>
+                            <strong>Mode consultation seule</strong><br>
+                            En tant que vacataire en remplacement partiel, vous pouvez consulter l'historique des présences<br>
+                            mais vous ne pouvez pas modifier les présences. Seul l'enseignant titulaire peut saisir/modifier les présences.
+                        </div>
+                    `;
+                } else if (userRole === 'permanent' || userRole === 'vacataire') {
+                    const badge = document.createElement('span');
+                    badge.className = 'remplacement-badge';
+                    badge.textContent = '✏️ Mode édition (remplacement complet)';
+                    if (headerTitle) headerTitle.appendChild(badge);
+                }
+            }
+        } catch (error) {
+            console.warn("Impossible de récupérer les infos utilisateur:", error);
+            enseignantOriginalId = enseignantId;
+        }
+    }
+
+    // ============================================
+    // FONCTIONS DE NOTIFICATION AUX PARENTS - VERSION CORRIGÉE
+    // ============================================
+
+    async function envoyerNotificationParent(eleveId, typeEvenement, titre, message) {
+        try {
+            addDebugLog(`🔔 Envoi notification parent: ${typeEvenement} pour élève ${eleveId}`);
+            
+            const eleve = eleves.find(e => extractId(e) === eleveId);
+            if (!eleve) {
+                addDebugLog(`❌ Élève ${eleveId} non trouvé`);
+                return false;
+            }
+            
+            // Récupérer l'email du parent (qui sert d'identifiant)
+            let parentEmail = eleve.emailParent || eleve.EmailParent || eleve.parentPrincipalEmail;
+            if (!parentEmail) {
+                addDebugLog(`❌ Aucun email parent trouvé pour l'élève ${eleveId}`);
+                return false;
+            }
+            
+            const nomEleve = `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() || 'Élève';
+            const nomClasse = classe ? formatClasseName(classe) : '';
+            
+            // Utiliser les types de notification reconnus par le service
+            let typeReconnu = typeEvenement;
+            if (typeEvenement === "presence") {
+                typeReconnu = "note";
+            } else if (typeEvenement === "remarque") {
+                typeReconnu = "note";
+            }
+            
+            const notification = {
+                Titre: titre,
+                Message: message,
+                DestinataireId: parentEmail,  // Utiliser l'email comme identifiant
+                TypeNotification: typeReconnu,
+                Date: new Date().toISOString(),
+                Lu: false,
+                Statut: "envoyée",
+                CreatedAt: new Date().toISOString(),
+                UpdatedAt: new Date().toISOString()
+            };
+            
+            addDebugLog(`📧 Notification à envoyer:`, notification);
+            
+            const response = await fetch(`${API_BASE}/api/Notification`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(notification)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                addDebugLog(`✅ Notification stockée en base pour le parent de ${nomEleve} (Email: ${parentEmail})`);
+                return true;
+            } else {
+                const errorText = await response.text();
+                addDebugLog(`❌ Erreur envoi notification: ${response.status} - ${errorText}`);
+                return false;
+            }
+        } catch (error) {
+            addDebugLog(`❌ Exception lors de l'envoi de notification: ${error.message}`);
+            return false;
+        }
+    }
+
+    async function envoyerNotificationPresence(eleveId, estPresent) {
+        const eleve = eleves.find(e => extractId(e) === eleveId);
+        const nomEleve = eleve ? `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() : 'Votre enfant';
+        const nomClasse = classe ? formatClasseName(classe) : 'sa classe';
+        const matiere = seanceActuelle ? seanceActuelle.matiere : '';
+        const heureDebut = seanceActuelle ? seanceActuelle.heureDebut : '';
+        const heureFin = seanceActuelle ? seanceActuelle.heureFin : '';
+        
+        if (estPresent) {
+            const titre = `✅ ${nomEleve} est présent(e)`;
+            const message = `${nomEleve} est présent(e) en classe de ${nomClasse} pour le cours de ${matiere} (${heureDebut} - ${heureFin}).`;
+            return await envoyerNotificationParent(eleveId, "presence", titre, message);
+        }
+        return true;
+    }
+
+    async function envoyerNotificationRetard(eleveId, motif, duree) {
+        const eleve = eleves.find(e => extractId(e) === eleveId);
+        const nomEleve = eleve ? `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() : 'Votre enfant';
+        const nomClasse = classe ? formatClasseName(classe) : 'sa classe';
+        const matiere = seanceActuelle ? seanceActuelle.matiere : '';
+        const heureDebut = seanceActuelle ? seanceActuelle.heureDebut : '';
+        const heureFin = seanceActuelle ? seanceActuelle.heureFin : '';
+        
+        const titre = `⏰ ${nomEleve} est en retard`;
+        const message = `${nomEleve} est en retard (${duree} heure(s)) en classe de ${nomClasse} pour le cours de ${matiere} (${heureDebut} - ${heureFin}). Motif: ${motif}.`;
+        return await envoyerNotificationParent(eleveId, "retard", titre, message);
+    }
+
+    async function envoyerNotificationAbsence(eleveId, motif, duree) {
+        const eleve = eleves.find(e => extractId(e) === eleveId);
+        const nomEleve = eleve ? `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() : 'Votre enfant';
+        const nomClasse = classe ? formatClasseName(classe) : 'sa classe';
+        const matiere = seanceActuelle ? seanceActuelle.matiere : '';
+        const heureDebut = seanceActuelle ? seanceActuelle.heureDebut : '';
+        const heureFin = seanceActuelle ? seanceActuelle.heureFin : '';
+        
+        const titre = `❌ ${nomEleve} est absent(e)`;
+        const message = `${nomEleve} est absent(e) (${duree} heure(s)) en classe de ${nomClasse} pour le cours de ${matiere} (${heureDebut} - ${heureFin}). Motif: ${motif}.`;
+        return await envoyerNotificationParent(eleveId, "absence", titre, message);
+    }
+
+    async function envoyerNotificationRemarque(eleveId, typeRemarque, gravite, contenu) {
+        const eleve = eleves.find(e => extractId(e) === eleveId);
+        const nomEleve = eleve ? `${eleve.prenom || eleve.Prenom || ''} ${eleve.nom || eleve.Nom || ''}`.trim() : 'Votre enfant';
+        const nomClasse = classe ? formatClasseName(classe) : 'sa classe';
+        
+        const typeTexte = {
+            'comportement': 'comportement',
+            'discipline': 'discipline',
+            'travail': 'travail',
+            'participation': 'participation'
+        }[typeRemarque] || typeRemarque;
+        
+        const graviteTexte = {
+            'faible': 'faible',
+            'moyenne': 'moyenne',
+            'élevée': 'élevée'
+        }[gravite] || gravite;
+        
+        const titre = `📝 Remarque concernant ${nomEleve}`;
+        const message = `Une remarque de ${typeTexte} (gravité ${graviteTexte}) a été ajoutée pour ${nomEleve} en classe de ${nomClasse}. Contenu: "${contenu}".`;
+        return await envoyerNotificationParent(eleveId, "remarque", titre, message);
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        const classeStr = localStorage.getItem('classeSelectionnee');
+        token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        enseignantId = localStorage.getItem('enseignantId');
+        enseignantNom = localStorage.getItem('enseignantNom') || 'Enseignant';
+        
+        const storedEnseignantRemplaceId = localStorage.getItem('enseignantRemplaceId');
+        if (storedEnseignantRemplaceId) {
+            enseignantOriginalId = storedEnseignantRemplaceId;
+            addDebugLog(`✅ ID enseignant remplacé récupéré depuis localStorage: ${enseignantOriginalId}`);
+        }
+        
+        addDebugLog("🔐 Informations de connexion:", {
+            token: token ? `${token.substring(0, 30)}...` : 'NON TROUVÉ',
+            enseignantId: enseignantId,
+            enseignantOriginalId: enseignantOriginalId,
+            enseignantNom: enseignantNom
+        });
+        
+        if (!classeStr) {
+            alert('Aucune classe sélectionnée');
+            window.location.href = 'enseignant-classes.html';
+            return;
+        }
+        
+        classe = JSON.parse(classeStr);
+        
+        // ✅ Utiliser la nouvelle fonction de formatage pour le titre
+        const formattedClasseName = formatClasseName(classe);
+        document.getElementById('classeNom').innerHTML = `📋 ${formattedClasseName}`;
+        document.getElementById('classeInfo').textContent = `${classe.niveau} | ${classe.matieres.length} matière(s) | ${classe.seances.length} séance(s)`;
+        
+        await chargerInfosUtilisateur();
+        
+        updateDateDisplay();
+        
+        await chargerEleves();
+        await chargerRemarques();
+        await chargerPresences();
+        chargerSeancesDuJour();
+        
+        chargerListeElevesPourFiltre();
+        
+        const today = new Date();
+        document.getElementById('dateDebut').value = today.toISOString().split('T')[0];
+        document.getElementById('dateFin').value = today.toISOString().split('T')[0];
+    });
+    
+    async function chargerToutesDonnees() {
+        await chargerEleves();
+        await chargerRemarques();
+        await chargerPresences();
+        chargerSeancesDuJour();
+    }
+    
+    async function rechargerToutesDonnees() {
+        addDebugLog("🔄 Rechargement complet des données...");
+        await chargerToutesDonnees();
+        afficherToast("Données rechargées");
+    }
+    
+    function chargerSeancesDuJour() {
+        const { dateStr, jourFrancais } = getCurrentDateInfo();
+        
+        seancesDuJour = getSeancesDisponiblesPourJour(jourFrancais);
+        seancesDuJour.sort((a, b) => a.heureDebut.localeCompare(b.heureDebut));
+        
+        const seanceSelect = document.getElementById('seanceSelect');
+        const seanceSelector = document.getElementById('seanceSelector');
+        const alertContainer = document.getElementById('alertContainer');
+        
+        if (seancesDuJour.length === 0) {
+            seanceSelector.style.display = 'none';
+            seanceActuelle = null;
+            
+            alertContainer.innerHTML = `
+                <div class="alert-no-cours">
+                    <div style="font-size:1.8rem;">📅❌</div>
+                    <div style="flex:1; color:#e65100;">
+                        <strong>Aucun cours disponible ce jour à partir de ${HEURE_MINIMUM}h</strong><br>
+                        Le ${new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} (${jourFrancais}), il n'y a pas de cours pour cette classe.
+                    </div>
+                </div>
+            `;
+            
+            afficherEleves();
+            return;
+        }
+        
+        alertContainer.innerHTML = '';
+        seanceSelector.style.display = 'block';
+        seanceSelect.innerHTML = '<option value="">Sélectionner une séance</option>';
+        
+        for (const seance of seancesDuJour) {
+            const option = document.createElement('option');
+            option.value = JSON.stringify(seance);
+            option.textContent = `📖 ${seance.matiere} | ⏰ ${seance.heureDebut} - ${seance.heureFin} | 🏠 Salle ${seance.salle}`;
+            seanceSelect.appendChild(option);
+        }
+        
+        if (isReadOnly) {
+            seanceSelect.disabled = true;
+        }
+        
+        seanceSelect.onchange = function() {
+            if (this.value) {
+                seanceActuelle = JSON.parse(this.value);
+                document.getElementById('seanceInfo').innerHTML = `📖 ${seanceActuelle.matiere} | ${seanceActuelle.heureDebut} - ${seanceActuelle.heureFin} | Salle ${seanceActuelle.salle}`;
+                afficherEleves();
+            } else {
+                seanceActuelle = null;
+                document.getElementById('seanceInfo').innerHTML = '';
+                afficherEleves();
+            }
+        };
+        
+        const firstOption = seanceSelect.querySelector('option:not([value=""])');
+        if (firstOption) {
+            seanceSelect.value = firstOption.value;
+            seanceActuelle = JSON.parse(firstOption.value);
+            document.getElementById('seanceInfo').innerHTML = `📖 ${seanceActuelle.matiere} | ${seanceActuelle.heureDebut} - ${seanceActuelle.heureFin} | Salle ${seanceActuelle.salle}`;
+            afficherEleves();
+        }
+    }
+    
+    function extraireHeure(heureStr) {
+        if (!heureStr) return 0;
+        const parts = heureStr.split(':');
+        return parseInt(parts[0], 10);
+    }
+
+    function filtrerSeancesParHeure(seances) {
+        return seances.filter(seance => extraireHeure(seance.heureDebut) >= HEURE_MINIMUM);
+    }
+
+    function getSeancesDisponiblesPourJour(jourFrancais) {
+        const seancesDuJour = (classe.seances || []).filter(seance => 
+            seance.jour?.toLowerCase().trim() === jourFrancais?.toLowerCase().trim()
+        );
+        return filtrerSeancesParHeure(seancesDuJour);
+    }
+    
+    async function chargerEleves() {
+        try {
+            addDebugLog(`🔍 Chargement des élèves pour la classe: ${classe.id}`);
+            const response = await fetch(`${API_BASE}/api/Eleve/par-classe/${classe.id}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                eleves = genererElevesDemo();
+            } else {
+                const result = await response.json();
+                addDebugLog("📦 Réponse API élèves:", result);
+                
+                if (result.Success && result.Data) {
+                    eleves = result.Data;
+                } else if (result.success && result.data) {
+                    eleves = result.data;
+                } else if (result.data && Array.isArray(result.data)) {
+                    eleves = result.data;
+                } else if (Array.isArray(result)) {
+                    eleves = result;
+                } else if (result.$values) {
+                    eleves = result.$values;
+                } else {
+                    eleves = result;
+                }
+                
+                if (!Array.isArray(eleves)) {
+                    eleves = [];
+                }
+            }
+            addDebugLog(`✅ ${eleves.length} élèves chargés`);
+        } catch (error) {
+            addDebugLog(`❌ Erreur chargement élèves: ${error.message}`);
+            eleves = genererElevesDemo();
+        }
+    }
+    
+    async function chargerRemarques() {
+        try {
+            const response = await fetch(`${API_BASE}/api/Remarque/enseignant/${enseignantId}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) return;
+            
+            const result = await response.json();
+            let remarques = [];
+            
+            if (result.Success && result.Data) remarques = result.Data;
+            else if (result.success && result.data) remarques = result.data;
+            else if (Array.isArray(result)) remarques = result;
+            else if (result.$values) remarques = result.$values;
+            
+            remarquesData = {};
+            const { dateStr } = getCurrentDateInfo();
+            
+            for (const r of remarques) {
+                let eleveId = extractId(r.eleveId || r.EleveId || r.eleve);
+                
+                let dateRemarque = r.date || r.Date;
+                if (dateRemarque) {
+                    if (dateRemarque.$date) {
+                        dateRemarque = new Date(dateRemarque.$date);
+                    } else {
+                        dateRemarque = new Date(dateRemarque);
+                    }
+                    const remarqueDateStr = dateRemarque.toISOString().split('T')[0];
+                    if (remarqueDateStr === dateStr) {
+                        const key = `${eleveId}_${remarqueDateStr}`;
+                        remarquesData[key] = {
+                            Id: r._id || r.id,
+                            Contenu: r.contenu || r.Contenu,
+                            Type: r.type || r.Type,
+                            Gravite: r.gravite || r.Gravite,
+                            Date: remarqueDateStr
+                        };
+                    }
+                }
+            }
+        } catch (error) {
+            addDebugLog(`❌ Erreur chargement remarques: ${error.message}`);
+        }
+    }
+    
+    async function chargerPresences() {
+        try {
+            const response = await fetch(`${API_BASE}/api/Absence`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) return;
+            
+            const result = await response.json();
+            addDebugLog("📦 Réponse API absences pour le jour:", result);
+            
+            let absences = [];
+            
+            if (result.Success && result.Data) absences = result.Data;
+            else if (result.success && result.data) absences = result.data;
+            else if (Array.isArray(result)) absences = result;
+            else if (result.$values) absences = result.$values;
+            
+            addDebugLog(`📊 ${absences.length} absences trouvées au total`);
+            
+            presencesData = {};
+            const { dateStr } = getCurrentDateInfo();
+            
+            let enseignantsIdsAFiltrer = [enseignantId];
+            
+            let originalId = enseignantOriginalId || localStorage.getItem('enseignantRemplaceId');
+            if (originalId && originalId !== enseignantId) {
+                enseignantsIdsAFiltrer.push(originalId);
+            }
+            
+            addDebugLog(`🔍 Filtrage des présences pour les enseignants: ${enseignantsIdsAFiltrer.join(', ')}`);
+            
+            for (const absence of absences) {
+                let absenceDate = absence.date || absence.Date;
+                if (!absenceDate) continue;
+                
+                if (absenceDate.$date) {
+                    absenceDate = new Date(absenceDate.$date);
+                } else {
+                    absenceDate = new Date(absenceDate);
+                }
+                
+                const absenceDateStr = absenceDate.toISOString().split('T')[0];
+                
+                if (absenceDateStr !== dateStr) continue;
+                
+                let enseignantRef = absence.enseignant || absence.EnseignantId || absence.enseignantId;
+                const enseignantIdExtracted = extractId(enseignantRef);
+                
+                if (!enseignantsIdsAFiltrer.includes(enseignantIdExtracted)) continue;
+                
+                let eleveRef = absence.eleve || absence.EleveId || absence.eleveId;
+                const eleveIdExtracted = extractId(eleveRef);
+                
+                if (!eleveIdExtracted) {
+                    continue;
+                }
+                
+                let type = absence.type || absence.Type;
+                if (type === 'retard') type = 'retard';
+                else if (type === 'absence') type = 'absent';
+                else if (type === 'presence' || type === 'present') type = 'present';
+                
+                let motif = absence.motif || absence.Motif || '';
+                
+                const key = `${eleveIdExtracted}_${absenceDateStr}`;
+                if (!presencesData[key]) presencesData[key] = [];
+                
+                presencesData[key].push({
+                    type: type,
+                    motif: motif,
+                    id: absence._id || absence.id,
+                    date: absenceDateStr
+                });
+            }
+            
+            addDebugLog(`✅ ${Object.keys(presencesData).length} élèves ont des enregistrements pour aujourd'hui`);
+        } catch (error) {
+            addDebugLog(`❌ Erreur chargement présences: ${error.message}`);
+        }
+    }
+    
+    function genererElevesDemo() {
+        return [
+            { 
+                Id: "699b7e2d9977fd14213a8650", 
+                Prenom: "Ahmed", 
+                Nom: "Ben Ali", 
+                IdentifiantEcole: "ECOLE-001", 
+                EmailParent: "ahmed.parent@email.com", 
+                TelephoneParent: "+216 12 345 678",
+                ParentId: "507f1f77bcf86cd799439011"
+            }
+        ];
+    }
+    
+    function afficherEleves() {
+        const container = document.getElementById('elevesContainer');
+        const { dateStr } = getCurrentDateInfo();
+        
+        if (!eleves || eleves.length === 0) {
+            container.innerHTML = '<div class="empty-state"><h3>📋 Aucun élève</h3><p>Aucun élève trouvé dans cette classe.</p></div>';
+            return;
+        }
+        
+        if (!seanceActuelle) {
+            if (seancesDuJour.length > 0) {
+                container.innerHTML = `<div class="empty-state"><h3>⏰ Sélectionnez une séance</h3><p>Veuillez choisir un créneau horaire.</p></div>`;
+            } else {
+                container.innerHTML = `<div class="empty-state"><h3>📅 Aucun cours aujourd'hui</h3><p>Il n'y a pas de cours programmé pour ce jour.</p></div>`;
+            }
+            return;
+        }
+        
+        let presents = 0, retards = 0, absents = 0;
+        
+        for (const eleve of eleves) {
+            const eleveId = extractId(eleve);
+            const presenceKey = `${eleveId}_${dateStr}`;
+            const presencesDuJour = presencesData[presenceKey] || [];
+            
+            let currentPresence = null;
+            for (const p of presencesDuJour) {
+                if (p.motif && p.motif.includes(seanceActuelle.matiere)) {
+                    currentPresence = p;
+                    break;
+                }
+            }
+            
+            if (currentPresence) {
+                if (currentPresence.type === 'present') presents++;
+                else if (currentPresence.type === 'retard') retards++;
+                else if (currentPresence.type === 'absent') absents++;
+            }
+        }
+        
+        let html = `
+            <div class="eleves-container">
+                <div class="eleves-header">
+                    <div>👥 Liste des élèves (${eleves.length})</div>
+                    <div class="summary-stats">✅ ${presents} présent(s) | ⏰ ${retards} retard(s) | ❌ ${absents} absent(s)</div>
+                    <button class="btn-all-present" onclick="toutMettrePresent()" ${isReadOnly ? 'disabled' : ''}>✅ Tout présent</button>
+                </div>
+                <table class="eleves-table">
+        `;
+        
+        for (const eleve of eleves) {
+            const eleveId = extractId(eleve);
+            const prenom = eleve.prenom || eleve.Prenom || '';
+            const nom = eleve.nom || eleve.Nom || '';
+            const nomComplet = `${prenom} ${nom}`.trim() || 'Élève';
+            const matricule = eleve.identifiantEcole || eleve.IdentifiantEcole || 'N/A';
+            const initiales = (prenom[0] || '') + (nom[0] || '');
+            const emailParent = eleve.EmailParent || eleve.emailParent || '';
+            const telParent = eleve.TelephoneParent || eleve.telephoneParent || '';
+            
+            const presenceKey = `${eleveId}_${dateStr}`;
+            const presencesDuJour = presencesData[presenceKey] || [];
+            
+            let currentPresence = null;
+            for (const p of presencesDuJour) {
+                if (p.motif && p.motif.includes(seanceActuelle.matiere)) {
+                    currentPresence = p;
+                    break;
+                }
+            }
+            
+            const isPresent = currentPresence?.type === 'present';
+            const isRetard = currentPresence?.type === 'retard';
+            const isAbsent = currentPresence?.type === 'absent';
+            
+            const remarqueKey = `${eleveId}_${dateStr}`;
+            const currentRemarque = remarquesData[remarqueKey];
+            
+            html += `
+                <tr id="eleve-row-${eleveId}">
+                    <td style="width: 60px;"><div class="eleve-avatar">${initiales.toUpperCase() || 'E'}</div></td>
+                    <td>
+                        <div class="eleve-nom">${escapeHtml(nomComplet)}</div>
+                        <div class="eleve-matricule">${escapeHtml(matricule)}</div>
+                        <div class="parents-info">
+                            ${emailParent ? `<span>📧 ${escapeHtml(emailParent)}</span>` : ''}
+                            ${telParent ? `<span>📞 ${escapeHtml(telParent)}</span>` : ''}
+                        </div>
+                        <div class="presence-buttons">
+                            <button class="btn-presence btn-present ${isPresent ? 'active' : ''}" onclick="definirPresence('${eleveId}', 'present', event)" ${isReadOnly ? 'disabled' : ''}>✅ Présent</button>
+                            <button class="btn-presence btn-retard ${isRetard ? 'active' : ''}" onclick="ouvrirFormulaireAbsence('${eleveId}', 'retard', event)" ${isReadOnly ? 'disabled' : ''}>⏰ Retard</button>
+                            <button class="btn-presence btn-absent ${isAbsent ? 'active' : ''}" onclick="ouvrirFormulaireAbsence('${eleveId}', 'absent', event)" ${isReadOnly ? 'disabled' : ''}>❌ Absent</button>
+                            <button class="btn-presence btn-remarque" onclick="ouvrirFormulaireRemarque('${eleveId}', event)" ${isReadOnly ? 'disabled' : ''}>📝 Remarque</button>
+                        </div>
+                        <div id="absence-detail-${eleveId}">
+                            ${(isRetard || isAbsent) && currentPresence?.motif ? `
+                                <div class="absence-detail ${isReadOnly ? 'readonly' : ''}">
+                                    <span>📝 ${escapeHtml(currentPresence.motif)}</span>
+                                    ${!isReadOnly ? `<button class="edit-motif" onclick="ouvrirFormulaireAbsence('${eleveId}', '${isRetard ? 'retard' : 'absent'}', event)">✏️ Modifier</button>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div id="remarque-detail-${eleveId}">
+                            ${currentRemarque ? `
+                                <div class="remarque-detail ${isReadOnly ? 'readonly' : ''}">
+                                    <span>📌 ${escapeHtml(currentRemarque.Contenu)}</span>
+                                    ${!isReadOnly ? `<button class="edit-remarque" onclick="ouvrirFormulaireRemarque('${eleveId}', event)">✏️ Modifier</button>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        html += `</table></div>`;
+        container.innerHTML = html;
+    }
+    
+    function ouvrirFormulaireAbsence(eleveId, type, event) {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas modifier les présences", "error");
+            return;
+        }
+        
+        if (event) event.stopPropagation();
+        const row = document.getElementById(`eleve-row-${eleveId}`);
+        if (!row) return;
+        
+        const buttonsCell = row.querySelector('td:last-child');
+        const motifs = type === 'retard' 
+            ? ['Retard transport', 'Retard personnel', 'Rendez-vous', 'Autre']
+            : ['Maladie', 'Autorisation parentale', 'Rendez-vous médical', 'Raison familiale', 'Autre'];
+        
+        const presenceButtons = buttonsCell.querySelector('.presence-buttons');
+        if (presenceButtons) {
+            presenceButtons.outerHTML = `
+                <div class="presence-buttons">
+                    <button class="btn-presence btn-present" onclick="definirPresence('${eleveId}', 'present', event)">✅ Présent</button>
+                    <button class="btn-presence btn-retard" onclick="ouvrirFormulaireAbsence('${eleveId}', 'retard', event)">⏰ Retard</button>
+                    <button class="btn-presence btn-absent" onclick="ouvrirFormulaireAbsence('${eleveId}', 'absent', event)">❌ Absent</button>
+                    <button class="btn-presence btn-remarque" onclick="ouvrirFormulaireRemarque('${eleveId}', event)">📝 Remarque</button>
+                </div>
+                <div class="absence-form-inline">
+                    <div class="form-group">
+                        <label>Motif</label>
+                        <select id="motif-${eleveId}">
+                            <option value="">Sélectionner</option>
+                            ${motifs.map(m => `<option value="${m}">${m}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Durée (heures)</label>
+                        <input type="number" id="duree-${eleveId}" step="0.5" value="1">
+                    </div>
+                    <button class="btn-submit-inline" onclick="validerAbsence('${eleveId}', '${type}', event)">✓ Valider</button>
+                    <button class="btn-submit-inline" style="background:#95a5a6;" onclick="rechargerToutesDonnees()">✗ Annuler</button>
+                </div>
+            `;
+        }
+    }
+    
+    function ouvrirFormulaireRemarque(eleveId, event) {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas ajouter de remarques", "error");
+            return;
+        }
+        
+        if (event) event.stopPropagation();
+        const { dateStr } = getCurrentDateInfo();
+        const remarqueKey = `${eleveId}_${dateStr}`;
+        const currentRemarque = remarquesData[remarqueKey] || {};
+        
+        const row = document.getElementById(`eleve-row-${eleveId}`);
+        if (!row) return;
+        
+        const buttonsCell = row.querySelector('td:last-child');
+        const presenceButtons = buttonsCell.querySelector('.presence-buttons');
+        
+        if (presenceButtons) {
+            presenceButtons.outerHTML = `
+                <div class="presence-buttons">
+                    <button class="btn-presence btn-present" onclick="definirPresence('${eleveId}', 'present', event)">✅ Présent</button>
+                    <button class="btn-presence btn-retard" onclick="ouvrirFormulaireAbsence('${eleveId}', 'retard', event)">⏰ Retard</button>
+                    <button class="btn-presence btn-absent" onclick="ouvrirFormulaireAbsence('${eleveId}', 'absent', event)">❌ Absent</button>
+                    <button class="btn-presence btn-remarque" onclick="ouvrirFormulaireRemarque('${eleveId}', event)">📝 Remarque</button>
+                </div>
+                <div class="remarque-form-inline">
+                    <div class="form-group">
+                        <label>Type de remarque</label>
+                        <select id="remarque-type-${eleveId}">
+                            <option value="comportement" ${currentRemarque.Type === 'comportement' ? 'selected' : ''}>Comportement</option>
+                            <option value="discipline" ${currentRemarque.Type === 'discipline' ? 'selected' : ''}>Discipline</option>
+                            <option value="travail" ${currentRemarque.Type === 'travail' ? 'selected' : ''}>Travail</option>
+                            <option value="participation" ${currentRemarque.Type === 'participation' ? 'selected' : ''}>Participation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Gravité</label>
+                        <select id="remarque-gravite-${eleveId}">
+                            <option value="faible" ${currentRemarque.Gravite === 'faible' ? 'selected' : ''}>Faible</option>
+                            <option value="moyenne" ${currentRemarque.Gravite === 'moyenne' ? 'selected' : ''}>Moyenne</option>
+                            <option value="élevée" ${currentRemarque.Gravite === 'élevée' ? 'selected' : ''}>Élevée</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:2;">
+                        <label>Contenu de la remarque</label>
+                        <textarea id="remarque-contenu-${eleveId}" rows="2" placeholder="Décrivez le comportement ou la remarque...">${currentRemarque.Contenu || ''}</textarea>
+                    </div>
+                    <button class="btn-submit-inline" onclick="validerRemarque('${eleveId}', event)">✓ Enregistrer</button>
+                    <button class="btn-submit-inline" style="background:#95a5a6;" onclick="rechargerToutesDonnees()">✗ Annuler</button>
+                </div>
+            `;
+        }
+    }
+    
+    async function validerRemarque(eleveId, event) {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas ajouter de remarques", "error");
+            return;
+        }
+        
+        if (event) event.stopPropagation();
+        const { dateStr } = getCurrentDateInfo();
+        const type = document.getElementById(`remarque-type-${eleveId}`)?.value;
+        const gravite = document.getElementById(`remarque-gravite-${eleveId}`)?.value;
+        const contenu = document.getElementById(`remarque-contenu-${eleveId}`)?.value;
+        
+        if (!contenu || contenu.trim() === '') {
+            afficherToast("Veuillez saisir le contenu de la remarque", "error");
+            return;
+        }
+        
+        const eleve = eleves.find(e => extractId(e) === eleveId);
+        const nomEleve = eleve ? `${eleve.Prenom || eleve.prenom} ${eleve.Nom || eleve.nom}`.trim() : "Élève";
+        
+        const remarque = {
+            EleveId: eleveId,
+            EnseignantId: enseignantId,
+            Date: new Date(dateStr).toISOString(),
+            Type: type || 'discipline',
+            Gravite: gravite || 'moyenne',
+            Contenu: contenu,
+            Suivi: false
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE}/api/Remarque`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(remarque)
+            });
+            
+            if (response.ok) {
+                await envoyerNotificationRemarque(eleveId, type, gravite, contenu);
+                
+                afficherToast(`Remarque enregistrée pour ${nomEleve} (notification envoyée au parent)`);
+                await chargerRemarques();
+                afficherEleves();
+            } else {
+                afficherToast("Erreur lors de l'enregistrement", "error");
+            }
+        } catch (error) {
+            afficherToast("Erreur de connexion", "error");
+        }
+    }
+    
+    function validerAbsence(eleveId, type, event) {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas modifier les présences", "error");
+            return;
+        }
+        
+        if (event) event.stopPropagation();
+        const motif = document.getElementById(`motif-${eleveId}`)?.value;
+        const duree = parseFloat(document.getElementById(`duree-${eleveId}`)?.value || 1);
+        
+        if (!motif) {
+            afficherToast("Veuillez sélectionner un motif", "error");
+            return;
+        }
+        
+        const motifComplet = seanceActuelle 
+            ? `${motif} - Séance: ${seanceActuelle.matiere} (${seanceActuelle.heureDebut}-${seanceActuelle.heureFin})`
+            : motif;
+        
+        enregistrerPresence(eleveId, type, motifComplet, duree);
+    }
+    
+    function definirPresence(eleveId, type, event) {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas modifier les présences", "error");
+            return;
+        }
+        
+        if (event) event.stopPropagation();
+        enregistrerPresence(eleveId, type, null, 1);
+    }
+    
+    function toutMettrePresent() {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas modifier les présences", "error");
+            return;
+        }
+        
+        for (const eleve of eleves) {
+            const eleveId = extractId(eleve);
+            enregistrerPresence(eleveId, 'present', null, 1);
+        }
+        afficherToast("Tous les élèves marqués comme présents");
+    }
+    
+    async function enregistrerPresence(eleveId, type, motif, duree) {
+        if (isReadOnly) {
+            afficherToast("Mode consultation seule - vous ne pouvez pas modifier les présences", "error");
+            return;
+        }
+        
+        const { dateStr } = getCurrentDateInfo();
+        
+        let motifFinal = motif;
+        if (!motifFinal && type === 'present') {
+            motifFinal = `Présent - ${seanceActuelle.matiere} (${seanceActuelle.heureDebut}-${seanceActuelle.heureFin})`;
+        } else if (!motifFinal && type === 'retard') {
+            motifFinal = `Retard - ${seanceActuelle.matiere} (${seanceActuelle.heureDebut}-${seanceActuelle.heureFin})`;
+        } else if (!motifFinal && type === 'absent') {
+            motifFinal = `Absence - ${seanceActuelle.matiere} (${seanceActuelle.heureDebut}-${seanceActuelle.heureFin})`;
+        }
+        
+        const absence = {
+            EleveId: eleveId,
+            EnseignantId: enseignantId,
+            Date: new Date(dateStr).toISOString(),
+            Motif: motifFinal,
+            Duree: duree || (type === 'retard' ? 0.5 : 1),
+            Type: type === 'retard' ? 'retard' : type === 'absent' ? 'absence' : 'presence',
+            Justificatif: null
+        };
+        
+        try {
+            const response = await fetch(`${API_BASE}/api/Absence`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(absence)
+            });
+            
+            if (response.ok) {
+                const eleve = eleves.find(e => extractId(e) === eleveId);
+                const nomEleve = eleve ? `${eleve.Prenom || eleve.prenom} ${eleve.Nom || eleve.nom}`.trim() : "Élève";
+                let messageNotification = "";
+                
+                if (type === 'present') {
+                    await envoyerNotificationPresence(eleveId, true);
+                    messageNotification = " (notification envoyée au parent)";
+                } else if (type === 'retard') {
+                    await envoyerNotificationRetard(eleveId, motifFinal, duree);
+                    messageNotification = " (notification de retard envoyée au parent)";
+                } else if (type === 'absent') {
+                    await envoyerNotificationAbsence(eleveId, motifFinal, duree);
+                    messageNotification = " (notification d'absence envoyée au parent)";
+                }
+                
+                const message = type === 'present' ? 'présent' : (type === 'retard' ? 'en retard' : 'absent');
+                afficherToast(`${nomEleve} marqué comme ${message}${messageNotification}`);
+                
+                await chargerPresences();
+                afficherEleves();
+            } else {
+                const errorText = await response.text();
+                addDebugLog(`❌ Erreur API présence: ${response.status} - ${errorText}`);
+                afficherToast("Erreur lors de l'enregistrement", "error");
+            }
+        } catch (error) {
+            addDebugLog(`❌ Erreur: ${error.message}`);
+            afficherToast("Erreur de connexion", "error");
+        }
+    }
+    
+    function retour() {
+        window.location.href = 'enseignant-classes.html';
+    }
+    
+    function afficherToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.style.backgroundColor = type === 'error' ? '#dc2626' : '#1e3b36';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+</script>
+</body>
+</html>

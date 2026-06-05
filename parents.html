@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des Parents</title>
+    <style>
+        /* ============ STYLES INSPIRÉS DE CLASSES.HTML ET GESTION-CONGES.HTML ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            
+            --status-active-bg: #e0f2f1;
+            --status-active-color: var(--primary-deep);
+            --status-inactive-bg: #f1f3f5;
+            --status-inactive-color: #868e96;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .parents-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ============ EN-TÊTE INSPIRÉ DE CLASSES.HTML ============ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title h1 {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .page-title h1 span:first-child {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            padding: 0.5rem;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-title p {
+            color: var(--text-light);
+            margin-top: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-export {
+            background: white;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-export:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: var(--shadow-md);
+            border-radius: 12px;
+            z-index: 100;
+            border: 1px solid var(--gray-border);
+            margin-top: 0.5rem;
+        }
+
+        .export-content a {
+            color: var(--text-soft);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+        }
+
+        .export-content a:hover {
+            background-color: var(--gray-bg);
+            color: var(--primary-green);
+        }
+
+        .export-dropdown:hover .export-content {
+            display: block;
+        }
+
+        /* ============ STATISTIQUES INSPIRÉES DE GESTION-CONGES.HTML ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ============ FILTRES INSPIRÉS DE GESTION-CONGES.HTML ============ */
+        .filters-section {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: flex-end;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            display: block;
+            color: var(--text-soft);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-filter {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-reset {
+            background: white;
+            border: 1px solid var(--gray-border);
+            color: var(--text-soft);
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        /* ============ TABLEAU INSPIRÉ DE CLASSES.HTML ============ */
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            color: var(--text-soft);
+        }
+
+        tr:hover td {
+            background: rgba(76, 168, 150, 0.05);
+        }
+
+        /* ============ BADGES ============ */
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: var(--status-active-bg);
+            color: var(--status-active-color);
+        }
+
+        .status-inactive {
+            background: var(--status-inactive-bg);
+            color: var(--status-inactive-color);
+        }
+
+        /* ============ BOUTONS D'ACTION ============ */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            background: var(--gray-bg);
+            font-size: 1rem;
+        }
+
+        .btn-icon:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-icon.edit:hover {
+            background: var(--blue-light);
+        }
+
+        .btn-icon.delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-icon.view:hover {
+            background: var(--accent-orange);
+        }
+
+        /* ============ MODAL INSPIRÉ DE CLASSES.HTML ============ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-header h2 {
+            color: var(--text-dark);
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        /* ============ FORMULAIRES ============ */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-border);
+        }
+
+        .btn-cancel {
+            background: white;
+            border: 1px solid var(--gray-border);
+            color: var(--text-soft);
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 168, 150, 0.3);
+        }
+
+        /* ============ ALERTES ============ */
+        .alert {
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-deep);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #dc2626;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============ AUTRES ============ */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .child-count-btn {
+            background: var(--gray-bg);
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--primary-green);
+        }
+
+        .child-count-btn:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-actions {
+                justify-content: center;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="parents-container">
+        <!-- En-tête -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>
+                    <span>👨‍👩‍👧‍👦</span>
+                    Gestion des Parents
+                </h1>
+                <p>Gérez les comptes parents et leurs relations avec les élèves</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="openAddParentModal()">
+                    <span>➕</span> Nouveau Parent
+                </button>
+                <div class="export-dropdown">
+                    <button class="btn-export">
+                        <span>📤</span> Exporter ▼
+                    </button>
+                    <div class="export-content">
+                        <a href="#" onclick="exportToExcel(); return false;">📊 Exporter en Excel</a>
+                        <a href="#" onclick="exportToPDF(); return false;">📄 Exporter en PDF</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="stats-grid" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-value" id="totalParents">-</div>
+                <div class="stat-label">Total Parents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="parentsActifs">-</div>
+                <div class="stat-label">Parents Actifs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="parentsAvecEnfants">-</div>
+                <div class="stat-label">Avec Enfants</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalEnfants">-</div>
+                <div class="stat-label">Enfants inscrits</div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>Rechercher</label>
+                <input type="text" id="searchInput" placeholder="Nom, prénom, email..." onkeyup="filterParents()">
+            </div>
+            <div class="filter-group">
+                <label>Statut</label>
+                <select id="statusFilter" onchange="filterParents()">
+                    <option value="all">Tous</option>
+                    <option value="active">Actifs</option>
+                    <option value="inactive">Inactifs</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Avec enfants</label>
+                <select id="childrenFilter" onchange="filterParents()">
+                    <option value="all">Tous</option>
+                    <option value="yes">Avec enfants</option>
+                    <option value="no">Sans enfants</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn-filter" onclick="filterParents()">Filtrer</button>
+                <button class="btn-reset" onclick="resetFilters()">Réinitialiser</button>
+            </div>
+        </div>
+
+        <!-- Tableau des parents -->
+        <div class="table-container">
+            <table id="parentsTable">
+                <thead>
+                    <tr>
+                        <th>CIN</th>
+                        <th>Nom & Prénom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Enfants</th>
+                        <th>Dernière connexion</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="parentsTableBody">
+                    <tr><td colspan="7" class="loading">Chargement des parents...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT/MODIFICATION PARENT -->
+    <div id="parentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">
+                    <span>➕</span> Nouveau Parent
+                </h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlert"></div>
+                <form id="parentForm">
+                    <input type="hidden" id="parentId" value="">
+                    
+                    <div class="form-group full-width">
+                        <label>CIN *</label>
+                        <input type="text" id="cin" required maxlength="8" pattern="\d{8}" title="Le CIN doit être composé exactement de 8 chiffres" placeholder="12345678">
+                        <small style="color: var(--text-light);">8 chiffres exactement</small>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nom *</label>
+                            <input type="text" id="nom" required placeholder="Nom">
+                        </div>
+                        <div class="form-group">
+                            <label>Prénom *</label>
+                            <input type="text" id="prenom" required placeholder="Prénom">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="email" required placeholder="email@exemple.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Téléphone *</label>
+                            <input type="tel" id="telephone" required placeholder="+216 XX XXX XXX">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Relation parentale *</label>
+                        <select id="relationParentale" required>
+                            <option value="pere">Père</option>
+                            <option value="mere">Mère</option>
+                            <option value="tuteur">Tuteur</option>
+                            <option value="grandparent">Grand-parent</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mot de passe (laisser vide pour générer automatiquement)</label>
+                        <input type="password" id="motDePasse" placeholder="••••••••">
+                        <small style="color: var(--text-light);">8 caractères minimum</small>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="envoyerEmail" checked>
+                        <label for="envoyerEmail">Envoyer les identifiants par email</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="statut" checked>
+                        <label for="statut">Compte actif</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+                <button class="btn-save" onclick="saveParent()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LISTE DES ENFANTS -->
+    <div id="childrenModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>👶 Enfants associés</h2>
+                <button class="modal-close" onclick="closeChildrenModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="childrenAlert"></div>
+                <div id="parentNameForChildren" style="margin-bottom: 15px; font-weight: bold;"></div>
+                <div class="table-container">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Identifiant</th>
+                                <th>Nom & Prénom</th>
+                                <th>Classe</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="childrenTableBody">
+                            <tr><td colspan="4" class="loading">Chargement...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                    <button class="btn-secondary" onclick="closeChildrenModal()">Fermer</button>
+                    <button class="btn-primary" onclick="openAddChildToParent()">➕ Ajouter un enfant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL AJOUT ENFANT -->
+    <div id="addChildModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>➕ Ajouter un enfant</h2>
+                <button class="modal-close" onclick="closeAddChildModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="addChildAlert"></div>
+                <div class="filter-group" style="margin-bottom: 15px;">
+                    <label>Rechercher un élève</label>
+                    <input type="text" id="searchEleve" placeholder="Nom, prénom ou identifiant..." onkeyup="searchEleves()">
+                </div>
+                <div class="table-container">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Identifiant</th>
+                                <th>Nom & Prénom</th>
+                                <th>Classe</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="elevesTableBody">
+                            <tr><td colspan="4" class="loading">Chargement des élèves...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                    <button class="btn-cancel" onclick="closeAddChildModal()">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const API_BASE_URL = 'http://localhost:5267';
+        
+        let allParents = [];
+        let filteredParents = [];
+        let currentParentId = null;
+        let allEleves = [];
+
+        // ============================================
+        // VALIDATION CIN - 8 CHIFFRES
+        // ============================================
+        function isValidCIN(cin) {
+            if (!cin) return false;
+            const cinRegex = /^\d{8}$/;
+            return cinRegex.test(cin);
+        }
+
+        function formatCIN(inputElement) {
+            let value = inputElement.value.replace(/\D/g, '');
+            if (value.length > 8) {
+                value = value.slice(0, 8);
+            }
+            inputElement.value = value;
+        }
+
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadParents();
+            
+            const cinInput = document.getElementById('cin');
+            if (cinInput) {
+                cinInput.addEventListener('input', function() {
+                    formatCIN(this);
+                });
+            }
+            
+            document.addEventListener('saghiryOpenParentModal', function(e) {
+                if (e.detail.mode === 'create') openAddParentModal();
+            });
+        });
+
+        function getToken() {
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        // ============================================
+        // CHARGEMENT DES DONNÉES
+        // ============================================
+        async function loadParents() {
+            try {
+                const token = getToken();
+                if (!token) {
+                    window.location.href = 'saghiry-auth.html';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error('Erreur chargement parents');
+
+                const data = await response.json();
+                let rawParents = data.data || [];
+                
+                allParents = [];
+                
+                for (const parent of rawParents) {
+                    const normalizedParent = {
+                        id: parent.id || parent.Id || parent._id,
+                        cin: parent.cin || parent.CIN || '',
+                        nom: parent.nom || parent.Nom || '',
+                        prenom: parent.prenom || parent.Prenom || '',
+                        email: parent.email || parent.Email || '',
+                        telephone: parent.telephone || parent.Telephone || '',
+                        statut: parent.statut !== undefined ? parent.statut : (parent.Statut !== undefined ? parent.Statut : true),
+                        twoFactorEnabled: parent.twoFactorEnabled || parent.TwoFactorEnabled || false,
+                        role: parent.role || parent.Role || '',
+                        dateDerniereConnexion: parent.dateDerniereConnexion || parent.DateDerniereConnexion || null,
+                        elevesIds: []
+                    };
+                    
+                    if (normalizedParent.role === 'parent' || normalizedParent.role === 'Parent') {
+                        try {
+                            const detailResponse = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${normalizedParent.id}`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            
+                            if (detailResponse.ok) {
+                                const detailData = await detailResponse.json();
+                                const parentDetail = detailData.data || detailData;
+                                normalizedParent.elevesIds = parentDetail.elevesIds || parentDetail.ElevesIds || [];
+                            }
+                        } catch (err) {
+                            console.warn(`Impossible de charger les détails pour ${normalizedParent.id}`);
+                        }
+                        
+                        allParents.push(normalizedParent);
+                    }
+                }
+                
+                filteredParents = [...allParents];
+                displayParents();
+                loadStats();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('parentsTableBody').innerHTML = '<tr><td colspan="7" class="alert alert-error">Erreur chargement des parents</td></tr>';
+            }
+        }
+
+        async function loadStats() {
+            const total = allParents.length;
+            const actifs = allParents.filter(p => p.statut).length;
+            const avecEnfants = allParents.filter(p => p.elevesIds && p.elevesIds.length > 0).length;
+            const totalEnfants = allParents.reduce((acc, p) => acc + (p.elevesIds?.length || 0), 0);
+            
+            document.getElementById('totalParents').textContent = total;
+            document.getElementById('parentsActifs').textContent = actifs;
+            document.getElementById('parentsAvecEnfants').textContent = avecEnfants;
+            document.getElementById('totalEnfants').textContent = totalEnfants;
+        }
+
+        async function loadEleves() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/api/eleve`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allEleves = data.data || data || [];
+                }
+            } catch (error) {
+                console.error('Erreur chargement élèves:', error);
+            }
+        }
+
+        // ============================================
+        // AFFICHAGE
+        // ============================================
+        function displayParents() {
+            const tbody = document.getElementById('parentsTableBody');
+            
+            if (filteredParents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">Aucun parent trouvé</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredParents.map(parent => {
+                const nbEnfants = (parent.elevesIds || []).length;
+                const fullName = `${parent.prenom || ''} ${parent.nom || ''}`.trim() || 'Nom non défini';
+                
+                return `
+                    <tr>
+                        <td>${escapeHtml(parent.cin || '-')}</td>
+                        <td><strong>${escapeHtml(fullName)}</strong></td>
+                        <td>${escapeHtml(parent.email || '-')}</td>
+                        <td>${escapeHtml(parent.telephone || '-')}</td>
+                        <td>
+                            <button class="child-count-btn" onclick="showChildren('${parent.id}')">
+                                👶 ${nbEnfants}
+                            </button>
+                        </td>
+                        <td>${parent.dateDerniereConnexion ? new Date(parent.dateDerniereConnexion).toLocaleDateString('fr-FR') : '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon edit" onclick="editParent('${parent.id}')" title="Modifier">✏️</button>
+                                <button class="btn-icon" onclick="resetPassword('${parent.id}')" title="Réinitialiser mot de passe">🔑</button>
+                                <button class="btn-icon delete" onclick="toggleParentStatus('${parent.id}', ${!parent.statut})" title="${parent.statut ? 'Désactiver' : 'Activer'}">
+                                    ${parent.statut ? '🔴' : '🟢'}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // ============================================
+        // FILTRES
+        // ============================================
+        function filterParents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const childrenFilter = document.getElementById('childrenFilter').value;
+
+            filteredParents = allParents.filter(parent => {
+                const matchesSearch = searchTerm === '' || 
+                    (parent.nom?.toLowerCase() || '').includes(searchTerm) ||
+                    (parent.prenom?.toLowerCase() || '').includes(searchTerm) ||
+                    (parent.email?.toLowerCase() || '').includes(searchTerm) ||
+                    (parent.cin?.toLowerCase() || '').includes(searchTerm);
+
+                const matchesStatus = statusFilter === 'all' ||
+                    (statusFilter === 'active' && parent.statut) ||
+                    (statusFilter === 'inactive' && !parent.statut);
+
+                const hasChildren = parent.elevesIds && parent.elevesIds.length > 0;
+                const matchesChildren = childrenFilter === 'all' ||
+                    (childrenFilter === 'yes' && hasChildren) ||
+                    (childrenFilter === 'no' && !hasChildren);
+
+                return matchesSearch && matchesStatus && matchesChildren;
+            });
+
+            displayParents();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('childrenFilter').value = 'all';
+            filteredParents = [...allParents];
+            displayParents();
+        }
+
+        // ============================================
+        // EXPORTATIONS
+        // ============================================
+        function getExportData() {
+            return filteredParents.map(parent => ({
+                'CIN': parent.cin || '',
+                'Nom': parent.nom || '',
+                'Prénom': parent.prenom || '',
+                'Email': parent.email || '',
+                'Téléphone': parent.telephone || '',
+                'Nombre d\'enfants': (parent.elevesIds || []).length,
+                'Dernière connexion': parent.dateDerniereConnexion ? new Date(parent.dateDerniereConnexion).toLocaleDateString('fr-FR') : 'Jamais',
+                'Statut': parent.statut ? 'Actif' : 'Inactif'
+            }));
+        }
+
+        function exportToExcel() {
+            const data = getExportData();
+            
+            if (data.length === 0) {
+                alert('Aucune donnée à exporter');
+                return;
+            }
+            
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Parents');
+            
+            const colWidths = [
+                {wch:15}, {wch:20}, {wch:20}, {wch:30}, {wch:15}, {wch:15}, {wch:15}, {wch:10}
+            ];
+            ws['!cols'] = colWidths;
+            
+            XLSX.writeFile(wb, `parents_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        }
+
+        function exportToPDF() {
+            const data = getExportData();
+            
+            if (data.length === 0) {
+                alert('Aucune donnée à exporter');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm' });
+            
+            const tableData = data.map(item => [
+                item.CIN,
+                item.Nom,
+                item.Prénom,
+                item.Email,
+                item.Téléphone,
+                item['Nombre d\'enfants'],
+                item['Dernière connexion'],
+                item.Statut
+            ]);
+            
+            doc.autoTable({
+                head: [['CIN', 'Nom', 'Prénom', 'Email', 'Téléphone', 'Nb Enfants', 'Dernière connexion', 'Statut']],
+                body: tableData,
+                theme: 'striped',
+                headStyles: {
+                    fillColor: [76, 168, 150],
+                    textColor: 255,
+                    fontSize: 10,
+                    fontStyle: 'bold'
+                },
+                bodyStyles: {
+                    fontSize: 8
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 245, 248]
+                },
+                margin: { top: 20, left: 10, right: 10 },
+                pageStartY: 30
+            });
+            
+            const dateStr = new Date().toLocaleDateString('fr-FR');
+            doc.setFontSize(16);
+            doc.setTextColor(30, 59, 54);
+            doc.text('Liste des Parents - SAGHIRY', 14, 15);
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Généré le ${dateStr} - Total: ${data.length} parent(s)`, 14, 23);
+            
+            doc.save(`parents_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+        }
+
+        // ============================================
+        // MODAL PARENT
+        // ============================================
+        function openAddParentModal() {
+            document.getElementById('modalTitle').innerHTML = '<span>➕</span> Nouveau Parent';
+            document.getElementById('parentForm').reset();
+            document.getElementById('parentId').value = '';
+            document.getElementById('statut').checked = true;
+            document.getElementById('envoyerEmail').checked = true;
+            document.getElementById('parentModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('parentModal').classList.remove('active');
+            document.getElementById('modalAlert').innerHTML = '';
+        }
+
+        async function editParent(id) {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Parent non trouvé');
+
+                const data = await response.json();
+                const parent = data.data;
+
+                document.getElementById('modalTitle').innerHTML = '<span>✏️</span> Modifier Parent';
+                document.getElementById('parentId').value = parent.id || parent.Id;
+                document.getElementById('cin').value = parent.cin || parent.CIN || '';
+                document.getElementById('nom').value = parent.nom || parent.Nom || '';
+                document.getElementById('prenom').value = parent.prenom || parent.Prenom || '';
+                document.getElementById('email').value = parent.email || parent.Email || '';
+                document.getElementById('telephone').value = parent.telephone || parent.Telephone || '';
+                document.getElementById('relationParentale').value = parent.relationParentale || 'parent';
+                document.getElementById('statut').checked = parent.statut;
+                document.getElementById('motDePasse').value = '';
+                document.getElementById('envoyerEmail').checked = false;
+
+                document.getElementById('parentModal').classList.add('active');
+            } catch (error) {
+                showModalAlert('error', 'Erreur chargement parent');
+            }
+        }
+
+        async function saveParent() {
+            try {
+                const token = getToken();
+                const parentId = document.getElementById('parentId').value;
+                const isEdit = parentId !== '';
+                
+                const cin = document.getElementById('cin').value;
+                if (!isValidCIN(cin)) {
+                    showModalAlert('error', 'Le CIN doit être composé exactement de 8 chiffres');
+                    return;
+                }
+
+                const parentData = {
+                    cin: cin,
+                    role: 'parent',
+                    nom: document.getElementById('nom').value,
+                    prenom: document.getElementById('prenom').value,
+                    email: document.getElementById('email').value,
+                    telephone: document.getElementById('telephone').value,
+                    statut: document.getElementById('statut').checked,
+                    envoyerEmail: document.getElementById('envoyerEmail').checked,
+                    password: document.getElementById('motDePasse').value || 'Parent@123'
+                };
+
+                let response;
+                if (isEdit) {
+                    const updateData = {
+                        nom: parentData.nom,
+                        prenom: parentData.prenom,
+                        telephone: parentData.telephone,
+                        statut: parentData.statut
+                    };
+                    
+                    response = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${parentId}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`, 
+                            'Content-Type': 'application/json' 
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs`, {
+                        method: 'POST',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`, 
+                            'Content-Type': 'application/json' 
+                        },
+                        body: JSON.stringify(parentData)
+                    });
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Erreur sauvegarde');
+                }
+
+                showModalAlert('success', isEdit ? 'Parent modifié avec succès' : 'Parent créé avec succès');
+                setTimeout(() => {
+                    closeModal();
+                    loadParents();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Erreur saveParent:', error);
+                showModalAlert('error', error.message);
+            }
+        }
+
+        function showModalAlert(type, message) {
+            const alertDiv = document.getElementById('modalAlert');
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 3000);
+        }
+
+        // ============================================
+        // GESTION ENFANTS
+        // ============================================
+        async function showChildren(parentId) {
+            currentParentId = parentId;
+            
+            try {
+                const token = getToken();
+                const parentResponse = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${parentId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!parentResponse.ok) throw new Error('Parent non trouvé');
+                const parentData = await parentResponse.json();
+                const parent = parentData.data || parentData;
+                
+                document.getElementById('parentNameForChildren').innerHTML = `<strong>Parent:</strong> ${parent.prenom || parent.Prenom || ''} ${parent.nom || parent.Nom || ''}`;
+                
+                await loadChildrenForParent(parentId);
+                document.getElementById('childrenModal').classList.add('active');
+            } catch (error) {
+                console.error('Erreur:', error);
+                showChildrenAlert('error', 'Erreur chargement');
+            }
+        }
+
+        async function loadChildrenForParent(parentId) {
+            try {
+                const token = getToken();
+                const parent = allParents.find(p => p.id === parentId);
+                const eleveIds = parent?.elevesIds || [];
+                
+                if (eleveIds.length === 0) {
+                    document.getElementById('childrenTableBody').innerHTML = '<tr><td colspan="4" class="no-data">Aucun enfant associé</td></tr>';
+                    return;
+                }
+                
+                const elevesResponse = await fetch(`${API_BASE_URL}/api/eleve`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!elevesResponse.ok) throw new Error('Erreur chargement élèves');
+                const elevesData = await elevesResponse.json();
+                const allElevesList = elevesData.data || elevesData || [];
+                
+                const enfants = allElevesList.filter(eleve => {
+                    const eleveId = eleve.id || eleve._id;
+                    return eleveIds.includes(eleveId);
+                });
+                
+                displayChildren(enfants);
+            } catch (error) {
+                console.error('Erreur loadChildren:', error);
+                document.getElementById('childrenTableBody').innerHTML = '<tr><td colspan="4" class="alert alert-error">Erreur chargement</td></tr>';
+            }
+        }
+
+        function displayChildren(eleves) {
+            const tbody = document.getElementById('childrenTableBody');
+            if (!eleves || eleves.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="no-data">Aucun enfant</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = eleves.map(eleve => {
+                const identifiant = eleve.identifiantEcole || eleve.matricule || '-';
+                const prenom = eleve.prenom || eleve.Prenom || '';
+                const nom = eleve.nom || eleve.Nom || '';
+                const classe = eleve.classeId || 'Non assigné';
+                const eleveId = eleve.id || eleve._id;
+                return `
+                    <tr>
+                        <td>${escapeHtml(identifiant)}</td>
+                        <td>${escapeHtml(prenom)} ${escapeHtml(nom)}</td>
+                        <td>${escapeHtml(classe)}</td>
+                        <td><button class="btn-icon delete" onclick="removeChild('${eleveId}')" title="Retirer">❌</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function closeChildrenModal() {
+            document.getElementById('childrenModal').classList.remove('active');
+            currentParentId = null;
+        }
+
+        function showChildrenAlert(type, message) {
+            const alertDiv = document.getElementById('childrenAlert');
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 3000);
+        }
+
+        // ============================================
+        // AJOUT ENFANT
+        // ============================================
+        async function openAddChildToParent() {
+            await loadEleves();
+            const parent = allParents.find(p => p.id === currentParentId);
+            const enfantsIds = parent?.elevesIds || [];
+            const elevesDisponibles = allEleves.filter(eleve => !enfantsIds.includes(eleve.id || eleve._id));
+            displayEleves(elevesDisponibles);
+            document.getElementById('addChildModal').classList.add('active');
+        }
+
+        function displayEleves(eleves) {
+            const tbody = document.getElementById('elevesTableBody');
+            if (eleves.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="no-data">Aucun élève disponible</td></tr>';
+                return;
+            }
+            tbody.innerHTML = eleves.map(eleve => `
+                <tr>
+                    <td>${escapeHtml(eleve.identifiantEcole || eleve.matricule || '-')}</td>
+                    <td>${escapeHtml(eleve.prenom || '')} ${escapeHtml(eleve.nom || '')}</td>
+                    <td>${escapeHtml(eleve.classeId || 'Non assigné')}</td>
+                    <td><button class="btn-icon" onclick="addChildToParent('${eleve.id || eleve._id}')" title="Ajouter">➕</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function searchEleves() {
+            const searchTerm = document.getElementById('searchEleve').value.toLowerCase();
+            const filtered = allEleves.filter(eleve => 
+                (eleve.nom?.toLowerCase() || '').includes(searchTerm) ||
+                (eleve.prenom?.toLowerCase() || '').includes(searchTerm) ||
+                (eleve.identifiantEcole?.toLowerCase() || '').includes(searchTerm)
+            );
+            displayEleves(filtered);
+        }
+
+        async function addChildToParent(eleveId) {
+            try {
+                const token = getToken();
+                const parent = allParents.find(p => p.id === currentParentId);
+                if (!parent) throw new Error('Parent non trouvé');
+                
+                const parentEmail = parent.email;
+                
+                if (!parentEmail) {
+                    showAddChildAlert('error', 'Le parent doit avoir un email');
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/api/eleve/${eleveId}/ajouter-parent/${parentEmail}?relationType=parent&estPrincipal=false`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error('Erreur ajout relation');
+                
+                showAddChildAlert('success', '✅ Enfant ajouté avec succès');
+                setTimeout(() => {
+                    closeAddChildModal();
+                    if (currentParentId) {
+                        loadChildrenForParent(currentParentId);
+                        loadParents();
+                    }
+                }, 1500);
+            } catch (error) {
+                showAddChildAlert('error', error.message);
+            }
+        }
+
+        function closeAddChildModal() {
+            document.getElementById('addChildModal').classList.remove('active');
+            document.getElementById('searchEleve').value = '';
+        }
+
+        function showAddChildAlert(type, message) {
+            const alertDiv = document.getElementById('addChildAlert');
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 3000);
+        }
+
+        // ============================================
+        // RETIRER ENFANT
+        // ============================================
+        async function removeChild(eleveId) {
+            if (!confirm('Êtes-vous sûr de vouloir retirer cet enfant du parent ?')) return;
+            
+            try {
+                const token = getToken();
+                const parent = allParents.find(p => p.id === currentParentId);
+                if (!parent) throw new Error('Parent non trouvé');
+                
+                const parentEmail = parent.email;
+                
+                const response = await fetch(`${API_BASE_URL}/api/eleve/${eleveId}/retirer-parent/${parentEmail}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Erreur retrait');
+                
+                showChildrenAlert('success', '✅ Enfant retiré avec succès');
+                setTimeout(() => {
+                    loadChildrenForParent(currentParentId);
+                    loadParents();
+                }, 1500);
+            } catch (error) {
+                showChildrenAlert('error', error.message);
+            }
+        }
+
+        // ============================================
+        // ACTIONS SUR PARENTS
+        // ============================================
+        async function toggleParentStatus(id, newStatus) {
+            if (!confirm(`Voulez-vous ${newStatus ? 'activer' : 'désactiver'} ce parent ?`)) return;
+            try {
+                const token = getToken();
+                if (newStatus) {
+                    await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${id}/activate`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } else {
+                    await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                loadParents();
+            } catch (error) {
+                alert('Erreur lors du changement de statut');
+            }
+        }
+
+        async function resetPassword(id) {
+            if (!confirm('Voulez-vous réinitialiser le mot de passe ?')) return;
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs/${id}/reset-password`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`Mot de passe réinitialisé.\nNouveau mot de passe: ${data.tempPassword || 'Parent@123'}`);
+                } else {
+                    throw new Error('Erreur');
+                }
+            } catch (error) {
+                alert('Erreur réinitialisation');
+            }
+        }
+    </script>
+</body>
+</html>

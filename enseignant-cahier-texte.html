@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SAGHIRY - Mon Cahier de texte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+        }
+
+        :root {
+            --primary: #2c7a6e;
+            --primary-dark: #1e5a50;
+            --secondary: #ff8c42;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #eef2f3 100%);
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .logo-text p {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+
+        .remplacement-badge {
+            background: #ff9466;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .remplacement-partiel-badge {
+            background: #95a5a6;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .info-consultation {
+            background: #e8f4f1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #95a5a6;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .classes-nav {
+            display: flex;
+            gap: 0.75rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            scrollbar-width: thin;
+        }
+
+        .class-tab {
+            background: white;
+            border: 1px solid var(--gray-200);
+            padding: 0.75rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .class-tab:hover:not(.disabled) {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .class-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .class-tab.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 20px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--gray-300);
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 30px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .timeline-btn {
+            background: white;
+            border: 1px solid var(--gray-200);
+            padding: 0.4rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .timeline-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .seances-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .seance-item {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .seance-item:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .seance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: var(--gray-50);
+            cursor: pointer;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .seance-date-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .seance-day {
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .seance-time {
+            background: var(--gray-200);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .seance-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-draft { background: var(--gray-200); color: var(--gray-600); }
+        .status-submitted { background: #fef3c7; color: #b45309; }
+        .status-validated { background: #d1fae5; color: #065f46; }
+
+        .seance-content {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            display: none;
+        }
+
+        .seance-content.open {
+            display: block;
+        }
+
+        .sequence-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .content-card {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .content-card h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 0.25rem;
+        }
+
+        .content-card ul, .content-card p {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .content-card li {
+            margin-left: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pedagogy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            background: linear-gradient(135deg, #e8f4f1 0%, #d1e8e3 100%);
+            padding: 1rem;
+            border-radius: 16px;
+        }
+
+        .pedagogy-card {
+            background: white;
+            border-radius: 12px;
+            padding: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .pedagogy-card h5 {
+            color: var(--primary);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .seance-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            border: 2px dashed var(--gray-200);
+        }
+
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+        }
+
+        .alert-success { background: var(--success); color: white; }
+        .alert-error { background: var(--error); color: white; }
+        .alert-info { background: var(--info); color: white; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .app-container { padding: 0 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: var(--gray-200);
+        }
+
+        .readonly-indicator {
+            background: #f0f0f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <div class="logo-icon">📋</div>
+                <div class="logo-text">
+                    <h1>Mon Cahier de texte</h1>
+                    <p>Suivi des séances et planification pédagogique</p>
+                </div>
+            </div>
+            <div id="roleBadge"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div id="infoConsultation" style="display: none;" class="info-consultation"></div>
+
+        <div class="classes-nav" id="classesNav"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Séances totales</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Validées</div>
+                <div class="stat-value" id="statValidees">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">En brouillon</div>
+                <div class="stat-value" id="statBrouillon">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Heures totales</div>
+                <div class="stat-value" id="statHeures">0</div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <div class="timeline-nav">
+                <button class="timeline-btn" id="prevWeekBtn" onclick="changerSemaine(-1)">← Semaine précédente</button>
+                <button class="timeline-btn" onclick="changerSemaine(0)">📅 Cette semaine</button>
+                <button class="timeline-btn" id="nextWeekBtn" onclick="changerSemaine(1)">Semaine suivante →</button>
+            </div>
+       
+        </div>
+
+        <div class="filters-row">
+            <select id="filterStatus" class="filter-select" onchange="chargerSeances()">
+                <option value="all">Tous les statuts</option>
+                <option value="draft">Brouillons</option>
+                <option value="submitted">En attente</option>
+                <option value="validated">Validés</option>
+            </select>
+            <select id="filterMatiere" class="filter-select" onchange="chargerSeances()">
+                <option value="">Toutes matières</option>
+            </select>
+            <button class="btn-secondary" id="applyFilterBtn" onclick="chargerSeances()">🔍 Appliquer</button>
+        </div>
+
+        <div class="timeline-header">
+            <h3 style="color: var(--gray-700);" id="weekRange">Semaine du ...</h3>
+        </div>
+        <div id="seancesList" class="seances-list">
+            <div class="empty-state">📭 Chargement des séances...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = null;
+        let currentClasse = null;
+        let classesList = [];
+        let matieresList = [];
+        let allCreneaux = [];
+        let seancesPlanifiees = {};
+        let currentWeekOffset = 0;
+        let currentUserInfo = null;
+        
+        let userRole = null;
+        let remplacementComplet = true;
+        let isReadOnly = false;
+        let enseignantOriginalId = null;
+        let enseignantActuelId = null;
+
+        function getAuthToken() {
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        function getCurrentUser() {
+            try {
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) return JSON.parse(userStr);
+            } catch (e) {}
+            return null;
+        }
+
+        function showMessage(msg, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = msg;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formaterNomClasse(niveau, nomClasse) {
+            if (!niveau && !nomClasse) return 'Classe';
+            let niveauNum = '';
+            if (niveau) {
+                if (niveau.includes('1ère')) niveauNum = '1';
+                else if (niveau.includes('2ème')) niveauNum = '2';
+                else if (niveau.includes('3ème')) niveauNum = '3';
+                else if (niveau.includes('4ème')) niveauNum = '4';
+                else if (niveau.includes('5ème')) niveauNum = '5';
+                else if (niveau.includes('6ème')) niveauNum = '6';
+                else niveauNum = niveau.charAt(0);
+            }
+            if (niveauNum && nomClasse) return `${niveauNum} A ${nomClasse}`;
+            if (niveauNum) return `${niveauNum} A`;
+            if (nomClasse) return nomClasse;
+            return 'Classe';
+        }
+
+        function getWeekDates(offset = 0) {
+            const now = new Date();
+            const current = new Date(now.setDate(now.getDate() + (offset * 7)));
+            const day = current.getDay();
+            const diff = current.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(current.setDate(diff));
+            monday.setHours(0, 0, 0, 0);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+            return { monday, sunday };
+        }
+
+        function formatWeekRange(monday, sunday) {
+            const options = { day: 'numeric', month: 'short' };
+            return `Semaine du ${monday.toLocaleDateString('fr-FR', options)} au ${sunday.toLocaleDateString('fr-FR', options)}`;
+        }
+
+        function extraireHeure(dateValue) {
+            if (!dateValue) return '';
+            if (typeof dateValue === 'object' && dateValue.$date) {
+                return new Date(dateValue.$date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            }
+            if (typeof dateValue === 'string') {
+                if (dateValue.includes('T')) {
+                    return new Date(dateValue).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                }
+                if (dateValue.includes(':')) {
+                    return dateValue.substring(0, 5);
+                }
+            }
+            return '';
+        }
+
+        function decalerHeure(heure) {
+            if (!heure) return '10:00';
+            if (heure.includes(':')) {
+                const [heures, minutes] = heure.split(':').map(Number);
+                let nouvelleHeure = heures + 2;
+                if (nouvelleHeure >= 24) nouvelleHeure -= 24;
+                return `${nouvelleHeure.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            }
+            return '10:00';
+        }
+
+        function getDayName(date) {
+            const jours = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            return jours[date.getDay()];
+        }
+
+        function extractId(obj) {
+            if (!obj) return null;
+            if (typeof obj === 'string') return obj;
+            if (obj.$oid) return obj.$oid;
+            if (obj._id) return extractId(obj._id);
+            if (obj.Id) return obj.Id;
+            if (obj.id) return obj.id;
+            return null;
+        }
+
+        async function chargerInfosUtilisateur() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    userRole = (data.role || data.Role || '').toLowerCase();
+                    remplacementComplet = data.remplacementComplet !== false;
+                    enseignantActuelId = extractId(data.id || data.Id);
+                    
+                    if (userRole === 'permanent' || userRole === 'vacataire') {
+                        if (data.enseignantRemplaceId) {
+                            enseignantOriginalId = data.enseignantRemplaceId;
+                            localStorage.setItem('enseignantRemplaceId', enseignantOriginalId);
+                        } else {
+                            const storedId = localStorage.getItem('enseignantRemplaceId');
+                            if (storedId) enseignantOriginalId = storedId;
+                        }
+                    }
+                    
+                    isReadOnly = (userRole === 'permanent' || userRole === 'vacataire') && !remplacementComplet;
+                    
+                    const roleBadge = document.getElementById('roleBadge');
+                    const infoConsultation = document.getElementById('infoConsultation');
+                    const planifierBtn = document.getElementById('planifierBtn');
+                    const prevWeekBtn = document.getElementById('prevWeekBtn');
+                    const nextWeekBtn = document.getElementById('nextWeekBtn');
+                    const applyFilterBtn = document.getElementById('applyFilterBtn');
+                    const filterStatus = document.getElementById('filterStatus');
+                    const filterMatiere = document.getElementById('filterMatiere');
+                    
+                    if (isReadOnly) {
+                        roleBadge.innerHTML = '<span class="remplacement-partiel-badge">🔒 Mode consultation seule</span>';
+                        infoConsultation.style.display = 'flex';
+                        infoConsultation.innerHTML = `
+                            <i>🔒</i>
+                            <div>
+                                <strong>Mode consultation seule</strong><br>
+                                En tant que vacataire en remplacement partiel, vous pouvez consulter l'historique des séances<br>
+                                mais vous ne pouvez pas créer ou modifier des séances. Seul l'enseignant titulaire peut gérer le cahier de texte.
+                            </div>
+                        `;
+                        if (planifierBtn) planifierBtn.style.display = 'none';
+                        if (prevWeekBtn) prevWeekBtn.disabled = true;
+                        if (nextWeekBtn) nextWeekBtn.disabled = true;
+                        if (applyFilterBtn) applyFilterBtn.disabled = true;
+                        if (filterStatus) filterStatus.disabled = true;
+                        if (filterMatiere) filterMatiere.disabled = true;
+                    } else if (userRole === 'permanent' || userRole === 'vacataire') {
+                        roleBadge.innerHTML = '<span class="remplacement-badge">✏️ Mode édition (remplacement complet)</span>';
+                    } else {
+                        roleBadge.innerHTML = '';
+                    }
+                }
+            } catch (error) {
+                console.warn("Impossible de récupérer les infos utilisateur:", error);
+            }
+        }
+
+        async function chargerEmploiEnseignant() {
+            try {
+                const user = getCurrentUser();
+                let enseignantId = user?.id;
+                
+                if (!enseignantId) return false;
+
+                if ((userRole === 'permanent' || userRole === 'vacataire') && enseignantOriginalId) {
+                    enseignantId = enseignantOriginalId;
+                    console.log(`📚 Vacataire - Chargement emploi pour enseignant original: ${enseignantId}`);
+                }
+
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) return false;
+                
+                const result = await response.json();
+                console.log('📅 Réponse emploi enseignant:', result);
+                
+                if (result.success && result.data && result.data.Creneaux) {
+                    allCreneaux = result.data.Creneaux;
+                    
+                    const classesMap = new Map();
+                    const matieresMap = new Map();
+                    
+                    for (const creneau of allCreneaux) {
+                        const classeId = extractId(creneau.ClasseId);
+                        const matiereId = extractId(creneau.MatiereId);
+                        
+                        if (classeId && !classesMap.has(classeId)) {
+                            classesMap.set(classeId, {
+                                id: classeId,
+                                nom: creneau.ClasseNom || `Classe`,
+                                niveau: creneau.Niveau || '',
+                                nomClasse: creneau.ClasseNom || ''
+                            });
+                        }
+                        if (matiereId && !matieresMap.has(matiereId)) {
+                            matieresMap.set(matiereId, {
+                                id: matiereId,
+                                nom: creneau.MatiereNom || 'Matière'
+                            });
+                        }
+                    }
+                    
+                    classesList = Array.from(classesMap.values());
+                    matieresList = Array.from(matieresMap.values());
+                    
+                    console.log(`📊 ${classesList.length} classes, ${matieresList.length} matières`);
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('Erreur chargement emploi:', error);
+                return false;
+            }
+        }
+
+        async function chargerSeancesPlanifiees() {
+            try {
+                const response = await fetch(`${API_BASE}/CahierTexte/enseignant`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let seances = data?.data || [];
+                    
+                    console.log(`📝 ${seances.length} séances reçues de l'API`);
+                    
+                    seancesPlanifiees = {};
+                    for (const seance of seances) {
+                        const dateKey = seance.Date?.split('T')[0];
+                        let heureDebut = seance.Seance?.HeureDebut || '';
+                        if (heureDebut && heureDebut.includes(':')) {
+                            heureDebut = heureDebut.substring(0, 5);
+                        }
+                        const classeId = extractId(seance.ClasseId);
+                        const key = `${classeId}_${dateKey}_${heureDebut}`;
+                        
+                        const seanceId = extractId(seance.Id || seance._id);
+                        seance.fichiers = seance.Fichiers || [];
+                        seance.idReel = seanceId;
+                        
+                        seancesPlanifiees[key] = seance;
+                        
+                        console.log(`  - Séance: ID=${seanceId}, Classe=${classeId}, Date=${dateKey}, Heure=${heureDebut}, Fichiers=${seance.fichiers?.length || 0}`);
+                    }
+                    console.log(`📝 ${Object.keys(seancesPlanifiees).length} séances planifiées chargées`);
+                } else {
+                    console.error('Erreur chargement séances:', response.status);
+                }
+            } catch (error) {
+                console.error('Erreur chargement séances:', error);
+            }
+        }
+
+        function afficherClassesNav() {
+            const nav = document.getElementById('classesNav');
+            if (classesList.length === 0) {
+                nav.innerHTML = '<div style="color: var(--gray-500);">Aucune classe assignée</div>';
+                return;
+            }
+            
+            nav.innerHTML = classesList.map(classe => {
+                const nomFormate = formaterNomClasse(classe.niveau, classe.nom);
+                const disabledClass = isReadOnly ? 'disabled' : '';
+                return `
+                    <div class="class-tab ${currentClasse?.id === classe.id ? 'active' : ''} ${disabledClass}" onclick="${!isReadOnly ? `changerClasse('${classe.id}')` : ''}">
+                        <span>🏫</span> ${escapeHtml(nomFormate)}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function changerClasse(classeId) {
+            if (isReadOnly) return;
+            currentClasse = classesList.find(c => c.id === classeId);
+            afficherClassesNav();
+            localStorage.setItem('currentClasseId', currentClasse.id);
+            localStorage.setItem('currentClasseNom', formaterNomClasse(currentClasse.niveau, currentClasse.nom));
+            chargerSeances();
+        }
+
+        function changerSemaine(offset) {
+            if (isReadOnly && offset !== 0) return;
+            if (offset === 0) currentWeekOffset = 0;
+            else currentWeekOffset += offset;
+            chargerSeances();
+        }
+
+        async function chargerSeances() {
+            if (!currentClasse) {
+                document.getElementById('seancesList').innerHTML = '<div class="empty-state">📭 Sélectionnez une classe</div>';
+                return;
+            }
+            
+            const statusFilter = document.getElementById('filterStatus').value;
+            const matiereFilter = document.getElementById('filterMatiere').value;
+            
+            const { monday, sunday } = getWeekDates(currentWeekOffset);
+            document.getElementById('weekRange').textContent = formatWeekRange(monday, sunday);
+            
+            console.log(`🔍 Recherche des créneaux pour la classe: ${currentClasse.id}`);
+            
+            const creneauxClasse = allCreneaux.filter(c => {
+                const classeId = extractId(c.ClasseId);
+                return classeId === currentClasse.id;
+            });
+            
+            console.log(`📊 ${creneauxClasse.length} créneaux trouvés pour cette classe`);
+            
+            const seancesSemaine = [];
+            
+            for (const creneau of creneauxClasse) {
+                const jourNom = creneau.Jour?.toLowerCase();
+                if (!jourNom) continue;
+                
+                const dateCreneau = getDateForJour(jourNom, monday);
+                
+                if (dateCreneau >= monday && dateCreneau <= sunday) {
+                    const heureCreneau = extraireHeure(creneau.HeureDebut) || '08:00';
+                    const heureCreneauFin = extraireHeure(creneau.HeureFin) || '10:00';
+                    const dateStr = dateCreneau.toISOString().split('T')[0];
+                    
+                    const key = `${currentClasse.id}_${dateStr}_${heureCreneau}`;
+                    const seanceExistante = seancesPlanifiees[key];
+                    
+                    const heureDebutAffichage = decalerHeure(heureCreneau);
+                    const heureFinAffichage = decalerHeure(heureCreneauFin);
+                    
+                    const matiere = matieresList.find(m => m.id === creneau.MatiereId);
+                    
+                    seancesSemaine.push({
+                        id: seanceExistante?.idReel || `temp_${Date.now()}_${Math.random()}`,
+                        seanceId: seanceExistante?.idReel || null,
+                        classeId: currentClasse.id,
+                        classeNom: formaterNomClasse(currentClasse.niveau, currentClasse.nom),
+                        matiereId: creneau.MatiereId,
+                        matiereNom: matiere?.nom || creneau.MatiereNom || 'Matière',
+                        date: dateCreneau,
+                        dateStr: dateStr,
+                        heureDebut: heureDebutAffichage,
+                        heureFin: heureFinAffichage,
+                        heureCreneau: heureCreneau,
+                        heureCreneauFin: heureCreneauFin,
+                        salle: creneau.Salle || 'Salle',
+                        lecon: seanceExistante?.Lecon || null,
+                        devoirs: seanceExistante?.DevoirsDonnes || [],
+                        remarques: seanceExistante?.Remarques || '',
+                        statut: seanceExistante?.Statut || 'brouillon',
+                        pedagogie: seanceExistante?.Pedagogie || null,
+                        seanceDetail: seanceExistante?.Seance || null,
+                        fichiers: seanceExistante?.Fichiers || [] 
+                    });
+                }
+            }
+            
+            seancesSemaine.sort((a, b) => a.date - b.date);
+            
+            let filtered = seancesSemaine;
+            if (statusFilter !== 'all') filtered = filtered.filter(s => s.statut === statusFilter);
+            if (matiereFilter) filtered = filtered.filter(s => s.matiereId === matiereFilter);
+            
+            afficherSeances(filtered);
+            mettreAJourStats(seancesSemaine);
+        }
+
+        function getDateForJour(jourNom, referenceDate) {
+            const joursMap = {
+                'lundi': 1, 'mardi': 2, 'mercredi': 3, 'jeudi': 4, 'vendredi': 5, 'samedi': 6, 'dimanche': 0
+            };
+            const targetDay = joursMap[jourNom?.toLowerCase()] ?? 0;
+            const currentDay = referenceDate.getDay();
+            const diff = targetDay - currentDay;
+            const targetDate = new Date(referenceDate);
+            targetDate.setDate(referenceDate.getDate() + diff);
+            return targetDate;
+        }
+
+        function renderPedagogySection(pedagogie) {
+            if (!pedagogie) return '';
+            
+            return `
+                <div class="pedagogy-grid">
+                    ${pedagogie.objectifSeance ? `
+                        <div class="pedagogy-card">
+                            <h5>🎯 Objectif de la séance</h5>
+                            <p>${escapeHtml(pedagogie.objectifSeance)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.intentionApprentissage ? `
+                        <div class="pedagogy-card">
+                            <h5>💡 Intention d'apprentissage</h5>
+                            <p>${escapeHtml(pedagogie.intentionApprentissage)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.competences && pedagogie.competences.length ? `
+                        <div class="pedagogy-card">
+                            <h5>📚 Composantes de la compétence</h5>
+                            <ul>${pedagogie.competences.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.objectifsSpecifiques && pedagogie.objectifsSpecifiques.length ? `
+                        <div class="pedagogy-card">
+                            <h5>✅ Objectifs spécifiques</h5>
+                            <ul>${pedagogie.objectifsSpecifiques.map(o => `<li>${escapeHtml(o)}</li>`).join('')}</ul>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.competenceVie ? `
+                        <div class="pedagogy-card">
+                            <h5>🌟 Compétence de vie</h5>
+                            <p>${escapeHtml(pedagogie.competenceVie)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.unite ? `
+                        <div class="pedagogy-card">
+                            <h5>📖 Unité</h5>
+                            <p>${escapeHtml(pedagogie.unite)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.numeroJour ? `
+                        <div class="pedagogy-card">
+                            <h5>🔢 Numéro du jour</h5>
+                            <p>${escapeHtml(pedagogie.numeroJour)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.approcheIntegrative ? `
+                        <div class="pedagogy-card">
+                            <h5>🔄 Approche intégrative</h5>
+                            <p>${escapeHtml(pedagogie.approcheIntegrative)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.evaluation ? `
+                        <div class="pedagogy-card">
+                            <h5>📝 Évaluation</h5>
+                            <p>${escapeHtml(pedagogie.evaluation)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.remediation ? `
+                        <div class="pedagogy-card">
+                            <h5>🔄 Remédiation</h5>
+                            <p>${escapeHtml(pedagogie.remediation)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.soutien ? `
+                        <div class="pedagogy-card">
+                            <h5>🆘 Soutien</h5>
+                            <p>${escapeHtml(pedagogie.soutien)}</p>
+                        </div>
+                    ` : ''}
+                    ${pedagogie.periode ? `
+                        <div class="pedagogy-card">
+                            <h5>⏱️ Période</h5>
+                            <p>${escapeHtml(pedagogie.periode)}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function afficherSeances(seances) {
+            const container = document.getElementById('seancesList');
+            
+            if (!seances.length) {
+                container.innerHTML = `<div class="empty-state">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                    <h3>Aucune séance cette semaine</h3>
+                    <p>Consultez l'emploi du temps ou planifiez une nouvelle séance</p>
+                    ${!isReadOnly ? `<a href="enseignant-planification.html" class="btn-primary" style="margin-top:1rem; display:inline-block;">➕ Planifier</a>` : ''}
+                </div>`;
+                return;
+            }
+            
+            const groupedByDay = {};
+            for (const seance of seances) {
+                const dayKey = seance.date.toDateString();
+                if (!groupedByDay[dayKey]) {
+                    groupedByDay[dayKey] = {
+                        date: seance.date,
+                        jour: getDayName(seance.date),
+                        seances: []
+                    };
+                }
+                groupedByDay[dayKey].seances.push(seance);
+            }
+            
+            container.innerHTML = Object.values(groupedByDay).map(day => `
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="margin-bottom: 0.75rem; color: var(--gray-600);">${day.jour} ${day.date.toLocaleDateString('fr-FR')}</h4>
+                    ${day.seances.map(seance => renderSeanceCard(seance)).join('')}
+                </div>
+            `).join('');
+        }
+
+        function renderSeanceCard(seance) {
+            const statutClass = {
+                'brouillon': 'status-draft',
+                'soumis': 'status-submitted', 
+                'valide': 'status-validated'
+            }[seance.statut] || 'status-draft';
+            
+            const statutText = {
+                'brouillon': '📝 Brouillon',
+                'soumis': '⏳ En attente de validation',
+                'valide': '✅ Validé'
+            }[seance.statut] || seance.statut;
+            
+            const safeId = (seance.seanceId || seance.id).replace(/[^a-zA-Z0-9]/g, '_');
+            const editUrl = `enseignant-planification.html?id=${seance.seanceId || seance.id}`;
+            const createUrl = `enseignant-planification.html?classeId=${seance.classeId}&date=${seance.dateStr}&heureDebut=${seance.heureCreneau}&heureFin=${seance.heureCreneauFin}&matiereId=${seance.matiereId}`;
+            
+            let titreLecon = seance.lecon?.Titre || seance.lecon?.titre || '';
+            if (!titreLecon) {
+                const dateObj = new Date(seance.date);
+                const dateFormatee = dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                titreLecon = `${seance.matiereNom} - ${dateFormatee}`;
+            }
+            
+            let description = seance.lecon?.Description || seance.lecon?.description || '';
+            if (!description && seance.statut === 'brouillon') {
+                description = 'Aucun contenu renseigné. Cliquez sur "Modifier" pour ajouter le contenu de la séance.';
+            } else if (!description) {
+                description = 'Contenu non spécifié';
+            }
+            
+            let objectifs = seance.lecon?.Objectifs || seance.lecon?.objectifs || [];
+            if (objectifs.length === 0 && seance.statut === 'brouillon') {
+                objectifs = ['À définir'];
+            } else if (objectifs.length === 0) {
+                objectifs = ['Non définis'];
+            }
+            
+            let ressources = seance.lecon?.Ressources || seance.lecon?.ressources || [];
+            if (ressources.length === 0 && seance.statut === 'brouillon') {
+                ressources = ['À ajouter'];
+            } else if (ressources.length === 0) {
+                ressources = ['Aucune ressource spécifiée'];
+            }
+            
+            let devoirs = seance.devoirs || [];
+            if (devoirs.length === 0 && seance.statut === 'brouillon') {
+                devoirs = [{ Description: 'Aucun devoir pour le moment', DateLimite: null }];
+            } else if (devoirs.length === 0) {
+                devoirs = [{ Description: 'Aucun devoir', DateLimite: null }];
+            }
+            
+            // Affichage simplifié des fichiers (sans téléchargement)
+            let fichiersHtml = '';
+            if (seance.fichiers && seance.fichiers.length > 0) {
+                fichiersHtml = `
+                    <div class="content-card">
+                        <h4>📎 Fichiers joints (${seance.fichiers.length})</h4>
+                        <ul style="list-style: none; padding-left: 0;">
+                            ${seance.fichiers.map(f => {
+                                let tailleKo = (f.taille / 1024);
+                                let tailleAffichee = tailleKo < 1024 ? `${tailleKo.toFixed(1)} KB` : `${(tailleKo / 1024).toFixed(1)} MB`;
+                                let fileIcon = '📎';
+                                if (f.type) {
+                                    if (f.type.includes('pdf')) fileIcon = '📄';
+                                    else if (f.type.includes('image')) fileIcon = '🖼️';
+                                    else if (f.type.includes('video')) fileIcon = '🎬';
+                                    else if (f.type.includes('word')) fileIcon = '📝';
+                                    else if (f.type.includes('excel')) fileIcon = '📊';
+                                }
+                                return `
+                                    <li style="margin-bottom: 0.5rem; padding: 0.5rem; background: white; border-radius: 8px;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <span style="font-size: 1rem;">${fileIcon}</span>
+                                            <span style="font-weight: 500;">${escapeHtml(f.nom)}</span>
+                                            <span style="font-size: 0.7rem; color: var(--gray-500);">(${tailleAffichee})</span>
+                                        </div>
+                                    </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            const showEditButtons = !isReadOnly && seance.statut === 'brouillon' && seance.seanceId;
+            const showCreateButton = !isReadOnly && !seance.seanceId;
+            
+            return `
+                <div class="seance-item">
+                    <div class="seance-header" onclick="toggleSeanceContent('${safeId}')">
+                        <div class="seance-date-info">
+                            <span class="seance-time">⏰ ${seance.heureDebut} - ${seance.heureFin}</span>
+                            <span class="seance-badge ${statutClass}">${statutText}</span>
+                            ${seance.salle ? `<span class="seance-time">🏫 ${escapeHtml(seance.salle)}</span>` : ''}
+                            ${seance.fichiers && seance.fichiers.length > 0 ? `<span class="seance-time" style="background: var(--primary); color: white;">📎 ${seance.fichiers.length}</span>` : ''}
+                            ${isReadOnly ? '<span class="readonly-indicator">🔒 Consultation</span>' : ''}
+                        </div>
+                        <div><span style="font-weight: 500;">${escapeHtml(seance.matiereNom)}</span> <span style="color: var(--gray-400);">▼</span></div>
+                    </div>
+                    <div class="seance-content" id="content-${safeId}">
+                        <div class="sequence-title">📖 ${escapeHtml(titreLecon)}</div>
+                        
+                        ${seance.seanceDetail?.Duree ? `
+                            <div style="margin-bottom: 1rem;">
+                                <span class="badge">⌚ Durée: ${seance.seanceDetail.Duree} min</span>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="content-grid">
+                            <div class="content-card">
+                                <h4>📖 Contenu de la leçon</h4>
+                                <p style="white-space: pre-wrap;">${escapeHtml(description)}</p>
+                                ${showEditButtons && !seance.lecon?.Description ? `
+                                    <a href="${editUrl}" style="display: inline-block; margin-top: 0.5rem; color: var(--primary); font-size: 0.8rem;">✏️ Ajouter du contenu</a>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="content-card">
+                                <h4>🎯 Objectifs de la leçon</h4>
+                                <ul>
+                                    ${objectifs.map(o => `<li>${escapeHtml(o)}</li>`).join('')}
+                                </ul>
+                                ${showEditButtons && (!seance.lecon?.Objectifs || seance.lecon?.Objectifs.length === 0) ? `
+                                    <a href="${editUrl}" style="display: inline-block; margin-top: 0.5rem; color: var(--primary); font-size: 0.8rem;">✏️ Définir des objectifs</a>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="content-card">
+                                <h4>📚 Supports / Ressources</h4>
+                                <ul>
+                                    ${ressources.map(r => `<li>${escapeHtml(r)}</li>`).join('')}
+                                </ul>
+                                ${showEditButtons && (!seance.lecon?.Ressources || seance.lecon?.Ressources.length === 0) ? `
+                                    <a href="${editUrl}" style="display: inline-block; margin-top: 0.5rem; color: var(--primary); font-size: 0.8rem;">✏️ Ajouter des ressources</a>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="content-card">
+                                <h4>📖 Chapitre</h4>
+                                <p>${seance.lecon?.Chapitre ? escapeHtml(seance.lecon.Chapitre) : 'Non spécifié'}</p>
+                                ${seance.lecon?.PageDebut ? `<p style="margin-top: 0.3rem;">📄 Pages: ${seance.lecon.PageDebut} - ${seance.lecon.PageFin || seance.lecon.PageDebut}</p>` : ''}
+                            </div>
+                            
+                            <div class="content-card">
+                                <h4>✏️ Devoirs donnés</h4>
+                                <ul>
+                                    ${devoirs.map(d => `
+                                        <li>
+                                            ${escapeHtml(d.Description || d)}
+                                            ${d.DateLimite ? `<br><span style="font-size: 0.7rem; color: var(--warning);">📅 À rendre: ${new Date(d.DateLimite).toLocaleDateString('fr-FR')}</span>` : ''}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                ${showEditButtons && (seance.devoirs?.length === 0 || !seance.devoirs) ? `
+                                    <a href="${editUrl}" style="display: inline-block; margin-top: 0.5rem; color: var(--primary); font-size: 0.8rem;">✏️ Ajouter des devoirs</a>
+                                ` : ''}
+                            </div>
+                            
+                            ${fichiersHtml}
+                        </div>
+                        
+                        ${seance.pedagogie ? renderPedagogySection(seance.pedagogie) : ''}
+                        
+                        ${seance.remarques ? `
+                            <div style="background: var(--gray-50); padding: 0.75rem; border-radius: 12px; margin-top: 1rem;">
+                                <strong>📝 Remarques:</strong> ${escapeHtml(seance.remarques)}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="seance-footer">
+                            ${showEditButtons ? `
+                                <a href="${editUrl}" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    ✏️ Modifier
+                                </a>
+                                <button class="btn-secondary" onclick="soumettreSeance('${seance.seanceId}')" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    📤 Soumettre
+                                </button>
+                                <button class="btn-secondary" onclick="supprimerSeance('${seance.seanceId}')" style="color: var(--error); display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    🗑️ Supprimer
+                                </button>
+                            ` : ''}
+                            ${showCreateButton ? `
+                                <a href="${createUrl}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                    ✨ Créer la séance
+                                </a>
+                            ` : ''}
+                            ${seance.statut === 'soumis' ? '<span style="background: #fef3c7; padding: 0.3rem 1rem; border-radius: 20px;">⏳ En attente de validation par l\'administration</span>' : ''}
+                            ${seance.statut === 'valide' ? '<span style="background: #d1fae5; padding: 0.3rem 1rem; border-radius: 20px;">✅ Séance validée</span>' : ''}
+                            ${isReadOnly ? '<span style="background: #f0f0f0; padding: 0.3rem 1rem; border-radius: 20px;">🔒 Consultation seule</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleSeanceContent(id) {
+            const content = document.getElementById(`content-${id}`);
+            if (content) content.classList.toggle('open');
+        }
+
+        function mettreAJourStats(seances) {
+            document.getElementById('statTotal').textContent = seances.length;
+            document.getElementById('statValidees').textContent = seances.filter(s => s.statut === 'valide').length;
+            document.getElementById('statBrouillon').textContent = seances.filter(s => s.statut === 'brouillon').length;
+            
+            let totalHeures = 0;
+            for (const s of seances) {
+                if (s.heureDebut && s.heureFin) {
+                    const start = s.heureDebut.split(':');
+                    const end = s.heureFin.split(':');
+                    totalHeures += (parseInt(end[0]) + parseInt(end[1])/60) - (parseInt(start[0]) + parseInt(start[1])/60);
+                }
+            }
+            document.getElementById('statHeures').textContent = totalHeures.toFixed(1);
+        }
+
+        async function soumettreSeance(id) {
+            if (isReadOnly) {
+                showMessage("Mode consultation seule - vous ne pouvez pas soumettre de séance", "error");
+                return;
+            }
+            if (!id) { showMessage('Séance invalide', 'error'); return; }
+            try {
+                const resp = await fetch(`${API_BASE}/CahierTexte/${id}/soumettre`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ Commentaire: '' })
+                });
+                if (resp.ok) { showMessage('Séance soumise', 'success'); chargerSeances(); }
+                else { showMessage('Erreur lors de la soumission', 'error'); }
+            } catch (error) { showMessage('Erreur de connexion', 'error'); }
+        }
+
+        async function supprimerSeance(id) {
+            if (isReadOnly) {
+                showMessage("Mode consultation seule - vous ne pouvez pas supprimer de séance", "error");
+                return;
+            }
+            if (!id) { showMessage('Séance invalide', 'error'); return; }
+            if (!confirm('Supprimer cette séance ?')) return;
+            try {
+                const resp = await fetch(`${API_BASE}/CahierTexte/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (resp.ok) { showMessage('Séance supprimée', 'success'); chargerSeances(); }
+                else { showMessage('Erreur lors de la suppression', 'error'); }
+            } catch (error) { showMessage('Erreur de connexion', 'error'); }
+        }
+
+        async function init() {
+            token = getAuthToken();
+            if (!token) { window.location.href = 'saghiry-auth.html'; return; }
+            
+            currentUserInfo = getCurrentUser();
+            
+            await chargerInfosUtilisateur();
+            
+            const success = await chargerEmploiEnseignant();
+            
+            if (!success || classesList.length === 0) {
+                document.getElementById('classesNav').innerHTML = '<div style="color: var(--error);">⚠️ Aucune classe trouvée</div>';
+                document.getElementById('seancesList').innerHTML = '<div class="empty-state">📭 Aucune classe assignée. Contactez l\'administration.</div>';
+                return;
+            }
+            
+            await chargerSeancesPlanifiees();
+            
+            const filterSelect = document.getElementById('filterMatiere');
+            filterSelect.innerHTML = '<option value="">Toutes matières</option>';
+            matieresList.forEach(m => { filterSelect.innerHTML += `<option value="${m.id}">${escapeHtml(m.nom)}</option>`; });
+            
+            const savedClasseId = localStorage.getItem('currentClasseId');
+            if (savedClasseId && classesList.find(c => c.id === savedClasseId)) {
+                currentClasse = classesList.find(c => c.id === savedClasseId);
+            } else if (classesList.length > 0) {
+                currentClasse = classesList[0];
+            }
+            
+            afficherClassesNav();
+            if (currentClasse) await chargerSeances();
+        }
+
+        window.changerClasse = changerClasse;
+        window.changerSemaine = changerSemaine;
+        window.toggleSeanceContent = toggleSeanceContent;
+        window.chargerSeances = chargerSeances;
+        window.soumettreSeance = soumettreSeance;
+        window.supprimerSeance = supprimerSeance;
+        
+        init();
+    </script>
+</body>
+</html>

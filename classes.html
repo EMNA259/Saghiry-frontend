@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des Classes</title>
+    <style>
+        /* ... (tous les styles restent identiques à la version précédente) ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            color: #1e3b36;
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title h1 span {
+            background: #4ca896;
+            color: white;
+            font-size: 1rem;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            margin-left: 0.5rem;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateX(-3px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            padding: 0.3rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .search-container {
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .search-box:focus-within {
+            border-color: #4ca896;
+            box-shadow: 0 4px 20px rgba(76, 168, 150, 0.2);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-button {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: #3d8a7f;
+            transform: scale(1.02);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1.5rem;
+            background: white;
+            border: 1px solid #e0e9e7;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: #4ca896;
+            color: white;
+            border-color: #4ca896;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .search-info {
+            text-align: center;
+            margin: 0.5rem 0 1rem;
+            font-size: 0.9rem;
+            color: #5a9d91;
+        }
+        
+        .clear-search {
+            color: #4ca896;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+            margin-left: 0.5rem;
+        }
+        
+        .clear-search:hover {
+            color: #2d6b63;
+        }
+
+        .niveaux-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .niveau-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .niveau-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(76, 168, 150, 0.15);
+            border-color: #4ca896;
+        }
+
+        .niveau-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #4ca896, #ff9466);
+        }
+
+        .niveau-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .niveau-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 0.5rem;
+        }
+
+        .niveau-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+            color: #5a9d91;
+        }
+
+        .niveau-count {
+            background: #e0f2f1;
+            color: #1e3b36;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .niveau-card:hover .niveau-count {
+            background: #4ca896;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .classe-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .classe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4ca896, #ff9466, #4ca896);
+            background-size: 200% 100%;
+            transition: all 0.4s ease;
+        }
+
+        .classe-card:hover::before {
+            background-position: 100% 0;
+        }
+
+        .classe-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(76, 168, 150, 0.2);
+            border-color: rgba(76, 168, 150, 0.4);
+        }
+
+        .classe-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .classe-info-left {
+            flex: 1;
+        }
+
+        .classe-nom-principal {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3b36 0%, #2d6b63 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+        }
+
+        .classe-niveau-detail {
+            display: inline-block;
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
+        .classe-annee-badge {
+            background: linear-gradient(135deg, #ff9466, #ff7b3d);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 2px 8px rgba(255, 148, 102, 0.3);
+        }
+
+        .classe-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon-card {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            color: #5a9d91;
+            font-size: 1.1rem;
+        }
+
+        .btn-icon-card:hover {
+            background: #4ca896;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-icon-card.delete-card-btn {
+            color: #dc2626;
+        }
+
+        .btn-icon-card.delete-card-btn:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .classe-stats-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 0.8rem 0;
+            border-top: 2px dashed #e0e9e7;
+            border-bottom: 2px dashed #e0e9e7;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #5a9d91;
+            font-weight: 500;
+        }
+
+        .classe-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .classe-view-link {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+        }
+
+        .classe-view-link:hover {
+            transform: translateX(3px);
+            background: linear-gradient(135deg, #3d8a7f, #2d6b63);
+        }
+
+        @media (max-width: 640px) {
+            .classes-grid {
+                grid-template-columns: 1fr;
+            }
+            .classe-nom-principal {
+                font-size: 1.4rem;
+            }
+            .classe-stats-container {
+                flex-wrap: wrap;
+            }
+            .stat-item {
+                min-width: 80px;
+            }
+        }
+
+        .classe-details-page {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .classe-header-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .classe-title {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .classe-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3b36;
+            line-height: 1.2;
+        }
+
+        .classe-year {
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .classe-titulaire {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #f8fafc;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            border: 1px solid #e0e9e7;
+            transition: all 0.3s ease;
+        }
+
+        .classe-titulaire:hover {
+            border-color: #4ca896;
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .titulaire-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4ca896, #2d6b63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .titulaire-info h3 {
+            color: #1e3b36;
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .titulaire-info p {
+            color: #5a9d91;
+            font-size: 0.85rem;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-stat-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid #e0e9e7;
+            transition: all 0.3s ease;
+        }
+
+        .quick-stat-card:hover {
+            border-color: #4ca896;
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .quick-stat-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .quick-stat-content h4 {
+            color: #5a9d91;
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin-bottom: 0.2rem;
+        }
+
+        .quick-stat-content .stat-number {
+            color: #1e3b36;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .details-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e9e7;
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .details-nav-btn {
+            padding: 0.8rem 2rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .details-nav-btn:hover {
+            color: #4ca896;
+            background: #e0f2f1;
+        }
+
+        .details-nav-btn.active {
+            color: #4ca896;
+            border-bottom: 3px solid #4ca896;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            color: #1e3b36;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .eleves-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e0e9e7;
+            background: white;
+        }
+
+        .eleves-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .eleves-table th {
+            background: #f8fafc;
+            color: #1e3b36;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .eleves-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e9e7;
+            vertical-align: middle;
+        }
+
+        .eleves-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .eleve-avatar {
+            width: 40px;
+            height: 40px;
+            background: #e0f2f1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e3b36;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .stats-cell {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #f8fafc;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e9e7;
+        }
+        
+        .stat-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-badge.present:hover { background: #e8f5e9; border-color: #4caf50; }
+        .stat-badge.retard:hover { background: #fff8e1; border-color: #ff9800; }
+        .stat-badge.absent:hover { background: #ffebee; border-color: #f44336; }
+        .stat-badge.remarque:hover { background: #e3f2fd; border-color: #2196f3; }
+        
+        .stat-icon { font-size: 1rem; }
+        .stat-number { font-weight: 700; font-size: 1.1rem; }
+        .stat-badge.present .stat-number { color: #2e7d32; }
+        .stat-badge.retard .stat-number { color: #f57c00; }
+        .stat-badge.absent .stat-number { color: #c62828; }
+        .stat-badge.remarque .stat-number { color: #1976d2; }
+        .stat-label { font-size: 0.7rem; color: #5a9d91; }
+
+        .enseignants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .enseignant-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid #4ca896;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enseignant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 50%, rgba(76, 168, 150, 0.1) 50%);
+            border-radius: 0 0 0 100px;
+        }
+
+        .enseignant-card.permanent {
+            border-left-color: #ff9466;
+        }
+
+        .enseignant-card.permanent::before {
+            background: linear-gradient(135deg, transparent 50%, rgba(255, 148, 102, 0.1) 50%);
+        }
+
+        .enseignant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .cahier-texte-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed #e0e9e7;
+        }
+
+        .cahier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .cahier-header h5 {
+            color: #1e3b36;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .seances-mini-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .seance-mini-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 0.7rem;
+            margin-bottom: 0.6rem;
+            transition: all 0.2s ease;
+            border: 1px solid #e0e9e7;
+        }
+
+        .seance-mini-item:hover {
+            background: #e0f2f1;
+            border-color: #4ca896;
+            transform: translateX(3px);
+        }
+
+        .seance-mini-date {
+            font-size: 0.7rem;
+            color: #5a9d91;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .seance-mini-titre {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e3b36;
+            margin: 0.2rem 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .seance-mini-statut {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            margin-top: 0.2rem;
+        }
+
+        .statut-draft { background: #e5e7eb; color: #4b5563; }
+        .statut-submitted { background: #fef3c7; color: #b45309; }
+        .statut-validated { background: #d1fae5; color: #065f46; }
+        .statut-refused { background: #fee2e2; color: #dc2626; }
+
+        .validation-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 0.5rem;
+        }
+
+        .validation-btn:hover {
+            background: #d97706;
+            transform: scale(1.05);
+        }
+
+        .voir-plus-link {
+            display: block;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4ca896;
+            margin-top: 0.5rem;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .voir-plus-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-seances {
+            text-align: center;
+            padding: 1rem;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #5a9d91;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb span {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb span:hover {
+            color: #4ca896;
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            color: #2d6b63;
+            border: 1px solid #4ca896;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #f59e0b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            border: 2px dashed #e0e9e7;
+            grid-column: 1/-1;
+        }
+
+        .empty-state h3 {
+            color: #1e3b36;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #5a9d91;
+            margin-bottom: 1.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            grid-column: 1/-1;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-content.historique-modal-content {
+            max-width: 700px;
+        }
+
+        .modal-content.validation-modal-content {
+            max-width: 500px;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .modal-title {
+            color: #1e3b36;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #5a9d91;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #1e3b36;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #4ca896;
+            outline: none;
+        }
+
+        .historique-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .historique-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .historique-item:hover {
+            background: #f8fafc;
+        }
+
+        .historique-date {
+            font-weight: 600;
+            color: #1e3b36;
+            min-width: 120px;
+        }
+
+        .presence-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .presence-badge.present { background: #e8f5e9; color: #2e7d32; }
+        .presence-badge.retard { background: #fff8e1; color: #f57c00; }
+        .presence-badge.absent { background: #ffebee; color: #c62828; }
+        
+        .remarque-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .type-comportement { background: #e3f2fd; color: #1976d2; }
+        .type-discipline { background: #ffebee; color: #c62828; }
+        .type-travail { background: #e8f5e9; color: #2e7d32; }
+        .type-participation { background: #fff8e1; color: #f57c00; }
+        .gravite-faible { background: #e8f5e9; color: #2e7d32; }
+        .gravite-moyenne { background: #fff8e1; color: #f57c00; }
+        .gravite-elevee { background: #ffebee; color: #c62828; }
+
+        .presence-stats-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e0e9e7;
+        }
+        
+        .presence-stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3b36;
+        }
+        
+        .presence-stats-label {
+            font-size: 0.8rem;
+            color: #5a9d91;
+        }
+
+        .validation-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .niveaux-grid { grid-template-columns: 1fr; }
+            .classe-name { font-size: 2rem; }
+            .stats-cell { flex-direction: column; gap: 0.5rem; }
+            .enseignants-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <div class="header-title">
+            <button class="btn-back" onclick="showNiveauxView()" id="backButton" style="display: none;">
+                ← Retour
+            </button>
+            <h1 id="mainTitle">
+                🏫 Gestion des Classes
+                <span id="totalClassesCount">0</span>
+            </h1>
+        </div>
+        <button class="btn-primary" onclick="openCreateModal()">
+            <span>➕</span> Nouvelle classe
+        </button>
+    </div>
+
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" 
+                   placeholder="Rechercher une classe par nom, niveau, année..." 
+                   value="" oninput="debounce(handleSearch, 300)()">
+            <button class="search-button" onclick="handleSearch()">Rechercher</button>
+        </div>
+        <div id="searchInfo" class="search-info" style="display: none;"></div>
+        <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" onclick="filterByYear('all', event)">Tous</button>
+            <button class="filter-tab" onclick="filterByYear('2025-2026', event)">2025-2026</button>
+        </div>
+    </div>
+
+    <div id="mainContainer"></div>
+
+    <!-- Modals -->
+    <div class="modal" id="classeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">➕ Nouvelle classe</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalAlert"></div>
+            <form id="classeForm" onsubmit="saveClasse(event)">
+                <div class="form-group">
+                    <label class="form-label required">Niveau</label>
+                    <select id="niveau" class="form-select" required>
+                        <option value="">Sélectionner un niveau</option>
+                        <option value="1ère année">1ère année</option>
+                        <option value="2ème année">2ème année</option>
+                        <option value="3ème année">3ème année</option>
+                        <option value="4ème année">4ème année</option>
+                        <option value="5ème année">5ème année</option>
+                        <option value="6ème année">6ème année</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Nom de la classe (Groupe)</label>
+                    <input type="text" id="nomClasse" class="form-input" placeholder="Ex: A2, B1, C3..." required>
+                    <small style="color: #5a9d91;">Le nom complet sera formaté automatiquement (ex: 3 A2)</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required">Année scolaire</label>
+                    <select id="anneeScolaire" class="form-select" required>
+                        <option value="2025-2026">2025-2026</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Capacité maximale</label>
+                    <input type="number" id="capaciteMax" class="form-input" value="30" min="1" max="50">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 1rem; justify-content: center;">
+                    <span>💾</span> Créer la classe
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🗑️ Confirmer la suppression</h2>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div id="deleteModalAlert"></div>
+            <p style="margin: 1.5rem 0;">Êtes-vous sûr de vouloir supprimer cette classe ? Cette action est irréversible.</p>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn-outline" onclick="closeDeleteModal()">Annuler</button>
+                <button class="btn-primary" onclick="confirmDelete()" style="background: #dc2626;">🗑️ Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="assignModal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">👨‍🏫 Assigner un enseignant</h2>
+                <button class="modal-close" onclick="closeAssignModal()">&times;</button>
+            </div>
+            <div id="assignModalAlert"></div>
+            <div style="padding: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Enseignant</label>
+                    <select id="enseignantSelect" class="form-select"><option value="">Chargement...</option></select>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="estTuteurCheck"> 
+                        <span>Définir comme tuteur de la classe</span>
+                    </label>
+                </div>
+                <button class="btn-primary" onclick="confirmerAssignation()" style="width: 100%;">✅ Assigner</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="seanceDetailModal">
+        <div class="modal-content historique-modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="seanceDetailTitle">📋 Détails de la séance</h2>
+                <button class="modal-close" onclick="closeSeanceDetailModal()">&times;</button>
+            </div>
+            <div id="seanceDetailContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="validationModal">
+        <div class="modal-content validation-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="validationModalTitle">✅ Valider la séance</h2>
+                <button class="modal-close" onclick="closeValidationModal()">&times;</button>
+            </div>
+            <div id="validationModalAlert"></div>
+            <div>
+                <div class="form-group">
+                    <label class="form-label">Commentaire (optionnel)</label>
+                    <textarea id="validationCommentaire" class="form-textarea" placeholder="Ajouter un commentaire pour l'enseignant..."></textarea>
+                </div>
+                <div class="validation-buttons">
+                    <button class="btn-outline" onclick="refuserSeance()">❌ Refuser</button>
+                    <button class="btn-success" onclick="validerSeance()">✅ Valider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="historiquePresenceModal">
+        <div class="modal-content historique-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="historiquePresenceTitle">📋 Historique des présences</h2>
+                <button class="modal-close" onclick="closeHistoriquePresenceModal()">&times;</button>
+            </div>
+            <div id="historiquePresenceContent" class="historique-list"><div class="loading">Chargement...</div></div>
+        </div>
+    </div>
+
+    <div class="modal" id="historiqueRemarqueModal">
+        <div class="modal-content historique-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="historiqueRemarqueTitle">📝 Historique des remarques</h2>
+                <button class="modal-close" onclick="closeHistoriqueRemarqueModal()">&times;</button>
+            </div>
+            <div id="historiqueRemarqueContent" class="historique-list"><div class="loading">Chargement...</div></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        let allClasses = [];
+        let filteredClasses = [];
+        let currentView = 'niveaux';
+        let currentNiveau = null;
+        let currentYearFilter = 'all';
+        let currentSearchTerm = '';
+        let deleteClasseId = null;
+        let currentClasseId = null;
+        let currentSeanceId = null;
+        let currentSeanceEnseignant = null;
+        
+        let currentClasse = null;
+        let currentEleves = [];
+        let currentEnseignants = [];
+        let currentAbsences = [];
+        let currentRemarques = [];
+        let currentTab = 'eleves';
+        let timeoutId = null;
+        
+        let seancesParEnseignant = {};
+
+        // Fonction pour incrémenter l'heure de +2
+        function incrementerHeure(heureStr) {
+            if (!heureStr) return '';
+            try {
+                let heures = 0, minutes = 0;
+                if (heureStr.includes(':')) {
+                    const parts = heureStr.split(':');
+                    heures = parseInt(parts[0], 10);
+                    minutes = parseInt(parts[1], 10);
+                } else {
+                    heures = parseInt(heureStr, 10);
+                }
+                heures = (heures + 2) % 24;
+                return `${heures.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            } catch(e) {
+                return heureStr;
+            }
+        }
+
+        function ajouterDuree(heureStr, minutes) {
+            if (!heureStr) return '';
+            let [heures, mins] = heureStr.split(':').map(Number);
+            let totalMinutes = heures * 60 + mins + minutes;
+            let newHeures = Math.floor(totalMinutes / 60) % 24;
+            let newMins = totalMinutes % 60;
+            return `${newHeures.toString().padStart(2, '0')}:${newMins.toString().padStart(2, '0')}`;
+        }
+
+        function formaterHeureAvecIncrement(heureStr, dureeMinutes = null) {
+            if (!heureStr) return '';
+            const heureIncrementee = incrementerHeure(heureStr);
+            if (dureeMinutes) {
+                const heureFin = incrementerHeure(ajouterDuree(heureStr, dureeMinutes));
+                return `${heureIncrementee.substring(0,5)} - ${heureFin.substring(0,5)} (${dureeMinutes} min)`;
+            }
+            return heureIncrementee.substring(0,5);
+        }
+
+        // Gestion du token (ignore l'erreur cross-origin)
+        function getAuthToken() {
+            try {
+                if (window.parent && window.parent.SaghirySidebar && typeof window.parent.SaghirySidebar.getToken === 'function') {
+                    return window.parent.SaghirySidebar.getToken();
+                }
+            } catch(e) { console.warn('Cannot access parent frame:', e); }
+            try {
+                if (window.SaghirySidebar && typeof window.SaghirySidebar.getToken === 'function') {
+                    return window.SaghirySidebar.getToken();
+                }
+            } catch(e) { console.warn('Cannot access SaghirySidebar:', e); }
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            token = getAuthToken();
+            loadClasses();
+        });
+
+        function debounce(func, delay) { return function() { clearTimeout(timeoutId); timeoutId = setTimeout(func, delay); }; }
+        
+        function escapeHtml(unsafe) { 
+            if (!unsafe) return ''; 
+            return String(unsafe).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+        
+        function showAlert(containerId, type, message) { 
+            const c = document.getElementById(containerId); 
+            if(c){ 
+                c.innerHTML = `<div class="alert alert-${type}">${message}</div>`; 
+                setTimeout(() => c.innerHTML = '', 3000); 
+            } 
+        }
+        
+        function showGlobalAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.bottom = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '10000';
+            alertDiv.innerHTML = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+        
+        function getValue(obj, propName, altPropName = null) { 
+            if(!obj) return null;
+            const camel = propName[0].toLowerCase() + propName.slice(1);
+            const pascal = propName[0].toUpperCase() + propName.slice(1);
+            if (obj[propName] !== undefined) return obj[propName];
+            if (obj[camel] !== undefined) return obj[camel];
+            if (obj[pascal] !== undefined) return obj[pascal];
+            if (altPropName) {
+                const altCamel = altPropName[0].toLowerCase() + altPropName.slice(1);
+                const altPascal = altPropName[0].toUpperCase() + altPropName.slice(1);
+                if (obj[altPropName] !== undefined) return obj[altPropName];
+                if (obj[altCamel] !== undefined) return obj[altCamel];
+                if (obj[altPascal] !== undefined) return obj[altPascal];
+            }
+            return null;
+        }
+        
+        function formatClasseNom(classe) {
+            const niveau = getValue(classe, 'niveau') || '';
+            const groupe = getValue(classe, 'nomClasse') || '';
+            let niveauNum = '';
+            if (niveau.includes('1ère')) niveauNum = '1';
+            else if (niveau.includes('2ème')) niveauNum = '2';
+            else if (niveau.includes('3ème')) niveauNum = '3';
+            else if (niveau.includes('4ème')) niveauNum = '4';
+            else if (niveau.includes('5ème')) niveauNum = '5';
+            else if (niveau.includes('6ème')) niveauNum = '6';
+            return groupe ? `${niveauNum} A ${groupe}` : niveauNum;
+        }
+        
+        function getNiveauLibelle(niveau) {
+            if (niveau.includes('1ère')) return '1ère année';
+            if (niveau.includes('2ème')) return '2ème année';
+            if (niveau.includes('3ème')) return '3ème année';
+            if (niveau.includes('4ème')) return '4ème année';
+            if (niveau.includes('5ème')) return '5ème année';
+            if (niveau.includes('6ème')) return '6ème année';
+            return niveau;
+        }
+
+        async function loadClasses() {
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const response = await fetch(`${API_BASE}/api/Classe/with-tuteurs`, { headers });
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                allClasses = Array.isArray(data) ? data : [];
+                document.getElementById('totalClassesCount').textContent = allClasses.length;
+                applyFilters();
+                if (currentView === 'niveaux') displayNiveaux();
+                else if (currentView === 'classes' && currentNiveau) displayClassesByNiveau(currentNiveau);
+            } catch(e) { console.error(e); }
+        }
+
+        function applyFilters() {
+            filteredClasses = [...allClasses];
+            if (currentYearFilter !== 'all') filteredClasses = filteredClasses.filter(c => getValue(c, 'anneeScolaire') === currentYearFilter);
+            if (currentSearchTerm && currentSearchTerm.trim()) {
+                const term = currentSearchTerm.toLowerCase().trim();
+                filteredClasses = filteredClasses.filter(c => {
+                    const nom = formatClasseNom(c).toLowerCase();
+                    const niveau = (getValue(c, 'niveau') || '').toLowerCase();
+                    const annee = (getValue(c, 'anneeScolaire') || '').toLowerCase();
+                    let tuteurText = '';
+                    const tuteur = getValue(c, 'tuteur') || getValue(c, 'Tuteur');
+                    if (tuteur) tuteurText = `${getValue(tuteur, 'prenom') || ''} ${getValue(tuteur, 'nom') || ''}`.toLowerCase();
+                    return nom.includes(term) || niveau.includes(term) || annee.includes(term) || tuteurText.includes(term);
+                });
+            }
+            const si = document.getElementById('searchInfo');
+            if(si) {
+                if(currentSearchTerm) { si.style.display='block'; si.innerHTML = `${filteredClasses.length} résultat(s) sur ${allClasses.length} classe(s) <span class="clear-search" onclick="clearSearch()">Effacer</span>`; }
+                else si.style.display='none';
+            }
+        }
+        
+        function clearSearch() { const inp=document.getElementById('searchInput'); if(inp) inp.value=''; currentSearchTerm=''; applyFilters(); if(currentView==='niveaux') displayNiveaux(); else displayClassesByNiveau(currentNiveau); }
+        function handleSearch() { const inp=document.getElementById('searchInput'); currentSearchTerm=inp?inp.value:''; applyFilters(); if(currentView==='niveaux') displayNiveaux(); else displayClassesByNiveau(currentNiveau); }
+        function filterByYear(year,event) { currentYearFilter=year; document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active')); event.target.classList.add('active'); applyFilters(); if(currentView==='niveaux') displayNiveaux(); else displayClassesByNiveau(currentNiveau); }
+        
+        function showNiveauxView() {
+            currentView='niveaux'; currentNiveau=null;
+            document.getElementById('backButton').style.display='none';
+            document.getElementById('mainTitle').innerHTML = `🏫 Gestion des Classes <span id="totalClassesCount">${allClasses.length}</span>`;
+            document.getElementById('searchContainer').style.display='block';
+            displayNiveaux();
+        }
+        
+        function displayNiveaux() {
+            const niveaux = ['1ère année','2ème année','3ème année','4ème année','5ème année','6ème année'];
+            const container = document.getElementById('mainContainer'); if(!container) return;
+            const html = `<div class="niveaux-grid"><div class="niveau-card" style="background: linear-gradient(135deg, #4ca896, #2d6b63); color: white;" onclick="showNiveauxView()"><div class="niveau-icon">📊</div><div class="niveau-title">Vue d'ensemble</div><div class="niveau-stats"><span>🏫 ${allClasses.length} classe(s)</span></div></div>${
+                niveaux.map(n=>{ const c=filteredClasses.filter(c=>getValue(c,'niveau')===n).length; return `<div class="niveau-card" onclick="showNiveauClasses('${n}')"><div class="niveau-icon">📚</div><div class="niveau-title">${n}</div><div class="niveau-stats"><span>📊 ${c} classe${c>1?'s':''}</span></div><div class="niveau-count">Voir →</div></div>`; }).join('')
+            }</div>`;
+            container.innerHTML = html;
+        }
+        
+        function showNiveauClasses(niveau) {
+            currentView='classes'; currentNiveau=niveau;
+            document.getElementById('backButton').style.display='flex';
+            document.getElementById('mainTitle').innerHTML = `📚 ${getNiveauLibelle(niveau)} <span>${filteredClasses.filter(c=>getValue(c,'niveau')===niveau).length}</span>`;
+            document.getElementById('searchContainer').style.display='block';
+            displayClassesByNiveau(niveau);
+        }
+        
+        async function chargerSeancesPourEnseignant(enseignantId) {
+            if (seancesParEnseignant[enseignantId]) return seancesParEnseignant[enseignantId];
+            try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                
+                let response = await fetch(`${API_BASE}/api/CahierTexte/enseignant/${enseignantId}`, { headers });
+                
+                if (!response.ok) {
+                    const allResponse = await fetch(`${API_BASE}/api/CahierTexte/enseignant`, { headers });
+                    if (allResponse.ok) {
+                        const allData = await allResponse.json();
+                        const toutesSeances = allData?.data || [];
+                        const eIdStr = typeof enseignantId === 'object' ? (enseignantId.$oid || enseignantId) : String(enseignantId);
+                        const seancesEnseignant = toutesSeances.filter(s => {
+                            const sEnseignantId = s.EnseignantId || s.enseignantId;
+                            const sIdStr = typeof sEnseignantId === 'object' ? (sEnseignantId.$oid || sEnseignantId) : String(sEnseignantId);
+                            return sIdStr === eIdStr;
+                        });
+                        seancesParEnseignant[enseignantId] = seancesEnseignant;
+                        return seancesEnseignant;
+                    }
+                    return [];
+                }
+                
+                const data = await response.json();
+                const seances = data?.data || [];
+                seancesParEnseignant[enseignantId] = seances;
+                return seances;
+            } catch(e) {
+                console.error('Erreur chargement séances:', e);
+                return [];
+            }
+        }
+        
+        function formatSeanceDate(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                if (typeof dateValue === 'object' && dateValue.$date) {
+                    return new Date(dateValue.$date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+                }
+                if (typeof dateValue === 'string') {
+                    return new Date(dateValue).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+                }
+            } catch(e) { return 'Date inconnue'; }
+            return 'Date inconnue';
+        }
+        
+        function getStatutText(statut) {
+            const statuts = {
+                'brouillon': 'Brouillon',
+                'soumis': 'Soumis',
+                'valide': 'Validé',
+                'refuse': 'Refusé'
+            };
+            return statuts[statut] || statut;
+        }
+        
+        function getStatutClass(statut) {
+            const classes = {
+                'brouillon': 'statut-draft',
+                'soumis': 'statut-submitted',
+                'valide': 'statut-validated',
+                'refuse': 'statut-refused'
+            };
+            return classes[statut] || 'statut-draft';
+        }
+        
+        // Fonctions de validation
+        function openValidationModal(seanceId, enseignantNom) {
+            currentSeanceId = seanceId;
+            currentSeanceEnseignant = enseignantNom;
+            document.getElementById('validationModalTitle').innerHTML = `✅ Valider la séance - ${escapeHtml(enseignantNom)}`;
+            document.getElementById('validationCommentaire').value = '';
+            document.getElementById('validationModalAlert').innerHTML = '';
+            document.getElementById('validationModal').classList.add('active');
+        }
+        
+        function closeValidationModal() {
+            document.getElementById('validationModal').classList.remove('active');
+            currentSeanceId = null;
+            currentSeanceEnseignant = null;
+        }
+        
+        async function validerSeance() {
+            if (!currentSeanceId) return;
+            const commentaire = document.getElementById('validationCommentaire').value;
+            
+            try {
+                const headers = { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                
+                // Correction : envoyer l'ID dans le body (le contrôleur attend un objet avec Id)
+                const body = JSON.stringify({ 
+                    id: currentSeanceId,
+                    valider: true, 
+                    commentaire: commentaire || "" 
+                });
+                
+                console.log('Envoi validation:', body);
+                
+                const response = await fetch(`${API_BASE}/api/CahierTexte/${currentSeanceId}/valider`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: body
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Erreur réponse:', errorText);
+                    let errorMessage = 'Erreur lors de la validation';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorData.title || errorMessage;
+                    } catch(e) {}
+                    throw new Error(errorMessage);
+                }
+                
+                const result = await response.json();
+                console.log('Résultat validation:', result);
+                
+                showGlobalAlert('✅ Séance validée avec succès', 'success');
+                closeValidationModal();
+                
+                // Recharger les séances pour tous les enseignants
+                for (const enseignant of currentEnseignants) {
+                    const enseignantId = enseignant.id || enseignant.Id;
+                    if (enseignantId) {
+                        delete seancesParEnseignant[enseignantId];
+                        await chargerSeancesPourEnseignant(enseignantId);
+                    }
+                }
+                
+                // Rafraîchir l'affichage
+                if (currentClasseId) {
+                    await viewClasseDetails(currentClasseId);
+                }
+                
+            } catch(e) {
+                console.error('Erreur validation:', e);
+                showAlert('validationModalAlert', 'error', e.message || '❌ Erreur lors de la validation');
+            }
+        }
+        
+        async function refuserSeance() {
+            if (!currentSeanceId) return;
+            const commentaire = document.getElementById('validationCommentaire').value;
+            
+            try {
+                const headers = { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                
+                // Correction : envoyer l'ID dans le body
+                const body = JSON.stringify({ 
+                    id: currentSeanceId,
+                    valider: false, 
+                    commentaire: commentaire || "Séance refusée" 
+                });
+                
+                console.log('Envoi refus:', body);
+                
+                const response = await fetch(`${API_BASE}/api/CahierTexte/${currentSeanceId}/valider`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: body
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Erreur réponse:', errorText);
+                    let errorMessage = 'Erreur lors du refus';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorData.title || errorMessage;
+                    } catch(e) {}
+                    throw new Error(errorMessage);
+                }
+                
+                const result = await response.json();
+                console.log('Résultat refus:', result);
+                
+                showGlobalAlert('❌ Séance refusée', 'warning');
+                closeValidationModal();
+                
+                // Recharger les séances pour tous les enseignants
+                for (const enseignant of currentEnseignants) {
+                    const enseignantId = enseignant.id || enseignant.Id;
+                    if (enseignantId) {
+                        delete seancesParEnseignant[enseignantId];
+                        await chargerSeancesPourEnseignant(enseignantId);
+                    }
+                }
+                
+                // Rafraîchir l'affichage
+                if (currentClasseId) {
+                    await viewClasseDetails(currentClasseId);
+                }
+                
+            } catch(e) {
+                console.error('Erreur refus:', e);
+                showAlert('validationModalAlert', 'error', e.message || '❌ Erreur lors du refus');
+            }
+        }
+        
+        function renderSeancesMini(seances, enseignantNom, enseignantId) {
+            if (!seances || seances.length === 0) {
+                return `<div class="empty-seances">📭 Aucune séance planifiée</div>`;
+            }
+            
+            const seancesRecent = [...seances].sort((a, b) => {
+                const dateA = a.Date || a.date;
+                const dateB = b.Date || b.date;
+                const valA = dateA?.$date || dateA;
+                const valB = dateB?.$date || dateB;
+                return new Date(valB) - new Date(valA);
+            }).slice(0, 3);
+            
+            return `
+                <div class="seances-mini-list">
+                    ${seancesRecent.map(seance => {
+                        const lecon = seance.Lecon || seance.lecon || {};
+                        const titre = lecon.titre || lecon.Titre || 'Séance sans titre';
+                        const date = formatSeanceDate(seance.Date || seance.date);
+                        const statut = seance.Statut || seance.statut || 'brouillon';
+                        const seanceInfo = seance.Seance || seance.seance || {};
+                        const heureDebut = seanceInfo.heureDebut || seanceInfo.HeureDebut || '';
+                        const duree = seanceInfo.duree || seanceInfo.Duree || 0;
+                        const heureAffichee = formaterHeureAvecIncrement(heureDebut, duree);
+                        const seanceId = seance.Id || seance.id;
+                        const showValidationButton = statut === 'soumis';
+                        return `
+                            <div class="seance-mini-item" style="${showValidationButton ? 'border-left: 3px solid #f59e0b;' : ''}">
+                                <div class="seance-mini-date">
+                                    <span>📅</span> ${date}
+                                    ${heureAffichee ? `<span style="margin-left:0.5rem;">⏰ ${heureAffichee}</span>` : ''}
+                                </div>
+                                <div class="seance-mini-titre" title="${escapeHtml(titre)}">${escapeHtml(titre.length > 50 ? titre.substring(0,47) + '...' : titre)}</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.3rem;">
+                                    <span class="seance-mini-statut ${getStatutClass(statut)}">${getStatutText(statut)}</span>
+                                    ${showValidationButton ? `
+                                        <button class="validation-btn" onclick="event.stopPropagation(); openValidationModal('${seanceId}', '${escapeHtml(enseignantNom)}')">
+                                            ✅ Valider
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                <div style="margin-top: 0.3rem;">
+                                    <span class="seance-mini-statut" style="font-size: 0.6rem; cursor: pointer; background: #e0e9e7;" onclick="event.stopPropagation(); showSeanceDetail('${seanceId}', '${escapeHtml(enseignantNom)}')">📖 Voir détails</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    ${seances.length > 3 ? `<div class="voir-plus-link" onclick="event.stopPropagation(); showAllSeancesEnseignant('${enseignantId}', '${escapeHtml(enseignantNom)}')">Voir les ${seances.length} séances →</div>` : ''}
+                </div>
+            `;
+        }
+        
+async function showSeanceDetail(seanceId, enseignantNom) {
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const response = await fetch(`${API_BASE}/api/CahierTexte/${seanceId}`, { headers });
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        const seance = data?.data;
+        
+        if (!seance) {
+            document.getElementById('seanceDetailContent').innerHTML = '<div class="empty-state">Séance introuvable</div>';
+            document.getElementById('seanceDetailModal').classList.add('active');
+            return;
+        }
+        
+        const lecon = seance.Lecon || seance.lecon || {};
+        const titre = lecon.titre || lecon.Titre || 'Séance sans titre';
+        const description = lecon.description || lecon.Description || 'Aucune description';
+        const objectifs = lecon.objectifs || lecon.Objectifs || [];
+        const ressources = lecon.ressources || lecon.Ressources || [];
+        const devoirs = seance.DevoirsDonnes || seance.devoirsDonnes || [];
+        const remarques = seance.Remarques || seance.remarques || '';
+        const date = formatSeanceDate(seance.Date || seance.date);
+        const statut = seance.Statut || seance.statut || 'brouillon';
+        const matiere = seance.MatiereNom || seance.matiereNom || 'Matière non spécifiée';
+        const seanceInfo = seance.Seance || seance.seance || {};
+        const heureDebut = seanceInfo.heureDebut || seanceInfo.HeureDebut || '';
+        const duree = seanceInfo.duree || seanceInfo.Duree || 0;
+        const commentaireValidation = seance.CommentaireValidation || seance.commentaireValidation || '';
+        const validePar = seance.ValidePar || seance.validePar || '';
+        const valideLe = seance.ValideLe || seance.valideLe;
+        
+        // Récupérer les fichiers joints
+        const fichiers = seance.Fichiers || seance.fichiers || [];
+        
+        const heureDebutIncrementee = incrementerHeure(heureDebut);
+        let heureFinIncrementee = '';
+        if (heureDebut && duree) {
+            const heureFinOriginale = ajouterDuree(heureDebut, duree);
+            heureFinIncrementee = incrementerHeure(heureFinOriginale);
+        }
+        
+        let validationInfo = '';
+        if (statut === 'valide' && validePar) {
+            let dateValidation = '';
+            if (valideLe) {
+                try {
+                    const vDate = valideLe.$date || valideLe;
+                    dateValidation = new Date(vDate).toLocaleDateString('fr-FR');
+                } catch(e) {}
+            }
+            validationInfo = `
+                <div style="margin-top: 1rem; background: #d1fae5; padding: 0.75rem; border-radius: 12px;">
+                    <strong>✅ Informations de validation :</strong>
+                    <p style="margin-top: 0.3rem;">Validé par : ${escapeHtml(validePar)}</p>
+                    ${dateValidation ? `<p>Date : ${dateValidation}</p>` : ''}
+                    ${commentaireValidation ? `<p>Commentaire : ${escapeHtml(commentaireValidation)}</p>` : ''}
+                </div>
+            `;
+        } else if (statut === 'refuse' && commentaireValidation) {
+            validationInfo = `
+                <div style="margin-top: 1rem; background: #fee2e2; padding: 0.75rem; border-radius: 12px;">
+                    <strong>❌ Raison du refus :</strong>
+                    <p style="margin-top: 0.3rem;">${escapeHtml(commentaireValidation)}</p>
+                </div>
+            `;
+        }
+        
+        // Générer l'affichage des fichiers joints
+        let fichiersHtml = '';
+        if (fichiers && fichiers.length > 0) {
+            fichiersHtml = `
+                <div style="margin-bottom: 1.5rem; background: #f8fafc; padding: 0.75rem; border-radius: 12px;">
+                    <strong>📎 Fichiers joints (${fichiers.length}) :</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        ${fichiers.map(f => {
+                            const nomFichier = f.nom || f.Nom || 'Fichier';
+                            const chemin = f.chemin || f.Chemin || '';
+                            const taille = f.taille || f.Taille || 0;
+                            const type = f.type || f.Type || '';
+                            
+                            // Déterminer l'icône selon le type
+                            let icon = '📎';
+                            if (type.includes('pdf')) icon = '📄';
+                            else if (type.includes('image')) icon = '🖼️';
+                            else if (type.includes('video')) icon = '🎬';
+                            else if (type.includes('word') || type.includes('document')) icon = '📝';
+                            else if (type.includes('excel') || type.includes('sheet')) icon = '📊';
+                            else if (type.includes('powerpoint') || type.includes('presentation')) icon = '📽️';
+                            
+                            // URL complète pour le téléchargement
+                            const downloadUrl = `${API_BASE}${chemin}`;
+                            
+                            return `
+                                <li style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span>${icon}</span>
+                                        <span>${escapeHtml(nomFichier)}</span>
+                                        <span style="font-size: 0.7rem; color: #5a9d91;">(${(taille / 1024).toFixed(1)} KB)</span>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <a href="${downloadUrl}" target="_blank" style="background: #4ca896; color: white; padding: 0.2rem 0.8rem; border-radius: 20px; text-decoration: none; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                            👁️ Ouvrir
+                                        </a>
+                                        <a href="${downloadUrl}" download style="background: #e0f2f1; color: #1e3b36; padding: 0.2rem 0.8rem; border-radius: 20px; text-decoration: none; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                            ⬇️ Télécharger
+                                        </a>
+                                    </div>
+                                </li>
+                            `;
+                        }).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        const showValidationButton = statut === 'soumis';
+        
+        document.getElementById('seanceDetailTitle').innerHTML = `📋 Séance - ${escapeHtml(enseignantNom)}`;
+        document.getElementById('seanceDetailContent').innerHTML = `
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #e0e9e7;">
+                    <span class="seance-mini-statut ${getStatutClass(statut)}" style="font-size: 0.85rem; padding: 0.3rem 1rem;">${getStatutText(statut)}</span>
+                    <span style="color: #5a9d91;">📅 ${date}</span>
+                    ${heureDebut ? `<span style="color: #5a9d91;">⏰ ${heureDebutIncrementee.substring(0,5)} - ${heureFinIncrementee.substring(0,5)} ${duree ? `(${duree} min)` : ''}</span>` : ''}
+                </div>
+                <h3 style="color: #1e3b36; margin-bottom: 1rem; font-size: 1.5rem;">📖 ${escapeHtml(titre)}</h3>
+                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 12px; margin-bottom: 1rem;">
+                    <strong>📖 Matière :</strong> ${escapeHtml(matiere)}
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <strong>📝 Description :</strong>
+                    <p style="margin-top: 0.5rem; color: #4b5563; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(description)}</p>
+                </div>
+                ${objectifs && objectifs.length > 0 ? `
+                <div style="margin-bottom: 1.5rem;">
+                    <strong>🎯 Objectifs pédagogiques :</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        ${objectifs.map(o => `<li style="margin-bottom: 0.3rem;">${escapeHtml(o)}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                ${ressources && ressources.length > 0 ? `
+                <div style="margin-bottom: 1.5rem;">
+                    <strong>📚 Supports et ressources :</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        ${ressources.map(r => `<li style="margin-bottom: 0.3rem;">${escapeHtml(r)}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                ${fichiersHtml}
+                ${devoirs && devoirs.length > 0 ? `
+                <div style="margin-bottom: 1.5rem;">
+                    <strong>✏️ Devoirs et travaux à rendre :</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                        ${devoirs.map(d => {
+                            const desc = d.description || d.Description || d;
+                            const dateLimite = d.dateLimite || d.DateLimite;
+                            let dateTexte = '';
+                            if (dateLimite) {
+                                try {
+                                    const dDate = dateLimite.$date || dateLimite;
+                                    dateTexte = ` <span style="color: #f57c00;">(à rendre avant le ${new Date(dDate).toLocaleDateString('fr-FR')})</span>`;
+                                } catch(e) {}
+                            }
+                            return `<li style="margin-bottom: 0.3rem;">${escapeHtml(desc)}${dateTexte}</li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                ${remarques ? `
+                <div style="margin-bottom: 1.5rem; background: #fff8e1; padding: 0.75rem; border-radius: 12px;">
+                    <strong>📝 Remarques et observations :</strong>
+                    <p style="margin-top: 0.5rem;">${escapeHtml(remarques)}</p>
+                </div>
+                ` : ''}
+                ${validationInfo}
+                ${showValidationButton ? `
+                <div class="validation-buttons" style="margin-top: 1.5rem;">
+                    <button class="btn-outline" onclick="closeSeanceDetailModal(); setTimeout(() => openValidationModal('${seanceId}', '${escapeHtml(enseignantNom)}'), 100)">❌ Refuser</button>
+                    <button class="btn-success" onclick="closeSeanceDetailModal(); setTimeout(() => openValidationModal('${seanceId}', '${escapeHtml(enseignantNom)}'), 100)">✅ Valider</button>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        document.getElementById('seanceDetailModal').classList.add('active');
+    } catch(e) {
+        console.error(e);
+        document.getElementById('seanceDetailContent').innerHTML = '<div class="empty-state">❌ Erreur lors du chargement de la séance</div>';
+        document.getElementById('seanceDetailModal').classList.add('active');
+    }
+}
+        
+        function closeSeanceDetailModal() {
+            document.getElementById('seanceDetailModal').classList.remove('active');
+        }
+        
+        async function showAllSeancesEnseignant(enseignantId, enseignantNom) {
+            const seances = seancesParEnseignant[enseignantId] || [];
+            if (seances.length === 0) {
+                document.getElementById('seanceDetailTitle').innerHTML = `📋 Séances - ${escapeHtml(enseignantNom)}`;
+                document.getElementById('seanceDetailContent').innerHTML = '<div class="empty-state">📭 Aucune séance trouvée pour cet enseignant</div>';
+                document.getElementById('seanceDetailModal').classList.add('active');
+                return;
+            }
+            
+            document.getElementById('seanceDetailTitle').innerHTML = `📋 Toutes les séances - ${escapeHtml(enseignantNom)} (${seances.length})`;
+            document.getElementById('seanceDetailContent').innerHTML = `
+                <div class="historique-list">
+                    ${seances.sort((a,b) => {
+                        const dateA = a.Date || a.date;
+                        const dateB = b.Date || b.date;
+                        const valA = dateA?.$date || dateA;
+                        const valB = dateB?.$date || dateB;
+                        return new Date(valB) - new Date(valA);
+                    }).map(seance => {
+                        const lecon = seance.Lecon || seance.lecon || {};
+                        const titre = lecon.titre || lecon.Titre || 'Séance sans titre';
+                        const date = formatSeanceDate(seance.Date || seance.date);
+                        const statut = seance.Statut || seance.statut || 'brouillon';
+                        const seanceInfo = seance.Seance || seance.seance || {};
+                        const heureDebut = seanceInfo.heureDebut || seanceInfo.HeureDebut || '';
+                        const duree = seanceInfo.duree || seanceInfo.Duree || 0;
+                        const heureAffichee = formaterHeureAvecIncrement(heureDebut, duree);
+                        const seanceId = seance.Id || seance.id;
+                        return `
+                            <div class="historique-item" style="cursor: pointer;" onclick="showSeanceDetail('${seanceId}', '${escapeHtml(enseignantNom)}'); document.getElementById('seanceDetailModal').classList.remove('active'); setTimeout(() => document.getElementById('seanceDetailModal').classList.add('active'), 100);">
+                                <div class="historique-date">📅 ${date}</div>
+                                <div style="flex: 1;"><strong>${escapeHtml(titre.length > 60 ? titre.substring(0,57) + '...' : titre)}</strong></div>
+                                <div style="font-size: 0.7rem; color: #5a9d91;">${heureAffichee}</div>
+                                <span class="seance-mini-statut ${getStatutClass(statut)}">${getStatutText(statut)}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="validation-buttons" style="margin-top: 1rem; justify-content: center;">
+                    <button class="btn-outline" onclick="closeSeanceDetailModal()">Fermer</button>
+                </div>
+            `;
+            document.getElementById('seanceDetailModal').classList.add('active');
+        }
+        
+        // Fonctions d'affichage des classes (simplifiées pour la longueur - à garder identiques)
+        function displayClassesByNiveau(niveau) {
+            const classes = filteredClasses.filter(c=>getValue(c,'niveau')===niveau);
+            const container = document.getElementById('mainContainer'); if(!container) return;
+            if(!classes.length) { container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">📭</div><h3>Aucune classe dans ce niveau</h3><button class="btn-primary" onclick="openCreateModal()">➕ Nouvelle classe</button></div>`; return; }
+            
+            Promise.all(classes.map(async (classe) => {
+                const classeId = getValue(classe, 'id') || getValue(classe, 'Id');
+                try {
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                    
+                    const elevesRes = await fetch(`${API_BASE}/api/Eleve/par-classe/${classeId}`, { headers });
+                    let eleves = [];
+                    if (elevesRes.ok) {
+                        const res = await elevesRes.json();
+                        eleves = res.Success ? res.Data : (res.data ? res.data : (Array.isArray(res) ? res : []));
+                    }
+                    
+                    const absencesRes = await fetch(`${API_BASE}/api/Absence`, { headers });
+                    let absences = [];
+                    if (absencesRes.ok) {
+                        let abs = await absencesRes.json();
+                        absences = abs.Success ? abs.Data : (abs.data ? abs.data : (abs.$values ? abs.$values : abs));
+                        const eleveIds = eleves.map(e => e.Id || e.id || e._id);
+                        absences = absences.filter(a => eleveIds.includes(a.EleveId || a.eleveId));
+                    }
+                    
+                    const remarquesRes = await fetch(`${API_BASE}/api/Remarque`, { headers });
+                    let remarques = [];
+                    if (remarquesRes.ok) {
+                        let rem = await remarquesRes.json();
+                        remarques = rem.Success ? rem.Data : (rem.data ? rem.data : (rem.$values ? rem.$values : rem));
+                        const eleveIds = eleves.map(e => e.Id || e.id || e._id);
+                        remarques = remarques.filter(r => eleveIds.includes(r.EleveId || r.eleveId));
+                    }
+                    
+                    let presents = 0, retards = 0, absents = 0;
+                    absences.forEach(a => {
+                        const t = a.Type || a.type;
+                        if (t === 'presence' || t === 'present') presents++;
+                        else if (t === 'retard') retards++;
+                        else if (t === 'absence') absents++;
+                    });
+                    
+                    const tuteur = getValue(classe, 'tuteur') || getValue(classe, 'Tuteur');
+                    
+                    return {
+                        id: classeId,
+                        nomFormate: formatClasseNom(classe),
+                        niveau: getValue(classe, 'niveau'),
+                        annee: getValue(classe, 'anneeScolaire'),
+                        effectif: eleves.length,
+                        presents: presents,
+                        retards: retards,
+                        absents: absents,
+                        remarques: remarques.length,
+                        tuteur: tuteur
+                    };
+                } catch(e) {
+                    return {
+                        id: classeId,
+                        nomFormate: formatClasseNom(classe),
+                        niveau: getValue(classe, 'niveau'),
+                        annee: getValue(classe, 'anneeScolaire'),
+                        effectif: 0,
+                        presents: 0, retards: 0, absents: 0, remarques: 0,
+                        tuteur: getValue(classe, 'tuteur') || getValue(classe, 'Tuteur')
+                    };
+                }
+            })).then(classesData => {
+                container.innerHTML = `<div class="breadcrumb"><span onclick="showNiveauxView()">Tous les niveaux</span> / <span>${getNiveauLibelle(niveau)}</span></div>
+                    <div class="classes-grid">${classesData.map(c => {
+                        return `<div class="classe-card" onclick="viewClasseDetails('${c.id}')">
+                            <div class="classe-card-header">
+                                <div class="classe-info-left">
+                                    <div class="classe-nom-principal">${escapeHtml(c.nomFormate)}</div>
+                                    <div class="classe-niveau-detail">📖 ${getNiveauLibelle(c.niveau)}</div>
+                                </div>
+                                <div class="classe-actions">
+                                    <div class="classe-annee-badge">📅 ${c.annee}</div>
+                                    <button class="btn-icon-card delete-card-btn" onclick="openDeleteModal('${c.id}', event)" title="Supprimer la classe">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="classe-stats-container">
+                                <div class="stat-item">
+                                    <span class="stat-icon">👥</span>
+                                    <div class="stat-value">${c.effectif}</div>
+                                    <div class="stat-label">Élèves</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">✅</span>
+                                    <div class="stat-value" style="color: #2e7d32;">${c.presents}</div>
+                                    <div class="stat-label">Présences</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">⏰</span>
+                                    <div class="stat-value" style="color: #f57c00;">${c.retards}</div>
+                                    <div class="stat-label">Retards</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">❌</span>
+                                    <div class="stat-value" style="color: #c62828;">${c.absents}</div>
+                                    <div class="stat-label">Absences</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-icon">📝</span>
+                                    <div class="stat-value" style="color: #1976d2;">${c.remarques}</div>
+                                    <div class="stat-label">Remarques</div>
+                                </div>
+                            </div>
+                            <div class="classe-footer">
+                                <div class="classe-view-link" onclick="event.stopPropagation(); viewClasseDetails('${c.id}')">
+                                    Voir détails <span>→</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('')}</div>`;
+            });
+        }
+        
+        async function viewClasseDetails(id) {
+            currentClasseId = id;
+            document.getElementById('searchContainer').style.display='none';
+            document.getElementById('backButton').style.display='flex';
+            document.getElementById('mainTitle').innerHTML = '📋 Détails de la classe';
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = '<div class="loading">Chargement...</div>';
+            try {
+                const headers = { 'Content-Type':'application/json' };
+                if(token) headers['Authorization'] = `Bearer ${token}`;
+                const classeRes = await fetch(`${API_BASE}/api/Classe/${id}/details-complets`,{headers});
+                if(!classeRes.ok) throw new Error();
+                currentClasse = await classeRes.json();
+                
+                const elevesRes = await fetch(`${API_BASE}/api/Eleve/par-classe/${id}`,{headers});
+                if(elevesRes.ok) { const res=await elevesRes.json(); currentEleves = res.Success?res.Data:(res.data?res.data:(Array.isArray(res)?res:[])); }
+                else currentEleves=[];
+                
+                const absencesRes = await fetch(`${API_BASE}/api/Absence`,{headers});
+                if(absencesRes.ok) { let abs=await absencesRes.json(); abs=abs.Success?abs.Data:(abs.data?abs.data:(abs.$values?abs.$values:abs)); const eleveIds=currentEleves.map(e=>e.Id||e.id||e._id); currentAbsences=abs.filter(a=>eleveIds.includes(a.EleveId||a.eleveId)); }
+                else currentAbsences=[];
+                
+                const remarquesRes = await fetch(`${API_BASE}/api/Remarque`,{headers});
+                if(remarquesRes.ok) { let rem=await remarquesRes.json(); rem=rem.Success?rem.Data:(rem.data?rem.data:(rem.$values?rem.$values:rem)); const eleveIds=currentEleves.map(e=>e.Id||e.id||e._id); currentRemarques=rem.filter(r=>eleveIds.includes(r.EleveId||r.eleveId)); }
+                else currentRemarques=[];
+                
+                const ensRes = await fetch(`${API_BASE}/api/EmploiDuTemps/classe/${id}/enseignants?anneeScolaire=2025-2026`,{headers});
+                if(ensRes.ok) { const ens=await ensRes.json(); currentEnseignants=ens.Success?ens.Data:(ens.data?ens.data:[]); }
+                else currentEnseignants=[];
+                
+                for (const enseignant of currentEnseignants) {
+                    const enseignantId = enseignant.id || enseignant.Id;
+                    if (enseignantId) {
+                        await chargerSeancesPourEnseignant(enseignantId);
+                    }
+                }
+                
+                displayClasseDetails();
+            } catch(e) { console.error(e); container.innerHTML = `<div class="empty-state"><div>❌</div><h3>Erreur</h3><button class="btn-primary" onclick="showNiveauClasses('${currentNiveau}')">Retour</button></div>`; }
+        }
+        
+        function getElevePresenceStats(eleveId) {
+            const p = currentAbsences.filter(a=>(a.EleveId||a.eleveId)===eleveId);
+            let presents=0, retards=0, absents=0;
+            p.forEach(pp=>{ const t=pp.Type||pp.type; if(t==='presence'||t==='present') presents++; else if(t==='retard') retards++; else if(t==='absence') absents++; });
+            return { presents, retards, absents, total:p.length, details:p };
+        }
+        
+        function getEleveRemarqueStats(eleveId) {
+            const r = currentRemarques.filter(rem=>(rem.EleveId||rem.eleveId)===eleveId);
+            return { total: r.length, details: r };
+        }
+        
+        function showEleveHistoriquePresence(eleveId, eleveNom) {
+            const stats = getElevePresenceStats(eleveId);
+            const modal = document.getElementById('historiquePresenceModal');
+            document.getElementById('historiquePresenceTitle').innerHTML = `📋 Historique des présences - ${escapeHtml(eleveNom)}`;
+            const content = document.getElementById('historiquePresenceContent');
+            if(stats.total===0) content.innerHTML = `<div class="empty-state"><div>📋</div><h3>Aucun enregistrement</h3></div>`;
+            else {
+                let html = `<div style="display:flex;gap:1rem;margin-bottom:1.5rem;padding:1rem;background:#f8fafc;border-radius:16px;">
+                    <div style="flex:1;text-align:center;"><div style="font-size:1.8rem;color:#2e7d32;">${stats.presents}</div><div>Présents</div></div>
+                    <div style="flex:1;text-align:center;"><div style="font-size:1.8rem;color:#f57c00;">${stats.retards}</div><div>Retards</div></div>
+                    <div style="flex:1;text-align:center;"><div style="font-size:1.8rem;color:#c62828;">${stats.absents}</div><div>Absences</div></div>
+                    <div style="flex:1;text-align:center;"><div style="font-size:1.8rem;color:#1e3b36;">${stats.total}</div><div>Total</div></div>
+                </div><div class="historique-list">`;
+                [...stats.details].sort((a,b)=>{ 
+                    let da=a.Date||a.date, db=b.Date||b.date; 
+                    if(da && da.$date) da = da.$date;
+                    if(db && db.$date) db = db.$date;
+                    return new Date(db) - new Date(da);
+                }).forEach(p=>{
+                    let date=p.Date||p.date; 
+                    if(date){ 
+                        if(date.$date) date=new Date(date.$date).toLocaleDateString('fr-FR'); 
+                        else date=new Date(date).toLocaleDateString('fr-FR'); 
+                    } else date='Date inconnue';
+                    const type=p.Type||p.type; 
+                    let status='', cls=''; 
+                    if(type==='presence'||type==='present'){ status='✅ Présent'; cls='present'; } 
+                    else if(type==='retard'){ status='⏰ Retard'; cls='retard'; } 
+                    else{ status='❌ Absent'; cls='absent'; }
+                    html += `<div class="historique-item"><div class="historique-date">📅 ${date}</div><div class="historique-status"><span class="presence-badge ${cls}">${status}</span></div><div class="historique-motif">📝 ${escapeHtml(p.Motif||p.motif||'Non spécifié')}</div></div>`;
+                });
+                html += `</div>`;
+                content.innerHTML = html;
+            }
+            modal.classList.add('active');
+        }
+        
+        function showEleveHistoriqueRemarque(eleveId, eleveNom) {
+            const stats = getEleveRemarqueStats(eleveId);
+            const modal = document.getElementById('historiqueRemarqueModal');
+            document.getElementById('historiqueRemarqueTitle').innerHTML = `📝 Historique des remarques - ${escapeHtml(eleveNom)}`;
+            const content = document.getElementById('historiqueRemarqueContent');
+            if(stats.total===0) content.innerHTML = `<div class="empty-state"><div>📝</div><h3>Aucune remarque</h3></div>`;
+            else {
+                let html = `<div style="margin-bottom:1.5rem;padding:1rem;background:#f8fafc;border-radius:16px;text-align:center;"><div style="font-size:2rem;font-weight:700;">${stats.total}</div><div>Remarque(s)</div></div><div class="historique-list">`;
+                [...stats.details].sort((a,b)=>{ 
+                    let da=a.Date||a.date, db=b.Date||b.date; 
+                    if(da && da.$date) da = da.$date;
+                    if(db && db.$date) db = db.$date;
+                    return new Date(db) - new Date(da);
+                }).forEach(r=>{
+                    let date=r.Date||r.date; 
+                    if(date){ 
+                        if(date.$date) date=new Date(date.$date).toLocaleDateString('fr-FR'); 
+                        else date=new Date(date).toLocaleDateString('fr-FR'); 
+                    } else date='Date inconnue';
+                    const type = r.Type||r.type||'générale';
+                    const gravite = r.Gravite||r.gravite||'moyenne';
+                    let typeClass=''; if(type==='comportement') typeClass='type-comportement'; else if(type==='discipline') typeClass='type-discipline'; else if(type==='travail') typeClass='type-travail'; else if(type==='participation') typeClass='type-participation'; else typeClass='type-comportement';
+                    let graviteClass=''; if(gravite==='faible') graviteClass='gravite-faible'; else if(gravite==='moyenne') graviteClass='gravite-moyenne'; else graviteClass='gravite-elevee';
+                    html += `<div class="historique-item">
+                        <div class="historique-date">📅 ${date}</div>
+                        <div><span class="remarque-badge ${typeClass}">${type}</span> <span class="${graviteClass}" style="padding:0.2rem 0.5rem;border-radius:20px;font-size:0.7rem;">${gravite}</span></div>
+                        <div class="historique-motif">📝 ${escapeHtml(r.Contenu||r.contenu||'')}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+                content.innerHTML = html;
+            }
+            modal.classList.add('active');
+        }
+        
+        function closeHistoriquePresenceModal() { document.getElementById('historiquePresenceModal').classList.remove('active'); }
+        function closeHistoriqueRemarqueModal() { document.getElementById('historiqueRemarqueModal').classList.remove('active'); }
+
+        function displayClasseDetails() {
+            const classe = currentClasse; if(!classe) return;
+            const effectif = currentEleves.length;
+            const capacite = getValue(classe,'capaciteMax')||30;
+            const tuteur = getValue(classe,'tuteur')||getValue(classe,'Tuteur');
+            const nomFormate = formatClasseNom(classe);
+            const niveauComplet = getNiveauLibelle(getValue(classe,'niveau')||'');
+            const container = document.getElementById('mainContainer'); if(!container) return;
+            container.innerHTML = `<div class="breadcrumb"><span onclick="showNiveauClasses('${getValue(classe,'niveau')}')">${niveauComplet}</span> / <span>${nomFormate}</span></div>
+                <div class="classe-details-page">
+                    <div class="classe-header-details">
+                        <div class="classe-title"><h1 class="classe-name">${nomFormate}</h1><span class="classe-year">${getValue(classe,'anneeScolaire')}</span></div>
+                        <div style="display:flex;gap:1rem;">${tuteur?`<div class="classe-titulaire"><div class="titulaire-avatar">${(getValue(tuteur,'prenom')||'')[0]}${(getValue(tuteur,'nom')||'')[0]}</div><div><h3>${getValue(tuteur,'prenom')||''} ${getValue(tuteur,'nom')||''}</h3><p>${getValue(tuteur,'estPermanent')?'Permanent':'Titulaire'}</p></div></div>`:''}
+                        <button class="btn-primary" onclick="showAssignerEnseignantModal('${getValue(classe,'id')||getValue(classe,'Id')}')"><span>➕</span> Assigner</button></div>
+                    </div>
+                    <div class="quick-stats">
+                        <div class="quick-stat-card"><div class="quick-stat-icon">👥</div><div><h4>Effectif</h4><div class="stat-number">${effectif}</div></div></div>
+                        <div class="quick-stat-card"><div class="quick-stat-icon">📊</div><div><h4>Capacité</h4><div class="stat-number">${capacite}</div></div></div>
+                        <div class="quick-stat-card"><div class="quick-stat-icon">👨‍🏫</div><div><h4>Enseignants</h4><div class="stat-number">${currentEnseignants.length}</div></div></div>
+                        <div class="quick-stat-card"><div class="quick-stat-icon">📝</div><div><h4>Remarques</h4><div class="stat-number">${currentRemarques.length}</div></div></div>
+                    </div>
+                    <div class="details-nav">
+                        <button class="details-nav-btn active" onclick="switchTab('eleves',event)">👥 Élèves (${effectif})</button>
+                        <button class="details-nav-btn" onclick="switchTab('enseignants',event)">👨‍🏫 Enseignants (${currentEnseignants.length})</button>
+                        <button class="details-nav-btn" onclick="switchTab('presences',event)">📋 Présences (${currentAbsences.length})</button>
+                        <button class="details-nav-btn" onclick="switchTab('remarques',event)">📝 Remarques (${currentRemarques.length})</button>
+                    </div>
+                    <div id="tabContent">${displayElevesTab()}</div>
+                </div>`;
+            currentTab='eleves';
+        }
+        
+        function switchTab(tab,event) {
+            currentTab=tab;
+            document.querySelectorAll('.details-nav-btn').forEach(b=>b.classList.remove('active'));
+            event.target.classList.add('active');
+            let content='';
+            if(tab==='eleves') content=displayElevesTab();
+            else if(tab==='enseignants') content=displayEnseignantsTab();
+            else if(tab==='presences') content=displayPresencesTab();
+            else if(tab==='remarques') content=displayRemarquesTab();
+            document.getElementById('tabContent').innerHTML=content;
+        }
+        
+        function displayElevesTab() {
+            if(!currentEleves.length) return `<div class="empty-state"><div>👥</div><h3>Aucun élève</h3></div>`;
+            return `<div><div class="section-header"><h2 class="section-title"><span>👥</span> Liste des élèves (${currentEleves.length})</h2></div>
+                <div class="eleves-table-container"><table class="eleves-table"><thead> <th>Élève</th><th>Matricule</th><th>Sexe</th><th>Statistiques</th> </thead><tbody>${
+                    currentEleves.map(e=>{
+                        const prenom=getValue(e,'prenom')||getValue(e,'Prenom')||'';
+                        const nom=getValue(e,'nom')||getValue(e,'Nom')||'';
+                        const matricule=getValue(e,'identifiantEcole')||getValue(e,'IdentifiantEcole')||'N/A';
+                        const sexe=getValue(e,'sexe')||getValue(e,'Sexe')||'Non spécifié';
+                        const eId=e.Id||e.id||e._id;
+                        const pStats=getElevePresenceStats(eId);
+                        const rStats=getEleveRemarqueStats(eId);
+                        const nomComplet=`${prenom} ${nom}`.trim()||'Élève';
+                        return `
+                            <tr>
+                                <td><div style="display:flex;gap:0.8rem;"><div class="eleve-avatar">${(prenom[0]||'')+(nom[0]||'')}</div><div><strong>${escapeHtml(nomComplet)}</strong></div></div>
+                                <td>${escapeHtml(matricule)}
+                                <td><span style="background:#e0f2f1;padding:0.2rem 0.8rem;border-radius:20px;">${sexe==='M'?'👦 Garçon':sexe==='F'?'👧 Fille':sexe}</span>
+                                <td><div class="stats-cell">
+                                    <div class="stat-badge present" onclick="showEleveHistoriquePresence('${eId}','${escapeHtml(nomComplet)}')"><span class="stat-icon">✅</span><span class="stat-number">${pStats.presents}</span><span class="stat-label">présent(s)</span></div>
+                                    <div class="stat-badge retard" onclick="showEleveHistoriquePresence('${eId}','${escapeHtml(nomComplet)}')"><span class="stat-icon">⏰</span><span class="stat-number">${pStats.retards}</span><span class="stat-label">retard(s)</span></div>
+                                    <div class="stat-badge absent" onclick="showEleveHistoriquePresence('${eId}','${escapeHtml(nomComplet)}')"><span class="stat-icon">❌</span><span class="stat-number">${pStats.absents}</span><span class="stat-label">absent(s)</span></div>
+                                    <div class="stat-badge remarque" onclick="showEleveHistoriqueRemarque('${eId}','${escapeHtml(nomComplet)}')"><span class="stat-icon">📝</span><span class="stat-number">${rStats.total}</span><span class="stat-label">remarque(s)</span></div>
+                                </div>
+                            </tr>
+                        `;
+                    }).join('')
+                }</tbody>
+            </div></div>`;
+        }
+        
+        function displayEnseignantsTab() {
+            if(!currentEnseignants.length) return `<div class="empty-state"><div>👨‍🏫</div><h3>Aucun enseignant</h3><button class="btn-primary" onclick="showAssignerTuteurModal('${currentClasseId}')">➕ Assigner</button></div>`;
+            return `<div><div class="section-header"><h2 class="section-title">👨‍🏫 Équipe enseignante (${currentEnseignants.length})</h2><button class="btn-primary" onclick="showAssignerTuteurModal('${currentClasseId}')">➕ Assigner</button></div>
+                <div class="enseignants-grid">${currentEnseignants.map(e=>{
+                    const prenom=e.prenom||'Inconnu', nom=e.nom||'', email=e.email||'', tel=e.telephone||'', sp=e.specialites||[], estTitulaire=e.estTitulaire||false, estPerm=e.estPermanent||false, heures=e.heuresParMatiere||{};
+                    const enseignantId = e.id || e.Id;
+                    const seances = seancesParEnseignant[enseignantId] || [];
+                    const col=estPerm?'#ff9466':'#4ca896';
+                    return `<div class="enseignant-card ${estPerm?'permanent':''}" style="border-left:4px solid ${col};">
+                        <div style="display:flex;gap:1rem;">
+                            <div style="width:60px;height:60px;background:linear-gradient(135deg,${col},${estPerm?'#ff7b3a':'#2d6b63'});border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;">${(prenom[0]||'')}${(nom[0]||'')}</div>
+                            <div>
+                                <h4>${escapeHtml(prenom)} ${escapeHtml(nom)}</h4>
+                                <p>${escapeHtml(email)}</p>
+                                ${tel?`<p>📞 ${escapeHtml(tel)}</p>`:''}
+                            </div>
+                        </div>
+                        <div style="margin:1rem 0;padding:0.8rem 0;border-top:2px dashed #e0e9e7;">
+                            <div><strong>📚 Matières :</strong></div>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.5rem; margin-top:0.3rem;">
+                                ${Object.entries(heures).length?Object.entries(heures).map(([m,h])=>`<span style="background:#e0f2f1;padding:0.3rem 1rem;border-radius:30px;">${escapeHtml(m)} (${h}h)</span>`).join(''):sp.length?sp.map(m=>`<span style="background:#e0f2f1;padding:0.3rem 1rem;border-radius:30px;">${escapeHtml(m)}</span>`).join(''):'<span>Aucune</span>'}
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:0.5rem; margin-bottom:1rem;">
+                            ${estTitulaire?'<span style="background:#ff9466;color:white;padding:0.3rem 1rem;border-radius:30px;">👑 TITULAIRE</span>':''}
+                            ${estPerm?'<span style="background:#4ca896;color:white;padding:0.3rem 1rem;border-radius:30px;">📌 PERMANENT</span>':''}
+                        </div>
+                        
+                        <div class="cahier-texte-section">
+                            <div class="cahier-header">
+                                <h5>📋 Cahier de texte <span style="font-size:0.7rem; color:#5a9d91;">(${seances.length} séance${seances.length>1?'s':''})</span></h5>
+                                <button class="btn-outline btn-sm" onclick="event.stopPropagation(); showAllSeancesEnseignant('${enseignantId}', '${escapeHtml(prenom)} ${escapeHtml(nom)}')" style="padding:0.2rem 0.6rem; font-size:0.7rem;">Voir tout</button>
+                            </div>
+                            ${renderSeancesMini(seances, `${prenom} ${nom}`, enseignantId)}
+                        </div>
+                    </div>`;
+                }).join('')}</div></div>`;
+        }
+        
+        function displayPresencesTab() {
+            // Grouper par date avec format standard YYYY-MM-DD
+            const byDate = {};
+            currentAbsences.forEach(a => {
+                let d = a.Date || a.date;
+                if (d) {
+                    // Gérer les différents formats de date
+                    let dateKey;
+                    if (d && d.$date) {
+                        dateKey = new Date(d.$date).toISOString().split('T')[0];
+                    } else if (typeof d === 'string') {
+                        dateKey = d.split('T')[0];
+                    } else {
+                        dateKey = new Date(d).toISOString().split('T')[0];
+                    }
+                    if (!byDate[dateKey]) byDate[dateKey] = [];
+                    byDate[dateKey].push(a);
+                }
+            });
+            
+            // Trier les dates du plus récent au plus ancien
+            const dates = Object.keys(byDate).sort((a, b) => new Date(b) - new Date(a));
+            
+            if (!dates.length) return `<div class="empty-state"><div>📋</div><h3>Aucune présence</h3></div>`;
+            
+            let totalP = 0, totalR = 0, totalA = 0;
+            currentAbsences.forEach(a => {
+                const t = a.Type || a.type;
+                if (t === 'presence' || t === 'present') totalP++;
+                else if (t === 'retard') totalR++;
+                else if (t === 'absence') totalA++;
+            });
+            
+            let html = `<div>
+                <div class="section-header"><h2 class="section-title">📋 Historique des présences</h2></div>
+                <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
+                    ${[[totalP, 'Présences', '#2e7d32'], [totalR, 'Retards', '#f57c00'], [totalA, 'Absences', '#c62828'], [currentAbsences.length, 'Total', '#1e3b36']].map(([v, l, color]) => `
+                        <div class="presence-stats-card" style="flex:1;min-width:100px;">
+                            <div class="presence-stats-number" style="color:${color};">${v}</div>
+                            <div class="presence-stats-label">${l}</div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            
+            for (const date of dates) {
+                const dObj = new Date(date);
+                const dateFormatee = dObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+                const jourSemaine = dObj.toLocaleDateString('fr-FR', { weekday: 'long' });
+                
+                // Compter les statuts pour cette date
+                const statsDate = { presents: 0, retards: 0, absents: 0 };
+                byDate[date].forEach(a => {
+                    const t = a.Type || a.type;
+                    if (t === 'presence' || t === 'present') statsDate.presents++;
+                    else if (t === 'retard') statsDate.retards++;
+                    else if (t === 'absence') statsDate.absents++;
+                });
+                
+                html += `
+                    <div style="margin-bottom: 2rem; background: #f8fafc; border-radius: 20px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e0e9e7;">
+                            <h3 style="color: #1e3b36; margin: 0;">📅 ${dateFormatee}</h3>
+                            <div style="display: flex; gap: 0.8rem;">
+                                <span style="background: #e8f5e9; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;">✅ ${statsDate.presents} présent(s)</span>
+                                <span style="background: #fff8e1; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;">⏰ ${statsDate.retards} retard(s)</span>
+                                <span style="background: #ffebee; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;">❌ ${statsDate.absents} absent(s)</span>
+                            </div>
+                        </div>
+                        <div class="eleves-table-container">
+                            <table class="eleves-table">
+                                <thead>
+                                    <tr>
+                                        <th>Élève</th>
+                                        <th>Statut</th>
+                                        <th>Motif</th>
+                                        <th>Durée</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+                
+                // Trier les absences de cette date par nom d'élève
+                const absencesDate = [...byDate[date]].sort((a, b) => {
+                    const eIdA = a.EleveId || a.eleveId;
+                    const eIdB = b.EleveId || b.eleveId;
+                    const eleveA = currentEleves.find(e => (e.Id || e.id || e._id) === eIdA);
+                    const eleveB = currentEleves.find(e => (e.Id || e.id || e._id) === eIdB);
+                    const nomA = eleveA ? `${getValue(eleveA, 'prenom') || ''} ${getValue(eleveA, 'nom') || ''}`.trim() : 'Élève inconnu';
+                    const nomB = eleveB ? `${getValue(eleveB, 'prenom') || ''} ${getValue(eleveB, 'nom') || ''}`.trim() : 'Élève inconnu';
+                    return nomA.localeCompare(nomB);
+                });
+                
+                for (const a of absencesDate) {
+                    const eId = a.EleveId || a.eleveId;
+                    const eleve = currentEleves.find(e => (e.Id || e.id || e._id) === eId);
+                    const nom = eleve ? `${getValue(eleve, 'prenom') || ''} ${getValue(eleve, 'nom') || ''}`.trim() : 'Élève inconnu';
+                    const t = a.Type || a.type;
+                    let status = '', cls = '';
+                    if (t === 'presence' || t === 'present') {
+                        status = '✅ Présent';
+                        cls = 'present';
+                    } else if (t === 'retard') {
+                        status = '⏰ Retard';
+                        cls = 'retard';
+                    } else {
+                        status = '❌ Absent';
+                        cls = 'absent';
+                    }
+                    const motif = a.Motif || a.motif || 'Non spécifié';
+                    const duree = a.Duree || a.duree || 1;
+                    html += `
+                        <tr>
+                            <td><strong>${escapeHtml(nom)}</strong></td>
+                            <td><span class="presence-badge ${cls}">${status}</span></td>
+                            <td>${escapeHtml(motif)}</td>
+                            <td>${duree} h</td>
+                        </tr>
+                    `;
+                }
+                
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `</div>`;
+            return html;
+        }
+        
+        function displayRemarquesTab() {
+            const byDate={};
+            currentRemarques.forEach(r=>{ let d=r.Date||r.date; if(d){ if(d.$date) d=new Date(d.$date).toISOString().split('T')[0]; else if(typeof d==='string') d=d.split('T')[0]; if(!byDate[d]) byDate[d]=[]; byDate[d].push(r); } });
+            const dates=Object.keys(byDate).sort().reverse();
+            if(!dates.length) return `<div class="empty-state"><div>📝</div><h3>Aucune remarque</h3></div>`;
+            let html=`<div><div class="section-header"><h2 class="section-title">📝 Historique des remarques</h2></div>
+                <div style="margin-bottom:2rem;padding:1rem;background:#f8fafc;border-radius:16px;text-align:center;"><div class="presence-stats-number">${currentRemarques.length}</div><div>Remarque(s) au total</div></div>`;
+            for(const date of dates){
+                const dObj=new Date(date); const dateFormatee=dObj.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+                html+=`<div style="margin-bottom:2rem;background:#f8fafc;border-radius:16px;padding:1rem;"><h3>📅 ${dateFormatee}</h3><div class="eleves-table-container"><table class="eleves-table"><thead><th>Élève</th><th>Type</th><th>Gravité</th><th>Remarque</th></thead><tbody>`;
+                byDate[date].forEach(r=>{
+                    const eId=r.EleveId||r.eleveId;
+                    const eleve=currentEleves.find(e=>(e.Id||e.id||e._id)===eId);
+                    const nom=eleve?`${getValue(eleve,'prenom')||''} ${getValue(eleve,'nom')||''}`.trim():'Élève inconnu';
+                    const type=r.Type||r.type||'générale';
+                    const gravite=r.Gravite||r.gravite||'moyenne';
+                    let typeClass=''; if(type==='comportement') typeClass='type-comportement'; else if(type==='discipline') typeClass='type-discipline'; else if(type==='travail') typeClass='type-travail'; else if(type==='participation') typeClass='type-participation'; else typeClass='type-comportement';
+                    let graviteClass=''; if(gravite==='faible') graviteClass='gravite-faible'; else if(gravite==='moyenne') graviteClass='gravite-moyenne'; else graviteClass='gravite-elevee';
+                    html+=`
+                        <tr><strong>${escapeHtml(nom)}</strong>
+                        <td><span class="remarque-badge ${typeClass}">${type}</span>
+                        <td><span class="${graviteClass}" style="padding:0.2rem 0.6rem;border-radius:20px;font-size:0.7rem;">${gravite}</span>
+                        <td>${escapeHtml(r.Contenu||r.contenu||'')}
+                    `;
+                });
+                html+=`</tbody>
+            </div></div>`;
+            }
+            html+=`</div>`;
+            return html;
+        }
+        
+        function openCreateModal() { document.getElementById('classeForm').reset(); document.getElementById('capaciteMax').value='30'; if(currentNiveau) document.getElementById('niveau').value=currentNiveau; document.getElementById('classeModal').classList.add('active'); }
+        function closeModal() { document.getElementById('classeModal').classList.remove('active'); document.getElementById('modalAlert').innerHTML=''; }
+        function openDeleteModal(id,e) { e.stopPropagation(); deleteClasseId=id; document.getElementById('deleteModal').classList.add('active'); }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); document.getElementById('deleteModalAlert').innerHTML=''; deleteClasseId=null; }
+        async function confirmDelete() { if(!deleteClasseId) return; try{ const h={'Content-Type':'application/json'}; if(token) h['Authorization']=`Bearer ${token}`; const r=await fetch(`${API_BASE}/api/Classe/${deleteClasseId}`,{method:'DELETE',headers:h}); if(!r.ok)throw new Error(); showAlert('deleteModalAlert','success','✅ Supprimée'); setTimeout(()=>{closeDeleteModal();loadClasses();},1500); }catch(e){showAlert('deleteModalAlert','error','❌ Erreur');} }
+        async function showAssignerEnseignantModal(classeId) { currentClasseId=classeId; try{ const h={'Content-Type':'application/json'}; if(token) h['Authorization']=`Bearer ${token}`; const r=await fetch(`${API_BASE}/api/utilisateurs/role/enseignant`,{headers:h}); if(!r.ok)throw new Error(); const ens=await r.json(); const s=document.getElementById('enseignantSelect'); s.innerHTML='<option value="">Sélectionner</option>'; ens.forEach(e=>{ const id=e.id||e._id||e.Id; const prenom=e.prenom||e.Prenom||''; const nom=e.nom||e.Nom||''; s.innerHTML+=`<option value="${id}">${prenom} ${nom}</option>`; }); document.getElementById('estTuteurCheck').checked=false; document.getElementById('assignModal').style.display='flex'; document.getElementById('assignModal').classList.add('active'); }catch(e){alert('Erreur');} }
+        function showAssignerTuteurModal(classeId){ showAssignerEnseignantModal(classeId); }
+        function closeAssignModal(){ const m=document.getElementById('assignModal'); if(m){ m.style.display='none'; m.classList.remove('active'); } }
+        async function confirmerAssignation(){ const id=document.getElementById('enseignantSelect')?.value; const tuteur=document.getElementById('estTuteurCheck')?.checked||false; if(!id){alert('Sélectionnez'); return;} try{ const h={'Content-Type':'application/json'}; if(token) h['Authorization']=`Bearer ${token}`; const r=await fetch(`${API_BASE}/api/Classe/${currentClasseId}/assigner-enseignant`,{method:'POST',headers:h,body:JSON.stringify({enseignantId:id,estTuteur:tuteur})}); if(r.ok){ showAlert('assignModalAlert','success','✅ Assigné'); setTimeout(()=>{closeAssignModal();viewClasseDetails(currentClasseId);},1500); } else showAlert('assignModalAlert','error','❌ Erreur'); }catch(e){showAlert('assignModalAlert','error','❌ Erreur');} }
+        async function saveClasse(e){ e.preventDefault(); const nom=document.getElementById('nomClasse')?.value, niveau=document.getElementById('niveau')?.value, annee=document.getElementById('anneeScolaire')?.value; const exist=allClasses.find(c=>getValue(c,'nomClasse')===nom && getValue(c,'niveau')===niveau && getValue(c,'anneeScolaire')===annee); if(exist){showAlert('modalAlert','error','❌ Existe déjà'); return;} const data={nomClasse:nom,niveau:niveau,anneeScolaire:annee,capaciteMax:parseInt(document.getElementById('capaciteMax')?.value)||30}; try{ const h={'Content-Type':'application/json'}; if(token) h['Authorization']=`Bearer ${token}`; const r=await fetch(`${API_BASE}/api/Classe`,{method:'POST',headers:h,body:JSON.stringify(data)}); if(!r.ok)throw new Error(); showAlert('modalAlert','success','✅ Créée'); setTimeout(()=>{closeModal();loadClasses();},1500); }catch(e){showAlert('modalAlert','error','❌ Erreur');} }
+        
+        document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal(); closeDeleteModal(); closeAssignModal(); closeHistoriquePresenceModal(); closeHistoriqueRemarqueModal(); closeSeanceDetailModal(); closeValidationModal(); } });
+        
+        window.showNiveauxView=showNiveauxView; window.showNiveauClasses=showNiveauClasses; window.viewClasseDetails=viewClasseDetails; window.openCreateModal=openCreateModal; window.closeModal=closeModal; window.openDeleteModal=openDeleteModal; window.closeDeleteModal=closeDeleteModal; window.confirmDelete=confirmDelete; window.showAssignerEnseignantModal=showAssignerEnseignantModal; window.showAssignerTuteurModal=showAssignerTuteurModal; window.closeAssignModal=closeAssignModal; window.confirmerAssignation=confirmerAssignation; window.saveClasse=saveClasse; window.handleSearch=handleSearch; window.clearSearch=clearSearch; window.filterByYear=filterByYear; window.switchTab=switchTab; window.showEleveHistoriquePresence=showEleveHistoriquePresence; window.showEleveHistoriqueRemarque=showEleveHistoriqueRemarque; window.closeHistoriquePresenceModal=closeHistoriquePresenceModal; window.closeHistoriqueRemarqueModal=closeHistoriqueRemarqueModal; window.debounce=debounce;
+        window.showSeanceDetail=showSeanceDetail; window.closeSeanceDetailModal=closeSeanceDetailModal; window.showAllSeancesEnseignant=showAllSeancesEnseignant;
+        window.openValidationModal=openValidationModal; window.closeValidationModal=closeValidationModal; window.validerSeance=validerSeance; window.refuserSeance=refuserSeance;
+    </script>
+</body>
+</html>

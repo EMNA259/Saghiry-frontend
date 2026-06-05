@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes vœux emploi du temps</title>
+    <style>
+        /* ============ STYLES INSPIRÉS DE CLASSES.HTML ET ADMIN-VŒUX ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            
+            /* Couleurs pour l'emploi du temps */
+            --dispo-vert: #e8f5e9;
+            --dispo-vert-border: #4ca896;
+            --indispo-rouge: #ffebee;
+            --indispo-rouge-border: #ef5350;
+            --jour-header: #f5f5f5;
+            --pause-jaune: #fff9c4;
+            --pause-jaune-border: #fdd835;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .voeux-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ============ PAGE HEADER ============ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '📋';
+            font-size: 2rem;
+            -webkit-text-fill-color: initial;
+            color: var(--primary-green);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        /* ============ CARTES ============ */
+        .voeux-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .voeux-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ============ SECTIONS ============ */
+        .voeux-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--gray-bg);
+            border-radius: 16px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .voeux-section h3 {
+            color: var(--accent-orange-dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .voeux-section h3::before {
+            content: '●';
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+        }
+
+        /* ============ FORMULAIRES ============ */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-select, .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(255, 148, 102, 0.1);
+        }
+
+        /* ============ BLOCS HORAIRES ============ */
+        .bloc-horaire {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid var(--accent-orange);
+            transition: all 0.2s;
+            opacity: 1;
+        }
+
+        .bloc-horaire.selected {
+            background: #fff3e0;
+            border-color: var(--accent-orange-dark);
+        }
+
+        .bloc-horaire.jour-off {
+            opacity: 0.5;
+            background: #f0f0f0;
+            border-color: #ccc;
+            pointer-events: none;
+        }
+
+        .bloc-horaire.partial-day {
+            border-color: #4ca896;
+            background: #e6f7f4;
+        }
+
+        .bloc-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bloc-header input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-orange);
+        }
+
+        .bloc-titre {
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            font-size: 1.1rem;
+        }
+
+        .bloc-horaires {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .bloc-horaires span {
+            background: var(--gray-bg);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .info-bloc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+        }
+
+        /* ============ JOURS OFF ============ */
+        .jours-off-selector {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid var(--accent-orange);
+        }
+
+        .jours-off-title {
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .jours-off-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .jour-off-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem;
+            background: var(--gray-bg);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--gray-border);
+        }
+
+        .jour-off-item.selected {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .jour-off-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-orange);
+        }
+
+        /* ============ CHOIX HEURES ============ */
+        .hours-choice {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .hours-option {
+            flex: 1;
+            padding: 1rem;
+            background: white;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .hours-option.selected {
+            border-color: var(--accent-orange);
+            background: #fff3e0;
+        }
+
+        .hours-option .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+        }
+
+        .hours-option .label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* ============ SECTION 18H EN BAS DES DISPONIBILITÉS ============ */
+        .extra-hours-section-bottom {
+            margin-top: 2rem;
+            background: linear-gradient(135deg, #fff9f0, #fff5e8);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 2px solid var(--accent-orange);
+            box-shadow: 0 8px 20px rgba(255, 148, 102, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .extra-hours-section-bottom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(255, 148, 102, 0.25);
+        }
+
+        .extra-hours-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px dashed var(--accent-orange);
+        }
+
+        .extra-hours-header span {
+            font-size: 2rem;
+        }
+
+        .extra-hours-header h4 {
+            font-size: 1.3rem;
+            color: var(--accent-orange-dark);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .extra-hours-content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .extra-hours-label {
+            font-weight: 700;
+            color: var(--text-dark);
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .extra-hours-select {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 40px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .extra-hours-select:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 3px rgba(255, 148, 102, 0.1);
+        }
+
+        .extra-hours-info {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .extra-hours-info::before {
+            content: "💡";
+            font-size: 1.1rem;
+        }
+
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* ============ GRILLE JOURS ============ */
+        .jours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .jour-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+        }
+
+        .jour-card:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+
+        .jour-titre {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-orange);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .jour-off-badge {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+
+        .partial-badge {
+            display: inline-block;
+            background: #4ca896;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+
+        /* ============ SPÉCIALITÉS ============ */
+        .specialite-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--accent-orange);
+        }
+
+        .specialite-titre {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent-orange);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--gray-bg);
+            border-radius: 8px;
+            border: 1px solid var(--gray-border);
+        }
+
+        /* ============ BOUTONS ============ */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(255, 148, 102, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 148, 102, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ============ BADGES ============ */
+        .info-badge {
+            display: inline-block;
+            background: rgba(255, 148, 102, 0.1);
+            color: var(--accent-orange-dark);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .specialite-tag {
+            display: inline-block;
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            margin: 0.2rem;
+        }
+
+        /* ============ MESSAGES ============ */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-waiting {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .info-message {
+            background: #e8f4f8;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .info-message-blue {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            border: 1px solid #bee5eb;
+            font-weight: 500;
+        }
+
+        .danger-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+            border: 1px solid #f5c6cb;
+            font-weight: 500;
+        }
+
+        .resume-selections {
+            background: #fff3e0;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .total-heures {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            margin-top: 0.5rem;
+        }
+
+        /* ============ VERROUILLAGE ============ */
+        .form-locked {
+            position: relative;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .form-locked::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            z-index: 100;
+            backdrop-filter: blur(3px);
+        }
+
+        .form-locked::after {
+            content: "🔒 FORMULAIRE VERROUILLÉ - VŒUX DÉJÀ VALIDÉS 🔒";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff6b6b;
+            color: white;
+            padding: 1.2rem 2rem;
+            border-radius: 60px;
+            font-weight: bold;
+            z-index: 101;
+            white-space: nowrap;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 2px solid white;
+        }
+
+        @media (max-width: 768px) {
+            .form-locked::after {
+                white-space: normal;
+                font-size: 1rem;
+                padding: 1rem;
+                width: 90%;
+                text-align: center;
+            }
+        }
+
+        /* ============ MODAL ============ */
+        .redirect-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .redirect-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .redirect-card h2 {
+            color: var(--accent-orange-dark);
+            margin-bottom: 1rem;
+        }
+
+        .redirect-card p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .redirect-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-redirect {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-dark));
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-redirect:hover {
+            transform: translateY(-2px);
+        }
+
+        .countdown-timer {
+            font-size: 0.9rem;
+            color: var(--accent-orange-dark);
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .hours-choice {
+                flex-direction: column;
+            }
+
+            .jours-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .extra-hours-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="voeux-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Mes vœux pour l'emploi du temps</h1>
+                <p class="page-subtitle">Choisissez vos jours de repos et vos créneaux de travail</p>
+            </div>
+        </div>
+
+        <div id="alertMessage"></div>
+        <div id="voeuxStatut"></div>
+
+        <div id="specialitesContainer" class="specialites-display">
+            <strong>📚 Mes spécialités :</strong>
+            <div id="specialitesList" style="margin-top: 0.5rem;"></div>
+        </div>
+
+        <div id="ancienneteContainer" class="info-message-blue" style="margin-top: 1rem; padding: 1rem; display: none;">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="font-size: 2rem;">📅</div>
+                <div>
+                    <strong style="font-size: 1.1rem; color: var(--accent-orange-dark);">Mon ancienneté</strong>
+                    <div id="ancienneteDetails" style="margin-top: 0.3rem;">
+                        <span id="ancienneteValeur">Chargement...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resumeSelections" class="info-message" style="display: none;">
+            <strong>📊 Résumé :</strong>
+            <div id="resumeContent" style="margin-top: 0.5rem;"></div>
+            <div id="totalHeuresInfo" style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--accent-orange);">
+                <strong>⏱️ Total heures :</strong>
+                <span id="totalHeuresValeur" class="total-heures">0h</span>
+                <span id="heuresSouhaiteesDisplay" style="margin-left: 1rem; font-size: 1rem; color: var(--text-light);"></span>
+            </div>
+        </div>
+
+        <form id="voeuxForm">
+            <div class="voeux-card" id="formCard">
+                <div class="voeux-section">
+                    <h3>😴 Mes jours de repos</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1rem;" id="joursReposDescription">
+                        Pour 16h, vous aurez 2 jours de repos complets
+                    </p>
+                    
+                    <div class="jours-off-selector">
+                        <div class="jours-off-title">Je ne travaille pas ces jours :</div>
+                        <div class="jours-off-grid" id="joursOffContainer">
+                            <div class="jour-off-item" data-jour="lundi">
+                                <input type="checkbox" id="off-lundi" value="lundi" class="jour-off-checkbox">
+                                <label for="off-lundi">Lundi</label>
+                            </div>
+                            <div class="jour-off-item" data-jour="mardi">
+                                <input type="checkbox" id="off-mardi" value="mardi" class="jour-off-checkbox">
+                                <label for="off-mardi">Mardi</label>
+                            </div>
+                            <div class="jour-off-item" data-jour="mercredi">
+                                <input type="checkbox" id="off-mercredi" value="mercredi" class="jour-off-checkbox">
+                                <label for="off-mercredi">Mercredi</label>
+                            </div>
+                            <div class="jour-off-item" data-jour="jeudi">
+                                <input type="checkbox" id="off-jeudi" value="jeudi" class="jour-off-checkbox">
+                                <label for="off-jeudi">Jeudi</label>
+                            </div>
+                            <div class="jour-off-item" data-jour="vendredi">
+                                <input type="checkbox" id="off-vendredi" value="vendredi" class="jour-off-checkbox">
+                                <label for="off-vendredi">Vendredi</label>
+                            </div>
+                            <div class="jour-off-item" data-jour="samedi">
+                                <input type="checkbox" id="off-samedi" value="samedi" class="jour-off-checkbox">
+                                <label for="off-samedi">Samedi</label>
+                            </div>
+                        </div>
+                        <div id="joursOffWarning" class="warning-message" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="voeux-section">
+                    <h3>⚖️ Charge horaire souhaitée</h3>
+                    
+                    <div class="hours-choice">
+                        <div class="hours-option" id="option-16h" onclick="selectHours(16)">
+                            <div class="value">16h</div>
+                            <div class="label">4 blocs de 4h = 2 jours de repos</div>
+                        </div>
+                        <div class="hours-option" id="option-18h" onclick="selectHours(18)">
+                            <div class="value">18h</div>
+                            <div class="label">4 blocs + 2h sur un jour de travail</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: white; border-radius: 12px; border: 1px solid var(--gray-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Blocs 4h sélectionnés :</strong>
+                                <span id="blocsCount" style="font-size: 1.2rem; font-weight: 700; color: var(--accent-orange-dark); margin-left: 0.5rem;">0</span>
+                            </div>
+                            <div>
+                                <strong>Total :</strong>
+                                <span id="totalHeuresBlocs" style="font-size: 1.2rem; font-weight: 700; color: var(--accent-orange-dark); margin-left: 0.5rem;">0h</span>
+                            </div>
+                        </div>
+                        <div id="heuresWarning" class="warning-message" style="display: none;"></div>
+                    </div>
+                </div>
+
+                <div class="voeux-section">
+                    <h3>⏰ Mes disponibilités</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1rem;">
+                        Choisissez vos créneaux de travail (blocs de 4h consécutifs)
+                    </p>
+                    
+                    <div class="jours-grid" id="blocsDisponibilites">
+                        <!-- Lundi -->
+                        <div class="jour-card" id="jour-lundi">
+                            <div class="jour-titre">
+                                Lundi
+                                <span class="jour-off-badge" id="off-badge-lundi" style="display: none;">Repos</span>
+                                <span class="partial-badge" id="partial-badge-lundi" style="display: none;">2h</span>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-lundi-matin">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="lundi_matin_bloc" value="lundi_matin" class="bloc-checkbox">
+                                    <label for="lundi_matin_bloc" class="bloc-titre">Matin</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>08:00 - 12:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-lundi-apres-midi">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="lundi_apres-midi_bloc" value="lundi_apres-midi" class="bloc-checkbox">
+                                    <label for="lundi_apres-midi_bloc" class="bloc-titre">Après-midi</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>14:00 - 18:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mardi -->
+                        <div class="jour-card" id="jour-mardi">
+                            <div class="jour-titre">
+                                Mardi
+                                <span class="jour-off-badge" id="off-badge-mardi" style="display: none;">Repos</span>
+                                <span class="partial-badge" id="partial-badge-mardi" style="display: none;">2h</span>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-mardi-matin">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="mardi_matin_bloc" value="mardi_matin" class="bloc-checkbox">
+                                    <label for="mardi_matin_bloc" class="bloc-titre">Matin</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>08:00 - 12:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-mardi-apres-midi">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="mardi_apres-midi_bloc" value="mardi_apres-midi" class="bloc-checkbox">
+                                    <label for="mardi_apres-midi_bloc" class="bloc-titre">Après-midi</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>14:00 - 18:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mercredi -->
+                        <div class="jour-card" id="jour-mercredi">
+                            <div class="jour-titre">
+                                Mercredi
+                                <span class="jour-off-badge" id="off-badge-mercredi" style="display: none;">Repos</span>
+                                <span class="partial-badge" id="partial-badge-mercredi" style="display: none;">2h</span>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-mercredi-matin">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="mercredi_matin_bloc" value="mercredi_matin" class="bloc-checkbox">
+                                    <label for="mercredi_matin_bloc" class="bloc-titre">Matin</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>08:00 - 12:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-mercredi-apres-midi">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="mercredi_apres-midi_bloc" value="mercredi_apres-midi" class="bloc-checkbox">
+                                    <label for="mercredi_apres-midi_bloc" class="bloc-titre">Après-midi</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>14:00 - 18:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Jeudi -->
+                        <div class="jour-card" id="jour-jeudi">
+                            <div class="jour-titre">
+                                Jeudi
+                                <span class="jour-off-badge" id="off-badge-jeudi" style="display: none;">Repos</span>
+                                <span class="partial-badge" id="partial-badge-jeudi" style="display: none;">2h</span>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-jeudi-matin">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="jeudi_matin_bloc" value="jeudi_matin" class="bloc-checkbox">
+                                    <label for="jeudi_matin_bloc" class="bloc-titre">Matin</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>08:00 - 12:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-jeudi-apres-midi">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="jeudi_apres-midi_bloc" value="jeudi_apres-midi" class="bloc-checkbox">
+                                    <label for="jeudi_apres-midi_bloc" class="bloc-titre">Après-midi</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>14:00 - 18:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vendredi -->
+                        <div class="jour-card" id="jour-vendredi">
+                            <div class="jour-titre">
+                                Vendredi
+                                <span class="jour-off-badge" id="off-badge-vendredi" style="display: none;">Repos</span>
+                                <span class="partial-badge" id="partial-badge-vendredi" style="display: none;">2h</span>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-vendredi-matin">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="vendredi_matin_bloc" value="vendredi_matin" class="bloc-checkbox">
+                                    <label for="vendredi_matin_bloc" class="bloc-titre">Matin</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>08:00 - 12:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-vendredi-apres-midi">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="vendredi_apres-midi_bloc" value="vendredi_apres-midi" class="bloc-checkbox">
+                                    <label for="vendredi_apres-midi_bloc" class="bloc-titre">Après-midi</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>14:00 - 18:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Samedi -->
+                        <div class="jour-card" id="jour-samedi">
+                            <div class="jour-titre">
+                                Samedi
+                                <span class="jour-off-badge" id="off-badge-samedi" style="display: none;">Repos</span>
+                                <span class="partial-badge" id="partial-badge-samedi" style="display: none;">2h</span>
+                            </div>
+                            <div class="bloc-horaire" id="bloc-samedi-matin">
+                                <div class="bloc-header">
+                                    <input type="checkbox" id="samedi_matin_bloc" value="samedi_matin" class="bloc-checkbox">
+                                    <label for="samedi_matin_bloc" class="bloc-titre">Matin</label>
+                                </div>
+                                <div class="bloc-horaires">
+                                    <span>08:00 - 12:00</span>
+                                </div>
+                                <div class="info-bloc">4h consécutives (max samedi)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SECTION 18H DÉPLACÉE ICI - EN BAS DES DISPONIBILITÉS -->
+                    <div id="extraHoursSelection" style="display: none;">
+                        <div class="extra-hours-section-bottom">
+                            <div class="extra-hours-header">
+                                <span>➕</span>
+                                <h4>2h supplémentaires (incluses dans le total 18h)</h4>
+                            </div>
+                            <div class="extra-hours-content">
+                                <div class="extra-hours-label">Ajouter les 2h à un bloc existant :</div>
+                                <select id="extraHoursWorkDay" class="extra-hours-select">
+                                    <option value="">Sélectionnez un jour de travail</option>
+                                </select>
+                                <div class="extra-hours-info">
+                                    Les 2h s'ajouteront à un bloc 4h déjà sélectionné (4h → 6h)
+                                </div>
+                            </div>
+                            <div id="extraHoursWarning" class="warning-message" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="voeux-section">
+                    <h3>❤️ Préférence</h3>
+                    <div class="form-group">
+                        <label class="form-label">Je préfère travailler :</label>
+                        <select id="preferenceHoraire" class="form-select">
+                            <option value="flexible">Sans préférence</option>
+                            <option value="matin">Plutôt le matin</option>
+                            <option value="apres-midi">Plutôt l'après-midi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="voeux-section">
+                    <h3>📚 Mes cours</h3>
+                    <p style="color: var(--text-light); margin-bottom: 1rem;">
+                        Sélectionnez les niveaux que vous souhaitez enseigner
+                    </p>
+                    
+                    <div id="specialitesChoixContainer"></div>
+                    
+                    <div id="heuresNiveauxWarning" class="danger-message" style="display: none;"></div>
+                    <div id="heuresNiveauxInfo" class="info-message-blue" style="display: none;"></div>
+                    <div id="heuresSpecialitesWarning" class="warning-message" style="display: none;"></div>
+                </div>
+
+                <div class="voeux-section">
+                    <h3>💬 Commentaires</h3>
+                    <div class="form-group">
+                        <textarea id="commentaires" class="form-textarea" rows="3" 
+                                  placeholder="Informations complémentaires..."></textarea>
+                    </div>
+                </div>
+
+                <input type="hidden" id="heuresSouhaitees" value="16">
+                <input type="hidden" id="heuresExtra" value="0">
+                <input type="hidden" id="extraHoursType" value="">
+                <input type="hidden" id="extraHoursDay" value="">
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    Enregistrer mes vœux
+                </button>
+            </div>
+        </form>
+
+        <div class="voeux-card" id="propositionsInfo" style="display: none;">
+            <h3 style="color: var(--accent-orange-dark); margin-bottom: 1rem;">
+                🎯 Prochaines étapes
+            </h3>
+            <p style="margin-bottom: 1rem;">
+                Vos vœux ont été enregistrés. L'administration va les valider.
+            </p>
+            <div style="background: #e8f4f8; padding: 1rem; border-radius: 12px;">
+                <ol style="margin-left: 1.5rem;">
+                    <li>Validation par l'administration</li>
+                    <li>Génération de propositions</li>
+                    <li>Vous pourrez faire votre choix</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="voeux-card" id="prioriteInfo" style="background: linear-gradient(135deg, #fff3e0, #ffe9d4);">
+            <h3 style="color: var(--accent-orange-dark); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>⚖️</span>
+                Règle de priorité
+            </h3>
+            <p style="margin-bottom: 0.5rem;">
+                En cas de conflit (plusieurs enseignants demandent les mêmes heures pour une même matière), 
+                <strong>la priorité est donnée à l'enseignant le plus ancien</strong>.
+            </p>
+            
+            <!-- ✅ SECTION DES COURS BLOQUÉS PAR PRIORITÉ D'ANCIENNETÉ -->
+            <div id="coursBloquesAlerte" style="display: none; margin-top: 1rem; padding: 1rem; background: #fff3cd; border-radius: 12px; border-left: 4px solid #ffc107;">
+                <strong>⚠️ Attention - Cours potentiellement bloqués :</strong>
+                <ul id="coursBloquesListe" style="margin-top: 0.5rem; margin-left: 1.5rem; margin-bottom: 0.5rem;"></ul>
+                <p class="small" style="margin-top: 0.5rem; font-size: 0.85rem; color: #856404;">
+                    Ces matières pourraient ne pas vous être attribuées si un enseignant plus ancien les demande.
+                </p>
+            </div>
+            
+            <div style="background: white; padding: 1rem; border-radius: 12px; margin-top: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="font-size: 2rem;">📅</div>
+                    <div>
+                        <strong>Votre ancienneté détermine votre priorité</strong>
+                        <p style="color: var(--text-light); margin-top: 0.3rem; font-size: 0.9rem;">
+                            Plus vous êtes ancien, plus vous avez de chances d'obtenir les heures que vous demandez.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CODE JAVASCRIPT ORIGINAL AVEC AMÉLIORATIONS ====================
+        
+        const API_BASE = 'http://localhost:5267/api';
+        const FLASK_API_BASE = 'http://localhost:5000';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        let currentEnseignant = null;
+        let currentVoeux = null;
+        let selectedHours = 16;
+        let joursOff = [];
+        let isFormLocked = false;
+        let coursBloquesList = [];
+        
+        const matieresParNiveau = {
+            '1ère année': [
+                'Langue arabe', 'Mathématiques', 'Éveil scientifique', 
+                'Éducation islamique', 'Éducation technologique', 
+                'Éducation musicale', 'Éducation artistique', 'Éducation physique'
+            ],
+            '2ème année': [
+                'Langue arabe', 'Langue française', 'Mathématiques', 
+                'Éveil scientifique', 'Éducation islamique', 'Éducation technologique', 
+                'Éducation musicale', 'Éducation artistique', 'Éducation physique'
+            ],
+            '3ème année': [
+                'Langue arabe', 'Langue française', 'Mathématiques', 
+                'Éveil scientifique', 'Éducation islamique', 'Éducation technologique', 
+                'Éducation musicale', 'Éducation artistique', 'Éducation physique'
+            ],
+            '4ème année': [
+                'Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques', 
+                'Éveil scientifique', 'Éducation islamique', 'Éducation technologique', 
+                'Éducation musicale', 'Éducation artistique', 'Éducation physique'
+            ],
+            '5ème année': [
+                'Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques', 
+                'Éveil scientifique', 'Éducation islamique', 'Éducation technologique', 
+                'Éducation musicale', 'Éducation artistique', 'Éducation physique',
+                'Histoire', 'Géographie', 'Éducation civique'
+            ],
+            '6ème année': [
+                'Langue arabe', 'Langue française', 'Langue anglaise', 'Mathématiques', 
+                'Éveil scientifique', 'Éducation islamique', 'Éducation technologique', 
+                'Éducation musicale', 'Éducation artistique', 'Éducation physique',
+                'Histoire', 'Géographie', 'Éducation civique'
+            ]
+        };
+
+        const volumesHoraires = {
+            '1ère année': {
+                'Langue arabe': 9,
+                'Mathématiques': 5,
+                'Éveil scientifique': 1,
+                'Éducation islamique': 1,
+                'Éducation technologique': 1,
+                'Éducation musicale': 1,
+                'Éducation artistique': 1,
+                'Éducation physique': 1
+            },
+            '2ème année': {
+                'Langue arabe': 9,
+                'Langue française': 2,
+                'Mathématiques': 5,
+                'Éveil scientifique': 1,
+                'Éducation islamique': 1,
+                'Éducation technologique': 1,
+                'Éducation musicale': 1,
+                'Éducation artistique': 1,
+                'Éducation physique': 1
+            },
+            '3ème année': {
+                'Langue arabe': 6,
+                'Langue française': 8,
+                'Mathématiques': 5,
+                'Éveil scientifique': 1,
+                'Éducation islamique': 1,
+                'Éducation technologique': 1,
+                'Éducation musicale': 1,
+                'Éducation artistique': 1,
+                'Éducation physique': 1
+            },
+            '4ème année': {
+                'Langue arabe': 6,
+                'Langue française': 8,
+                'Langue anglaise': 1,
+                'Mathématiques': 5,
+                'Éveil scientifique': 1,
+                'Éducation islamique': 1,
+                'Éducation technologique': 1,
+                'Éducation musicale': 1,
+                'Éducation artistique': 1,
+                'Éducation physique': 1
+            },
+            '5ème année': {
+                'Langue arabe': 6,
+                'Langue française': 8,
+                'Langue anglaise': 2,
+                'Mathématiques': 5,
+                'Éveil scientifique': 1,
+                'Éducation islamique': 1,
+                'Éducation technologique': 1,
+                'Éducation musicale': 1,
+                'Éducation artistique': 1,
+                'Éducation physique': 1,
+                'Histoire': 1,
+                'Géographie': 1,
+                'Éducation civique': 1
+            },
+            '6ème année': {
+                'Langue arabe': 6,
+                'Langue française': 8,
+                'Langue anglaise': 2,
+                'Mathématiques': 5,
+                'Éveil scientifique': 1,
+                'Éducation islamique': 1,
+                'Éducation technologique': 1,
+                'Éducation musicale': 1,
+                'Éducation artistique': 1,
+                'Éducation physique': 1,
+                'Histoire': 1,
+                'Géographie': 1,
+                'Éducation civique': 1
+            }
+        };
+
+        let selections = {};
+        let matieresDetails = [];
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!token) {
+                window.parent.location.href = 'saghiry-auth.html';
+                return;
+            }
+
+            await loadEnseignantInfos();
+            await loadExistingVoeux();
+            await verifierCoursBloquesPriorite();
+            setupJoursOffListeners();
+            setupBlocListeners();
+            updateJoursReposDescription();
+            selectHours(16);
+        });
+
+        // ✅ NOUVELLE FONCTION : Vérifier les cours déjà pris par des enseignants plus anciens
+        async function verifierCoursBloquesPriorite() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                if (!enseignantId) return;
+                
+                // Récupérer l'ancienneté de l'enseignant courant
+                const ancienneteResponse = await fetch(`${API_BASE}/utilisateurs/${enseignantId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                let ancienneteCourant = 0;
+                if (ancienneteResponse.ok) {
+                    const enseignantData = await ancienneteResponse.json();
+                    ancienneteCourant = enseignantData.ancienneteJours || 0;
+                }
+                
+                // Appeler l'API pour récupérer toutes les propositions favorites des autres enseignants
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/admin/favoris?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const enseignantsFavoris = data.data || [];
+                    
+                    const coursBloquesTemp = [];
+                    
+                    for (const enseignant of enseignantsFavoris) {
+                        // Ignorer l'enseignant courant
+                        if (enseignant.enseignantId === enseignantId) continue;
+                        
+                        // Récupérer l'ancienneté de cet enseignant
+                        const autreResponse = await fetch(`${API_BASE}/utilisateurs/${enseignant.enseignantId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        let ancienneteAutre = 0;
+                        let nomAutre = enseignant.enseignantNom;
+                        
+                        if (autreResponse.ok) {
+                            const autreData = await autreResponse.json();
+                            ancienneteAutre = autreData.ancienneteJours || 0;
+                            nomAutre = `${autreData.prenom || ''} ${autreData.nom || ''}`.trim() || enseignant.enseignantNom;
+                        }
+                        
+                        // Si l'autre enseignant est plus ancien, vérifier ses propositions
+                        if (ancienneteAutre > ancienneteCourant) {
+                            for (const proposition of enseignant.propositions || []) {
+                                const emploiParJour = proposition.EmploiParJour || {};
+                                for (const jour of Object.keys(emploiParJour)) {
+                                    for (const creneau of emploiParJour[jour] || []) {
+                                        coursBloquesTemp.push({
+                                            matiere: creneau.MatiereNom,
+                                            classe: creneau.ClasseNom,
+                                            classeId: creneau.ClasseId,
+                                            enseignant: nomAutre,
+                                            anciennete: ancienneteAutre,
+                                            jour: jour
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Dédupliquer par matière + classe
+                    const coursUniques = new Map();
+                    for (const cours of coursBloquesTemp) {
+                        const key = `${cours.matiere}|${cours.classeId}`;
+                        if (!coursUniques.has(key)) {
+                            coursUniques.set(key, cours);
+                        }
+                    }
+                    
+                    coursBloquesList = Array.from(coursUniques.values());
+                    
+                    // Afficher l'alerte si des cours sont bloqués
+                    const alerteDiv = document.getElementById('coursBloquesAlerte');
+                    const listeUl = document.getElementById('coursBloquesListe');
+                    
+                    if (coursBloquesList.length > 0) {
+                        listeUl.innerHTML = coursBloquesList.map(c => 
+                            `<li><strong>${c.matiere}</strong> - Classe ${c.classe} (déjà pris par ${c.enseignant})</li>`
+                        ).join('');
+                        alerteDiv.style.display = 'block';
+                    } else {
+                        alerteDiv.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur vérification cours bloqués:', error);
+            }
+        }
+
+        function setupJoursOffListeners() {
+            document.querySelectorAll('.jour-off-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (isFormLocked) return;
+                    
+                    const jour = this.value;
+                    
+                    if (this.checked) {
+                        if (joursOff.length >= 2) {
+                            this.checked = false;
+                            showJoursOffWarning('Vous ne pouvez sélectionner que 2 jours de repos maximum');
+                            return;
+                        }
+                        joursOff.push(jour);
+                    } else {
+                        joursOff = joursOff.filter(j => j !== jour);
+                    }
+                    
+                    updateJoursOffDisplay();
+                    updateExtraHoursOptions();
+                });
+            });
+        }
+
+        function showJoursOffWarning(message) {
+            const warning = document.getElementById('joursOffWarning');
+            warning.style.display = 'block';
+            warning.innerHTML = `⚠️ ${message}`;
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateJoursOffDisplay() {
+            document.querySelectorAll('[id^="off-badge-"]').forEach(badge => {
+                badge.style.display = 'none';
+            });
+            
+            document.querySelectorAll('.bloc-checkbox').forEach(cb => {
+                const jour = cb.value.split('_')[0];
+                const blocElement = cb.closest('.bloc-horaire');
+                
+                if (joursOff.includes(jour)) {
+                    const badge = document.getElementById(`off-badge-${jour}`);
+                    if (badge) badge.style.display = 'inline-block';
+                    
+                    cb.checked = false;
+                    cb.disabled = true;
+                    blocElement.classList.add('jour-off');
+                } else {
+                    cb.disabled = false;
+                    blocElement.classList.remove('jour-off');
+                }
+            });
+            
+            updateBlocCount();
+        }
+
+        function updateJoursReposDescription() {
+            const desc = document.getElementById('joursReposDescription');
+            if (selectedHours === 16) {
+                desc.innerHTML = 'Pour 16h, vous aurez 2 jours de repos complets (sélectionnez 2 jours)';
+            } else {
+                desc.innerHTML = 'Pour 18h, vous aurez 1 ou 2 jours de repos selon le placement des 2h supplémentaires';
+            }
+        }
+
+        function setupBlocListeners() {
+            document.querySelectorAll('.bloc-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (isFormLocked) return;
+                    
+                    const bloc = this.closest('.bloc-horaire');
+                    if (this.checked) {
+                        bloc.classList.add('selected');
+                    } else {
+                        bloc.classList.remove('selected');
+                    }
+                    updateBlocCount();
+                    updateExtraHoursOptions();
+                });
+            });
+        }
+
+        function updateExtraHoursOptions() {
+            if (selectedHours !== 18 || isFormLocked) return;
+            
+            const workDaySelect = document.getElementById('extraHoursWorkDay');
+            workDaySelect.innerHTML = '<option value="">Sélectionnez un jour</option>';
+            
+            const joursAvecBlocs = new Set();
+            document.querySelectorAll('.bloc-checkbox:checked').forEach(cb => {
+                const jour = cb.value.split('_')[0];
+                if (!joursOff.includes(jour) && jour !== 'samedi') {
+                    joursAvecBlocs.add(jour);
+                }
+            });
+            
+            joursAvecBlocs.forEach(jour => {
+                const option = document.createElement('option');
+                option.value = jour;
+                option.textContent = jour.charAt(0).toUpperCase() + jour.slice(1);
+                workDaySelect.appendChild(option);
+            });
+        }
+
+        window.selectHours = function(hours) {
+            if (isFormLocked) return;
+            
+            selectedHours = hours;
+            
+            document.getElementById('option-16h').classList.remove('selected');
+            document.getElementById('option-18h').classList.remove('selected');
+            document.getElementById(`option-${hours}h`).classList.add('selected');
+            
+            document.getElementById('heuresSouhaitees').value = hours;
+            document.getElementById('heuresSouhaiteesDisplay').innerHTML = `(souhaité: ${hours}h)`;
+            
+            if (hours === 18) {
+                document.getElementById('extraHoursSelection').style.display = 'block';
+                document.getElementById('heuresExtra').value = 2;
+                updateExtraHoursOptions();
+            } else {
+                document.getElementById('extraHoursSelection').style.display = 'none';
+                document.getElementById('heuresExtra').value = 0;
+                document.getElementById('extraHoursWorkDay').value = '';
+            }
+            
+            updateJoursReposDescription();
+            updateBlocCount();
+            verifierContrainteHeuresNiveaux();
+        };
+
+        function updateBlocCount() {
+            const checkboxes = document.querySelectorAll('.bloc-checkbox:checked');
+            const count = checkboxes.length;
+            let totalHeures = count * 4;
+            
+            const extraDay = document.getElementById('extraHoursWorkDay')?.value;
+            if (selectedHours === 18 && extraDay) {
+                totalHeures += 2;
+            }
+            
+            document.getElementById('blocsCount').textContent = count;
+            document.getElementById('totalHeuresBlocs').textContent = totalHeures + 'h';
+            
+            const warningDiv = document.getElementById('heuresWarning');
+            if (selectedHours === 16 && totalHeures > 16) {
+                warningDiv.style.display = 'block';
+                warningDiv.innerHTML = '⚠️ Vous ne pouvez pas dépasser 16h avec les blocs. Désélectionnez des blocs.';
+            } else if (selectedHours === 18 && totalHeures > 18) {
+                warningDiv.style.display = 'block';
+                warningDiv.innerHTML = '⚠️ Vous ne pouvez pas dépasser 18h avec les blocs. Désélectionnez des blocs.';
+            } else {
+                warningDiv.style.display = 'none';
+            }
+            
+            verifierToutesContraintes();
+        }
+
+        function calculerTotalHeuresNiveaux() {
+            let total = 0;
+            
+            Object.keys(selections).forEach(specialite => {
+                const selectionsMatiere = selections[specialite] || [];
+                
+                selectionsMatiere.forEach(key => {
+                    const parts = key.split('|');
+                    if (parts.length === 3) {
+                        const matiere = parts[1];
+                        const niveau = parts[2];
+                        
+                        if (volumesHoraires[niveau] && volumesHoraires[niveau][matiere] !== undefined) {
+                            total += volumesHoraires[niveau][matiere];
+                        }
+                    }
+                });
+            });
+            
+            return total;
+        }
+
+        function verifierContrainteHeuresNiveaux() {
+            const totalHeuresNiveaux = calculerTotalHeuresNiveaux();
+            const heuresSouhaitees = selectedHours;
+            
+            const warningDiv = document.getElementById('heuresNiveauxWarning');
+            const infoDiv = document.getElementById('heuresNiveauxInfo');
+            
+            mettreAJourMatieresDetails();
+            
+            if (totalHeuresNiveaux > heuresSouhaitees) {
+                warningDiv.style.display = 'block';
+                warningDiv.innerHTML = `⚠️ Le total des heures des niveaux sélectionnés (${totalHeuresNiveaux}h) dépasse vos heures souhaitées (${heuresSouhaitees}h). Veuillez réduire le nombre de niveaux.`;
+                infoDiv.style.display = 'none';
+                return false;
+            } else if (totalHeuresNiveaux > 0) {
+                warningDiv.style.display = 'none';
+                
+                if (totalHeuresNiveaux < heuresSouhaitees) {
+                    infoDiv.style.display = 'block';
+                    infoDiv.innerHTML = `ℹ️ Total des heures des niveaux: ${totalHeuresNiveaux}h (souhaité: ${heuresSouhaitees}h). Les heures restantes (${heuresSouhaitees - totalHeuresNiveaux}h) seront réparties entre les classes disponibles de chaque niveau.`;
+                } else {
+                    infoDiv.style.display = 'block';
+                    infoDiv.innerHTML = `✅ Total des heures des niveaux: ${totalHeuresNiveaux}h (égal aux heures souhaitées). La répartition entre les classes sera optimisée.`;
+                }
+                return true;
+            }
+            return true;
+        }
+
+        function mettreAJourMatieresDetails() {
+            matieresDetails = [];
+            
+            Object.keys(selections).forEach(specialite => {
+                const selectionsMatiere = selections[specialite] || [];
+                
+                selectionsMatiere.forEach(key => {
+                    const parts = key.split('|');
+                    if (parts.length === 3) {
+                        const matiere = parts[1];
+                        const niveau = parts[2];
+                        
+                        if (volumesHoraires[niveau] && volumesHoraires[niveau][matiere] !== undefined) {
+                            matieresDetails.push({
+                                matiere: matiere,
+                                niveau: niveau,
+                                heuresHebdo: volumesHoraires[niveau][matiere],
+                                specialite: specialite
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+        function verifierToutesContraintes() {
+            if (isFormLocked) return true;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            
+            const checkboxes = document.querySelectorAll('.bloc-checkbox:checked');
+            const count = checkboxes.length;
+            let totalHeuresBlocs = count * 4;
+            const extraDay = document.getElementById('extraHoursWorkDay')?.value;
+            if (selectedHours === 18 && extraDay) {
+                totalHeuresBlocs += 2;
+            }
+            
+            const blocOk = !((selectedHours === 16 && totalHeuresBlocs > 16) || 
+                            (selectedHours === 18 && totalHeuresBlocs > 18));
+            
+            const totalHeuresNiveaux = calculerTotalHeuresNiveaux();
+            const niveauxOk = totalHeuresNiveaux <= selectedHours;
+            
+            const niveauxSelectionnes = Object.values(selections).some(arr => arr.length > 0);
+            
+            const reposOk = joursOff.length === 2;
+            
+            const submitDisabled = !(blocOk && niveauxOk && niveauxSelectionnes && reposOk);
+            submitBtn.disabled = submitDisabled;
+            
+            return !submitDisabled;
+        }
+
+        function getSpecialites(enseignant) {
+            if (!enseignant) return [];
+            return enseignant.specialites || enseignant.Specialites || [];
+        }
+
+        async function loadEnseignantInfos() {
+            try {
+                const userId = getCurrentEnseignantId();
+                
+                const response = await fetch(`${API_BASE}/utilisateurs/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    currentEnseignant = await response.json();
+                    afficherAnciennete(currentEnseignant);
+                    
+                    let specialites = getSpecialites(currentEnseignant);
+                    specialites = specialites.map(s => 
+                        s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    );
+                    
+                    if (specialites.length > 0) {
+                        const specialitesHtml = specialites
+                            .map(s => `<span class="specialite-tag">${s}</span>`)
+                            .join('');
+                        
+                        document.getElementById('specialitesList').innerHTML = specialitesHtml;
+                        genererInterfaceParSpecialite(specialites);
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement enseignant:', error);
+            }
+        }
+function afficherAnciennete(enseignant) {
+    const container = document.getElementById('ancienneteContainer');
+    const valeurSpan = document.getElementById('ancienneteValeur');
+    
+    let dateEmbauche = null;
+    
+    // Récupérer la date d'embauche - PRIORITÉ à dateEmbauche, sinon createdAt
+    if (enseignant.dateEmbauche) {
+        dateEmbauche = enseignant.dateEmbauche;
+    } else if (enseignant.DateEmbauche) {
+        dateEmbauche = enseignant.DateEmbauche;
+    } else if (enseignant.createdAt) {
+        // ✅ UTILISER createdAt SI dateEmbauche N'EXISTE PAS
+        dateEmbauche = enseignant.createdAt;
+        console.log("📅 Utilisation de createdAt comme date d'embauche:", dateEmbauche);
+    } else if (enseignant.CreatedAt) {
+        dateEmbauche = enseignant.CreatedAt;
+        console.log("📅 Utilisation de CreatedAt comme date d'embauche:", dateEmbauche);
+    }
+    
+    // ✅ SI AUCUNE DATE, AFFICHER MESSAGE
+    if (!dateEmbauche) {
+        valeurSpan.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="background: #f0f0f0; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    ⚠️
+                </div>
+                <div>
+                    <div style="font-weight: 500;">Date d'embauche non définie</div>
+                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.2rem;">
+                        Veuillez contacter l'administration.
+                    </div>
+                </div>
+            </div>
+        `;
+        container.style.display = 'block';
+        return;
+    }
+    
+    try {
+        // ✅ CONVERTIR LA DATE CORRECTEMENT
+        let dateValue = null;
+        if (typeof dateEmbauche === 'object') {
+            if (dateEmbauche.$date) {
+                dateValue = new Date(dateEmbauche.$date);
+            } else if (dateEmbauche instanceof Date) {
+                dateValue = dateEmbauche;
+            } else {
+                // Essayer de parser directement
+                dateValue = new Date(dateEmbauche);
+            }
+        } else if (typeof dateEmbauche === 'string') {
+            dateValue = new Date(dateEmbauche);
+        }
+        
+        // ✅ VÉRIFIER QUE LA DATE EST VALIDE
+        if (!dateValue || isNaN(dateValue.getTime())) {
+            throw new Error('Date invalide');
+        }
+        
+        const aujourdhui = new Date();
+        
+        // ✅ CALCULER L'ANCIENNETÉ EN JOURS
+        const diffTemps = aujourdhui - dateValue;
+        const ancienneteJours = Math.floor(diffTemps / (1000 * 60 * 60 * 24));
+        
+        if (ancienneteJours <= 0) {
+            valeurSpan.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="background: var(--accent-orange); color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        📅
+                    </div>
+                    <div>
+                        <div style="font-weight: 500;">Date d'embauche: <strong style="color: var(--accent-orange-dark);">${dateValue.toLocaleDateString('fr-FR')}</strong></div>
+                        <div style="font-size: 1rem; font-weight: 500; color: var(--accent-orange-dark); margin-top: 0.2rem;">
+                            Nouvel enseignant (moins d'un jour)
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.style.display = 'block';
+            currentEnseignant.ancienneteJours = 0;
+            return;
+        }
+        
+        // ✅ FORMATER L'AFFICHAGE
+        const annees = Math.floor(ancienneteJours / 365);
+        const mois = Math.floor((ancienneteJours % 365) / 30);
+        const jours = (ancienneteJours % 365) % 30;
+        
+        let ancienneteTexte = '';
+        if (annees > 0) {
+            ancienneteTexte += `${annees} an${annees > 1 ? 's' : ''}`;
+            if (mois > 0) ancienneteTexte += `, ${mois} mois`;
+            if (jours > 0 && mois === 0) ancienneteTexte += `, ${jours} jour${jours > 1 ? 's' : ''}`;
+        } else if (mois > 0) {
+            ancienneteTexte += `${mois} mois`;
+            if (jours > 0) ancienneteTexte += `, ${jours} jour${jours > 1 ? 's' : ''}`;
+        } else {
+            ancienneteTexte += `${jours} jour${jours > 1 ? 's' : ''}`;
+        }
+        
+        const dateFormatee = dateValue.toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        valeurSpan.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="background: var(--accent-orange); color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    📅
+                </div>
+                <div>
+                    <div style="font-weight: 500;">Enseignant depuis le <strong style="color: var(--accent-orange-dark);">${dateFormatee}</strong></div>
+                    <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent-orange-dark); margin-top: 0.2rem;">
+                        ${ancienneteTexte}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.2rem;">
+                        (${ancienneteJours} jours)
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // ✅ STOCKER L'ANCIENNETÉ
+        currentEnseignant.ancienneteJours = ancienneteJours;
+        
+        container.style.display = 'block';
+        
+    } catch (e) {
+        console.error('Erreur parsing date:', e);
+        valeurSpan.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="background: #f0f0f0; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    ⚠️
+                </div>
+                <div>
+                    <div style="font-weight: 500;">Erreur de date</div>
+                    <div style="font-size: 0.9rem; color: #666; margin-top: 0.2rem;">
+                        ${e.message}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.style.display = 'block';
+    }
+}
+
+        function genererInterfaceParSpecialite(specialites) {
+            const container = document.getElementById('specialitesChoixContainer');
+            container.innerHTML = '';
+            
+            selections = {};
+            
+            const correspondancesMatieres = {
+                'education musicale': 'Éducation musicale',
+                'musique': 'Éducation musicale',
+                'education physique': 'Éducation physique',
+                'sport': 'Éducation physique',
+                'eveil scientifique': 'Éveil scientifique',
+                'sciences': 'Éveil scientifique',
+                'langue arabe': 'Langue arabe',
+                'arabe': 'Langue arabe',
+                'langue française': 'Langue française',
+                'francais': 'Langue française',
+                'langue anglaise': 'Langue anglaise',
+                'anglais': 'Langue anglaise',
+                'mathématiques': 'Mathématiques',
+                'maths': 'Mathématiques',
+                'education technologique': 'Éducation technologique',
+                'techno': 'Éducation technologique',
+                'education islamique': 'Éducation islamique',
+                'islamique': 'Éducation islamique',
+                'histoire': 'Histoire',
+                'géographie': 'Géographie',
+                'education civique': 'Éducation civique'
+            };
+            
+            specialites.forEach(specialiteOriginale => {
+                const specialiteNormalisee = specialiteOriginale
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .trim();
+                
+                let matiereCorrespondante = null;
+                
+                for (let [clef, valeur] of Object.entries(correspondancesMatieres)) {
+                    if (specialiteNormalisee.includes(clef) || clef.includes(specialiteNormalisee)) {
+                        matiereCorrespondante = valeur;
+                        break;
+                    }
+                }
+                
+                if (!matiereCorrespondante) {
+                    const toutesMatieres = [
+                        'Éducation musicale', 'Éducation physique', 'Éveil scientifique',
+                        'Langue arabe', 'Langue française', 'Langue anglaise',
+                        'Mathématiques', 'Éducation technologique', 'Éducation islamique',
+                        'Histoire', 'Géographie', 'Éducation civique'
+                    ];
+                    
+                    matiereCorrespondante = toutesMatieres.find(m => {
+                        const matiereNormalisee = m
+                            .toLowerCase()
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '');
+                        
+                        return matiereNormalisee.includes(specialiteNormalisee) || 
+                               specialiteNormalisee.includes(matiereNormalisee);
+                    });
+                }
+                
+                if (matiereCorrespondante) {
+                    const niveauxDisponibles = [];
+                    Object.keys(matieresParNiveau).forEach(niveau => {
+                        if (matieresParNiveau[niveau].includes(matiereCorrespondante)) {
+                            niveauxDisponibles.push(niveau);
+                        }
+                    });
+                    
+                    if (niveauxDisponibles.length === 0) return;
+                    
+                    selections[specialiteOriginale] = [];
+                    
+                    const section = document.createElement('div');
+                    section.className = 'specialite-section';
+                    
+                    const specialiteId = specialiteOriginale.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                    const matiereId = matiereCorrespondante.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                    
+                    section.innerHTML = `
+                        <div class="specialite-titre">
+                            ${specialiteOriginale} → ${matiereCorrespondante}
+                            <span class="info-badge">${niveauxDisponibles.length} niveau(x)</span>
+                        </div>
+                        <div class="checkbox-group">
+                            ${niveauxDisponibles.map(niveau => {
+                                const niveauId = niveau.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                                const heures = volumesHoraires[niveau]?.[matiereCorrespondante] || 0;
+                                
+                                return `
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" 
+                                               class="specialite-checkbox" 
+                                               data-specialite="${specialiteOriginale}"
+                                               data-matiere="${matiereCorrespondante}"
+                                               data-niveau="${niveau}"
+                                               id="cb-${specialiteId}-${matiereId}-${niveauId}">
+                                        <label for="cb-${specialiteId}-${matiereId}-${niveauId}">
+                                            ${niveau} (${heures}h)
+                                        </label>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                    
+                    container.appendChild(section);
+                }
+            });
+            
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="info-message">
+                        ⚠️ Aucune correspondance trouvée entre vos spécialités et les matières disponibles.
+                        <br><br>
+                        <strong>Vos spécialités :</strong> ${specialites.join(', ')}
+                        <br><br>
+                        <small>Veuillez contacter l'administration si le problème persiste.</small>
+                    </div>
+                `;
+            }
+            
+            document.querySelectorAll('.specialite-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (isFormLocked) return;
+                    
+                    const specialite = this.dataset.specialite;
+                    const matiere = this.dataset.matiere;
+                    const niveau = this.dataset.niveau;
+                    
+                    const key = `${specialite}|${matiere}|${niveau}`;
+                    
+                    if (this.checked) {
+                        if (!selections[specialite]) selections[specialite] = [];
+                        if (!selections[specialite].includes(key)) {
+                            selections[specialite].push(key);
+                        }
+                    } else {
+                        if (selections[specialite]) {
+                            selections[specialite] = selections[specialite].filter(k => k !== key);
+                        }
+                    }
+                    
+                    mettreAJourResume();
+                    verifierContrainteHeuresNiveaux();
+                    verifierToutesContraintes();
+                });
+            });
+        }
+
+        function mettreAJourResume() {
+            const resumeDiv = document.getElementById('resumeSelections');
+            const resumeContent = document.getElementById('resumeContent');
+            
+            let resumeHtml = '<div style="display: grid; gap: 0.8rem;">';
+            let totalHeuresSpecialites = 0;
+            
+            Object.keys(selections).forEach(specialite => {
+                const selectionsMatiere = selections[specialite] || [];
+                if (selectionsMatiere.length === 0) return;
+                
+                resumeHtml += `<div style="margin-top: 0.5rem;"><strong>${specialite}:</strong></div>`;
+                
+                selectionsMatiere.forEach(key => {
+                    const parts = key.split('|');
+                    if (parts.length === 3) {
+                        const matiere = parts[1];
+                        const niveau = parts[2];
+                        
+                        const heures = volumesHoraires[niveau]?.[matiere] || 0;
+                        totalHeuresSpecialites += heures;
+                        
+                        resumeHtml += `
+                            <div style="margin-left: 1.5rem; font-size: 0.95rem;">
+                                • ${matiere} - ${niveau} (${heures}h)
+                            </div>
+                        `;
+                    }
+                });
+            });
+            
+            resumeHtml += '</div>';
+            
+            if (Object.keys(selections).some(s => selections[s].length > 0)) {
+                resumeContent.innerHTML = resumeHtml;
+                document.getElementById('totalHeuresValeur').textContent = totalHeuresSpecialites + 'h';
+                document.getElementById('heuresSouhaiteesDisplay').innerHTML = `(souhaité: ${selectedHours}h)`;
+                resumeDiv.style.display = 'block';
+            } else {
+                resumeDiv.style.display = 'none';
+            }
+        }
+
+        async function loadExistingVoeux() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                
+                console.log('🔍 Chargement des vœux pour:', enseignantId);
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/voeux/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    console.log('📦 STRUCTURE COMPLÈTE:', JSON.stringify(data, null, 2));
+                    
+                    const voeux = data.data || data.Data;
+                    
+                    if (voeux) {
+                        console.log('✅ VŒUX TROUVÉS:', voeux);
+                        
+                        currentVoeux = voeux;
+                        
+                        const estValide = voeux.estValide === true || 
+                                         voeux.EstValide === true ||
+                                         voeux.statut === 'valide' ||
+                                         voeux.Statut === 'valide';
+                        
+                        console.log('✅ estValide:', estValide);
+                        
+                        if (estValide === true) {
+                            console.log('🚨🚨🚨 VŒUX VALIDÉS - VERROUILLAGE IMMÉDIAT');
+                            bloquerFormulaireComplet("✅ Vos vœux ont été validés.");
+                            afficherModalRedirectionAvecCompteur();
+                            return;
+                        }
+                        
+                        if (voeux.dateSoumission) {
+                            console.log('⏳ Vœux en attente');
+                            bloquerFormulaireComplet("⏳ Vœux en attente de validation.");
+                            return;
+                        }
+                        
+                        console.log('📝 Édition de vœux existants');
+                        remplirFormulaire(voeux);
+                        
+                    } else {
+                        console.log('📝 Aucun vœux trouvé - Formulaire libre');
+                    }
+                } else {
+                    console.log('❌ Erreur réponse:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+            }
+        }
+        
+        function bloquerFormulaireComplet(message) {
+            console.log('🔒 EXÉCUTION DE bloquerFormulaireComplet:', message);
+            
+            const formCard = document.getElementById('formCard');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!formCard) {
+                console.error('❌ formCard introuvable');
+                return;
+            }
+            
+            formCard.classList.add('form-locked');
+            
+            const allInputs = formCard.querySelectorAll('input, select, textarea, button');
+            console.log(`🔒 Désactivation de ${allInputs.length} champs`);
+            allInputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            if (submitBtn) {
+                submitBtn.disabled = true;
+            }
+            
+            isFormLocked = true;
+            
+            const statutDiv = document.getElementById('voeuxStatut');
+            const isValide = message.includes('validés');
+            
+            statutDiv.innerHTML = `
+                <div class="alert ${isValide ? 'alert-success' : 'alert-waiting'}" style="display: flex; align-items: center; gap: 1rem; padding: 1.5rem;">
+                    <span style="font-size: 2rem;">${isValide ? '✅' : '⏳'}</span>
+                    <div>
+                        <strong style="font-size: 1.1rem;">${isValide ? 'VŒUX VALIDÉS' : 'VŒUX EN ATTENTE'}</strong>
+                        <p style="margin-top: 0.5rem;">${message}</p>
+                        ${isValide ? '<p style="margin-top: 0.5rem; color: var(--accent-orange-dark);">🔜 Redirection automatique vers vos propositions...</p>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            console.log('🔒 Formulaire verrouillé avec succès');
+        }
+        
+        function afficherModalRedirectionAvecCompteur() {
+            let countdown = 5;
+            
+            const existingModal = document.querySelector('.redirect-modal');
+            if (existingModal) existingModal.remove();
+            
+            const modal = document.createElement('div');
+            modal.className = 'redirect-modal';
+            modal.innerHTML = `
+                <div class="redirect-card">
+                    <div class="redirect-icon">✅</div>
+                    <h2>Vœux validés !</h2>
+                    <p>Vos vœux ont été validés par l'administration.<br>Des propositions d'emploi du temps ont été générées pour vous.</p>
+                    <div class="countdown-timer" id="countdownTimer">Redirection dans <span id="countdownValue">${countdown}</span> seconde(s)...</div>
+                    <button class="btn-redirect" id="goToPropositionsBtn">Voir mes propositions maintenant</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            const countdownSpan = document.getElementById('countdownValue');
+            let timer = null;
+            
+            const redirect = () => {
+                if (timer) clearInterval(timer);
+                window.location.href = 'enseignant-propositions.html';
+            };
+            
+            timer = setInterval(() => {
+                countdown--;
+                if (countdownSpan) {
+                    countdownSpan.textContent = countdown;
+                }
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    redirect();
+                }
+            }, 1000);
+            
+            const goToBtn = document.getElementById('goToPropositionsBtn');
+            if (goToBtn) {
+                goToBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (timer) clearInterval(timer);
+                    redirect();
+                });
+            }
+        }
+        
+        function afficherConfirmationSoumission() {
+            if (isFormLocked) return Promise.resolve(false);
+            
+            return new Promise((resolve) => {
+                const modal = document.createElement('div');
+                modal.className = 'confirmation-modal';
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 2000;
+                    animation: fadeIn 0.3s ease;
+                `;
+                modal.innerHTML = `
+                    <div class="redirect-card" style="background: white; border-radius: 24px; padding: 2rem; max-width: 500px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                        <div class="redirect-icon">📋</div>
+                        <h3 style="color: var(--accent-orange-dark); margin-bottom: 1rem;">Confirmer l'envoi</h3>
+                        <p style="color: var(--text-light); margin-bottom: 1rem;">Une fois vos vœux envoyés, vous ne pourrez plus les modifier jusqu'à ce que l'administration les valide ou les refuse.</p>
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem;">
+                            Voulez-vous vraiment envoyer vos vœux ?
+                        </p>
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="cancelSubmitBtn" style="flex: 1; padding: 0.8rem; background: white; color: #666; border: 2px solid #ddd; border-radius: 12px; font-weight: 600; cursor: pointer;">Annuler</button>
+                            <button id="confirmSubmitBtn" style="flex: 1; padding: 0.8rem; background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-dark)); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer;">Oui, envoyer</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                document.getElementById('confirmSubmitBtn').addEventListener('click', () => {
+                    modal.remove();
+                    resolve(true);
+                });
+                
+                document.getElementById('cancelSubmitBtn').addEventListener('click', () => {
+                    modal.remove();
+                    resolve(false);
+                });
+            });
+        }
+
+        function remplirFormulaire(voeux) {
+            if (!voeux) return;
+            
+            if (voeux.heuresSouhaitees === 18) {
+                selectHours(18);
+            } else {
+                selectHours(16);
+            }
+
+            if (voeux.joursOff && voeux.joursOff.length > 0) {
+                voeux.joursOff.forEach(jour => {
+                    const cb = document.getElementById(`off-${jour}`);
+                    if (cb) {
+                        cb.checked = true;
+                        if (!joursOff.includes(jour)) {
+                            joursOff.push(jour);
+                        }
+                    }
+                });
+                updateJoursOffDisplay();
+            }
+
+            document.getElementById('preferenceHoraire').value = voeux.preferenceHoraire || 'flexible';
+            document.getElementById('commentaires').value = voeux.commentaires || '';
+            
+            if (voeux.niveauxParSpecialite) {
+                for (const [specialite, niveaux] of Object.entries(voeux.niveauxParSpecialite)) {
+                    if (selections[specialite]) {
+                        const matiereCorrespondante = trouverMatiereCorrespondante(specialite);
+                        if (matiereCorrespondante) {
+                            niveaux.forEach(niveau => {
+                                const key = `${specialite}|${matiereCorrespondante}|${niveau}`;
+                                if (!selections[specialite].includes(key)) {
+                                    selections[specialite].push(key);
+                                }
+                                
+                                const specialiteId = specialite.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                                const matiereId = matiereCorrespondante.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                                const niveauId = niveau.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                                const cb = document.getElementById(`cb-${specialiteId}-${matiereId}-${niveauId}`);
+                                if (cb) cb.checked = true;
+                            });
+                        }
+                    }
+                }
+            }
+            
+            mettreAJourResume();
+            verifierContrainteHeuresNiveaux();
+            verifierToutesContraintes();
+        }
+        
+        function trouverMatiereCorrespondante(specialite) {
+            const correspondancesMatieres = {
+                'education musicale': 'Éducation musicale',
+                'musique': 'Éducation musicale',
+                'education physique': 'Éducation physique',
+                'sport': 'Éducation physique',
+                'eveil scientifique': 'Éveil scientifique',
+                'sciences': 'Éveil scientifique',
+                'langue arabe': 'Langue arabe',
+                'arabe': 'Langue arabe',
+                'langue française': 'Langue française',
+                'francais': 'Langue française',
+                'langue anglaise': 'Langue anglaise',
+                'anglais': 'Langue anglaise',
+                'mathématiques': 'Mathématiques',
+                'maths': 'Mathématiques',
+                'education technologique': 'Éducation technologique',
+                'techno': 'Éducation technologique',
+                'education islamique': 'Éducation islamique',
+                'islamique': 'Éducation islamique',
+                'histoire': 'Histoire',
+                'géographie': 'Géographie',
+                'education civique': 'Éducation civique'
+            };
+            
+            const specialiteNormalisee = specialite
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
+            
+            for (let [clef, valeur] of Object.entries(correspondancesMatieres)) {
+                if (specialiteNormalisee.includes(clef) || clef.includes(specialiteNormalisee)) {
+                    return valeur;
+                }
+            }
+            
+            return null;
+        }
+
+        function afficherStatut(voeux, estValide) {
+            const statutDiv = document.getElementById('voeuxStatut');
+            
+            console.log('📊 afficherStatut - estValide:', estValide);
+            console.log('📊 afficherStatut - voeux.dateSoumission:', voeux?.dateSoumission);
+            
+            if (estValide === true) {
+                statutDiv.innerHTML = `
+                    <div class="alert alert-success" style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 1.5rem;">✅</span>
+                        <div>
+                            <strong>Vœux validés</strong>
+                            <p style="margin-top: 0.3rem;">Vos vœux ont été validés par l'administration le ${voeux.dateValidation ? new Date(voeux.dateValidation).toLocaleDateString('fr-FR') : 'récemment'}.</p>
+                            <p style="margin-top: 0.5rem; font-weight: bold;">🔒 Formulaire verrouillé - Redirection automatique...</p>
+                        </div>
+                    </div>
+                `;
+            } else if (voeux.dateSoumission) {
+                statutDiv.innerHTML = `
+                    <div class="alert alert-waiting" style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 1.5rem;">⏳</span>
+                        <div>
+                            <strong>En attente de validation</strong>
+                            <p style="margin-top: 0.3rem;">Vos vœux ont été soumis le ${new Date(voeux.dateSoumission).toLocaleDateString('fr-FR')}. L'administration les examinera prochainement.</p>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem;">🔒 Vous ne pouvez plus modifier vos vœux tant qu'ils sont en attente de validation.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                console.log('📊 Aucun statut particulier');
+            }
+        }
+
+        document.getElementById('voeuxForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isFormLocked) {
+                showMessage('Le formulaire est verrouillé. Vous ne pouvez plus modifier vos vœux.', 'warning');
+                return;
+            }
+            
+            const estValide = currentVoeux && (currentVoeux.estValide === true || currentVoeux.EstValide === true);
+            if (estValide) {
+                showMessage('Vos vœux sont déjà validés. Redirection vers vos propositions...', 'success');
+                bloquerFormulaireComplet("✅ Vos vœux sont validés ! Redirection...");
+                afficherModalRedirectionAvecCompteur();
+                return;
+            }
+            
+            if (currentVoeux && currentVoeux.dateSoumission && !estValide) {
+                showMessage('Vos vœux sont déjà en attente de validation. Vous ne pouvez plus les modifier.', 'warning');
+                bloquerFormulaireComplet("⏳ Vos vœux sont en attente de validation.");
+                return;
+            }
+            
+            if (!verifierToutesContraintes()) {
+                showMessage('Veuillez remplir tous les champs obligatoires : 2 jours de repos, des créneaux de travail, et des niveaux à enseigner.', 'error');
+                return;
+            }
+            
+            const confirmed = await afficherConfirmationSoumission();
+            if (!confirmed) return;
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loader"></span> Envoi en cours... Veuillez patienter...';
+
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                
+                if (joursOff.length !== 2) {
+                    showMessage('Veuillez sélectionner exactement 2 jours de repos', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+
+                const blocsSelectionnes = document.querySelectorAll('.bloc-checkbox:checked');
+                if (blocsSelectionnes.length === 0) {
+                    showMessage('Veuillez sélectionner au moins un créneau', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+
+                let totalHeuresBlocs = blocsSelectionnes.length * 4;
+                let extraHoursType = '';
+                let extraHoursDay = '';
+                
+                if (selectedHours === 18) {
+                    const workDay = document.getElementById('extraHoursWorkDay').value;
+                    
+                    if (!workDay) {
+                        showMessage('Veuillez choisir un jour de travail pour les 2h supplémentaires', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        return;
+                    }
+                    
+                    extraHoursType = 'work';
+                    extraHoursDay = workDay;
+                    totalHeuresBlocs += 2;
+                    
+                    if (extraHoursDay === 'samedi') {
+                        showMessage('Le samedi ne peut pas avoir 2h supplémentaires (maximum 4h)', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        return;
+                    }
+                }
+                
+                if ((selectedHours === 16 && totalHeuresBlocs > 16) || (selectedHours === 18 && totalHeuresBlocs > 18)) {
+                    showMessage(`Le total des heures des blocs (${totalHeuresBlocs}h) dépasse vos heures souhaitées (${selectedHours}h)`, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+
+                const indisponibilites = [];
+                
+                document.querySelectorAll('.bloc-checkbox').forEach(cb => {
+                    if (!cb.checked) {
+                        const [jour, periode] = cb.value.split('_');
+                        indisponibilites.push({
+                            jour: jour,
+                            periode: periode,
+                            motif: '',
+                            estRecurrent: true
+                        });
+                    }
+                });
+
+                const niveauxParSpecialite = {};
+
+                Object.keys(selections).forEach(specialite => {
+                    const selectionsMatiere = selections[specialite] || [];
+                    
+                    selectionsMatiere.forEach(key => {
+                        const parts = key.split('|');
+                        if (parts.length === 3) {
+                            const niveau = parts[2];
+                            
+                            if (!niveauxParSpecialite[specialite]) {
+                                niveauxParSpecialite[specialite] = [];
+                            }
+                            if (!niveauxParSpecialite[specialite].includes(niveau)) {
+                                niveauxParSpecialite[specialite].push(niveau);
+                            }
+                        }
+                    });
+                });
+
+                if (Object.keys(niveauxParSpecialite).length === 0) {
+                    showMessage('Veuillez sélectionner au moins un niveau pour une matière', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+
+                const totalHeuresNiveaux = calculerTotalHeuresNiveaux();
+                if (totalHeuresNiveaux > selectedHours) {
+                    showMessage(`Le total des heures des niveaux (${totalHeuresNiveaux}h) dépasse vos heures souhaitées (${selectedHours}h). Veuillez réduire le nombre de niveaux.`, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+
+                mettreAJourMatieresDetails();
+
+                const voeuxDto = {
+                    enseignantId: enseignantId,
+                    anneeScolaire: '2025-2026',
+                    preferenceHoraire: document.getElementById('preferenceHoraire').value,
+                    indisponibilites: indisponibilites,
+                    niveauxParSpecialite: niveauxParSpecialite,
+                    heuresSouhaitees: selectedHours,
+                    joursOff: joursOff,
+                    extraHours: selectedHours === 18 ? {
+                        type: extraHoursType,
+                        jour: extraHoursDay
+                    } : null,
+                    commentaires: document.getElementById('commentaires').value,
+                    dateSoumission: new Date().toISOString(),
+                    matieresDetails: matieresDetails,
+                    totalHeuresNiveaux: totalHeuresNiveaux,
+                    heuresRestantes: selectedHours - totalHeuresNiveaux
+                };
+
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/voeux`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(voeuxDto)
+                });
+
+                if (response.ok) {
+                    showMessage('✅ Vœux enregistrés avec succès ! Ils sont en attente de validation.', 'success');
+                    
+                    bloquerFormulaireComplet("⏳ Vos vœux ont été soumis et sont en attente de validation. Vous ne pouvez plus les modifier.");
+                    
+                    await loadExistingVoeux();
+                    document.getElementById('propositionsInfo').style.display = 'block';
+                } else {
+                    const error = await response.text();
+                    showMessage('Erreur: ' + error, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                showMessage('Erreur de connexion au serveur', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        function getCurrentEnseignantId() {
+            try {
+                if (window.parent && window.parent.ENSEIGNANT_CONFIG) {
+                    return window.parent.ENSEIGNANT_CONFIG.user?.id;
+                }
+            } catch (e) {}
+            
+            const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    return user.id;
+                } catch (e) {}
+            }
+            
+            return null;
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            const className = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-error' : 
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
+            
+            setTimeout(() => {
+                alertDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        document.getElementById('extraHoursWorkDay')?.addEventListener('change', function() {
+            if (!isFormLocked) {
+                updateBlocCount();
+                verifierToutesContraintes();
+            }
+        });
+    </script>
+</body>
+</html>

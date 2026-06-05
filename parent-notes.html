@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Notes & Moyennes de mes enfants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .enfants-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .enfant-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            background: #f8fafc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .enfant-tab:hover {
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .enfant-tab.active {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            border-color: #4ca896;
+            box-shadow: 0 4px 15px rgba(76, 168, 150, 0.3);
+        }
+
+        .enfant-tab.active .enfant-tab-name {
+            color: white;
+        }
+
+        .enfant-tab.active .enfant-tab-class {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .enfant-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #4ca896, #2d6b63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .enfant-tab-info {
+            text-align: left;
+        }
+
+        .enfant-tab-name {
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .enfant-tab-class {
+            font-size: 0.7rem;
+            background: #e0e9e7;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+
+        .hide-class {
+            display: none;
+        }
+
+        .moyenne-generale-card {
+            background: linear-gradient(135deg, #4ca896, #2d6b63);
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            box-shadow: 0 10px 30px rgba(76, 168, 150, 0.3);
+        }
+
+        .moyenne-value {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .moyenne-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .appreciation-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e9e7;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #4ca896;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .stat-label {
+            color: #5a9d91;
+            font-size: 0.85rem;
+        }
+
+        .matieres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .matiere-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .matiere-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(76, 168, 150, 0.15);
+        }
+
+        .matiere-header {
+            padding: 1.2rem 1.5rem;
+            background: linear-gradient(135deg, #f8fafc, #f0f5f8);
+            border-bottom: 1px solid #e0e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .matiere-nom {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .matiere-moyenne {
+            background: #4ca896;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .matiere-coeff {
+            font-size: 0.75rem;
+            color: #5a9d91;
+            margin-top: 0.2rem;
+        }
+
+        .notes-list {
+            padding: 1rem 1.5rem;
+        }
+
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .note-item:last-child {
+            border-bottom: none;
+        }
+
+        .note-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .note-type {
+            background: #e0f2f1;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #2d6b63;
+        }
+
+        .note-date {
+            font-size: 0.7rem;
+            color: #5a9d91;
+        }
+
+        .note-commentaire {
+            font-size: 0.75rem;
+            color: #5a9d91;
+            font-style: italic;
+            margin-left: 0.5rem;
+        }
+
+        .note-valeur {
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+        }
+
+        .note-valeur.excellent {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .note-valeur.bon {
+            background: #d9f99d;
+            color: #3f6212;
+        }
+
+        .note-valeur.passable {
+            background: #fed7aa;
+            color: #9b2c1d;
+        }
+
+        .note-valeur.insuffisant {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            border: 2px dashed #e0e9e7;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #b45309;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .progress-bar-container {
+            background: #e0e9e7;
+            border-radius: 20px;
+            height: 8px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: #4ca896;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto;
+        }
+
+        .btn-export {
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-export-pdf {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-export-pdf:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-export-excel {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-export-excel:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .matieres-grid { grid-template-columns: 1fr; }
+            .moyenne-value { font-size: 2.5rem; }
+            .enfant-tab { padding: 0.5rem 1rem; }
+            .enfant-avatar { width: 35px; height: 35px; font-size: 0.9rem; }
+            .export-buttons { margin-left: 0; margin-top: 1rem; width: 100%; justify-content: center; }
+            .moyenne-generale-card { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContainer">
+        <div class="loading">Chargement des notes...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        let enfants = [];
+        let currentEnfantId = null;
+        let notesData = {};
+
+        // Configuration : mettre à false pour cacher complètement la classe
+        const AFFICHER_CLASSE = true;  // Mettre à false pour supprimer l'affichage de la classe
+        const UTILISER_NIVEAU = true;   // Mettre à true pour utiliser le niveau au lieu de l'ID
+
+        // Fonction pour vérifier si une chaîne est un ID MongoDB
+        function isMongoId(str) {
+            return typeof str === 'string' && /^[a-f0-9]{24}$/i.test(str);
+        }
+
+        // Fonction pour formater le nom de la classe
+        function formatClassName(enfant) {
+            if (!AFFICHER_CLASSE) {
+                return ''; // Ne rien afficher
+            }
+            
+            // Essayer d'utiliser le niveau d'abord
+            if (UTILISER_NIVEAU && enfant.niveau) {
+                return enfant.niveau;
+            }
+            
+            // Sinon essayer classeNom
+            if (enfant.classeNom && !isMongoId(enfant.classeNom)) {
+                return enfant.classeNom;
+            }
+            
+            // Sinon essayer classeId si ce n'est pas un ID
+            if (enfant.classeId && !isMongoId(enfant.classeId)) {
+                return enfant.classeId;
+            }
+            
+            // Si on a un niveau dans l'objet original
+            if (enfant.niveau) {
+                return enfant.niveau;
+            }
+            
+            // Dernier recours : ne rien afficher
+            return '';
+        }
+
+        // Fonction ULTRA aggressive pour supprimer TOUS les IDs
+        function cleanChildName(prenom, nom) {
+            let cleanPrenom = prenom || '';
+            let cleanNom = nom || '';
+            
+            // Si c'est un objet, essayer d'extraire la valeur
+            if (typeof cleanPrenom === 'object') {
+                cleanPrenom = cleanPrenom.nom || cleanPrenom.prenom || cleanPrenom.value || '';
+            }
+            if (typeof cleanNom === 'object') {
+                cleanNom = cleanNom.nom || cleanNom.prenom || cleanNom.value || '';
+            }
+            
+            let fullName = `${cleanPrenom} ${cleanNom}`.trim();
+            
+            // Supprimer TOUS les IDs MongoDB (24 caractères hexadécimaux)
+            fullName = fullName.replace(/[a-f0-9]{24}/gi, '');
+            
+            // Supprimer spécifiquement les IDs connus
+            fullName = fullName.replace(/6995fdbdaf7c09c380f1e289/gi, '');
+            fullName = fullName.replace(/699aebde9977fd14213a85a7/gi, '');
+            
+            // Supprimer tout autre pattern d'ID possible
+            fullName = fullName.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+            fullName = fullName.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '');
+            
+            // Nettoyer les espaces multiples
+            fullName = fullName.replace(/\s+/g, ' ').trim();
+            
+            // Mettre en forme: première lettre de chaque mot en majuscule
+            if (fullName && fullName.length > 0 && fullName !== ' ') {
+                fullName = fullName.split(' ').map(word => {
+                    if (word.length === 0) return '';
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }).join(' ');
+            }
+            
+            // Si le nom est vide, retourner "Mon enfant"
+            if (!fullName || fullName.length === 0 || fullName === ' ') {
+                return "Mon enfant";
+            }
+            
+            return fullName;
+        }
+
+        // Récupérer le token depuis le parent
+        function getAuthToken() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    return window.parent.ParentSpace.getToken();
+                }
+                if (window.ParentSpace && typeof window.ParentSpace.getToken === 'function') {
+                    return window.ParentSpace.getToken();
+                }
+            } catch(e) { console.warn('Cannot access ParentSpace:', e); }
+            
+            return localStorage.getItem('authToken') || 
+                   localStorage.getItem('parentAuthToken') || 
+                   sessionStorage.getItem('authToken');
+        }
+
+        function getCurrentUser() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getCurrentUser === 'function') {
+                    return window.parent.ParentSpace.getCurrentUser();
+                }
+                if (window.ParentSpace && typeof window.ParentSpace.getCurrentUser === 'function') {
+                    return window.ParentSpace.getCurrentUser();
+                }
+            } catch(e) { console.warn('Cannot access ParentSpace:', e); }
+            
+            try {
+                const userStr = localStorage.getItem('currentUser') || localStorage.getItem('parentUser');
+                if (userStr) return JSON.parse(userStr);
+            } catch(e) {}
+            return null;
+        }
+
+        function requestTokenFromParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'REQUEST_TOKEN' }, '*');
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'SET_TOKEN') {
+                token = event.data.token;
+                console.log('✅ Token reçu du parent');
+                chargerEnfants();
+            }
+        });
+
+        function getAppreciation(moyenne) {
+            if (moyenne >= 16) return { text: '🏆 Excellent', color: '#065f46', bg: '#d1fae5' };
+            if (moyenne >= 14) return { text: '🌟 Très bien', color: '#1e40af', bg: '#dbeafe' };
+            if (moyenne >= 12) return { text: '👍 Bien', color: '#3f6212', bg: '#d9f99d' };
+            if (moyenne >= 10) return { text: '✅ Passable', color: '#9b2c1d', bg: '#fed7aa' };
+            if (moyenne >= 8) return { text: '⚠️ Insuffisant', color: '#b45309', bg: '#ffedd5' };
+            return { text: '❌ Faible', color: '#b91c1c', bg: '#fee2e2' };
+        }
+
+        function getNoteClass(valeur) {
+            if (valeur >= 16) return 'excellent';
+            if (valeur >= 14) return 'bon';
+            if (valeur >= 10) return 'passable';
+            return 'insuffisant';
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                if (typeof dateValue === 'object' && dateValue.$date) {
+                    return new Date(dateValue.$date).toLocaleDateString('fr-FR');
+                }
+                return new Date(dateValue).toLocaleDateString('fr-FR');
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        async function chargerEnfants() {
+            if (!token) {
+                token = getAuthToken();
+                if (!token) {
+                    requestTokenFromParent();
+                    setTimeout(() => {
+                        if (!token) chargerEnfants();
+                    }, 500);
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enfants`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        requestTokenFromParent();
+                        setTimeout(() => chargerEnfants(), 1000);
+                        return;
+                    }
+                    throw new Error(`Erreur ${response.status}`);
+                }
+
+                const data = await response.json();
+                enfants = data.data || [];
+                console.log(`📊 ${enfants.length} enfant(s) trouvé(s)`);
+                
+                enfants.forEach(e => {
+                    const clean = cleanChildName(e.prenom, e.nom);
+                    console.log(`Enfant: "${e.prenom} ${e.nom}" -> Nettoyé: "${clean}" | Niveau: "${e.niveau || 'non défini'}"`);
+                });
+
+                if (enfants.length === 0) {
+                    afficherAucunEnfant();
+                    return;
+                }
+
+                await chargerNotesTousEnfants();
+                
+                if (enfants.length > 0 && !currentEnfantId) {
+                    currentEnfantId = enfants[0].id;
+                }
+                
+                afficherInterface();
+
+            } catch (error) {
+                console.error('Erreur chargement enfants:', error);
+                afficherErreur('Impossible de charger la liste de vos enfants. Veuillez réessayer.');
+            }
+        }
+
+        async function chargerNotesTousEnfants() {
+            for (const enfant of enfants) {
+                await chargerNotesEnfant(enfant.id);
+            }
+        }
+
+        async function chargerNotesEnfant(eleveId) {
+            try {
+                console.log(`📊 Chargement des notes pour l'élève ${eleveId}`);
+                
+                const response = await fetch(`${API_BASE}/api/Note/eleve/${eleveId}/moyenne-detaillee`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    console.warn(`⚠️ Pas de notes pour l'élève ${eleveId}`);
+                    notesData[eleveId] = {
+                        moyenneGenerale: 0,
+                        nombreNotes: 0,
+                        detailsParMatiere: []
+                    };
+                    return;
+                }
+
+                const data = await response.json();
+                notesData[eleveId] = {
+                    moyenneGenerale: data.moyenneGenerale || 0,
+                    nombreNotes: data.nombreNotes || 0,
+                    detailsParMatiere: data.detailsParMatiere || []
+                };
+                
+                console.log(`✅ Notes chargées pour ${eleveId}`);
+
+            } catch (error) {
+                console.error(`Erreur chargement notes pour ${eleveId}:`, error);
+                notesData[eleveId] = {
+                    moyenneGenerale: 0,
+                    nombreNotes: 0,
+                    detailsParMatiere: []
+                };
+            }
+        }
+
+        async function rafraichirNotes() {
+            if (currentEnfantId) {
+                await chargerNotesEnfant(currentEnfantId);
+                afficherNotesEnfant();
+            }
+        }
+
+        function afficherInterface() {
+            const container = document.getElementById('mainContainer');
+            
+            // Générer l'affichage des onglets enfants
+            let tabsHtml = '';
+            for (const enfant of enfants) {
+                const cleanName = cleanChildName(enfant.prenom, enfant.nom);
+                const initial = cleanName.charAt(0) || 'E';
+                const classeDisplay = formatClassName(enfant);
+                const classHtml = classeDisplay ? `<div class="enfant-tab-class">${escapeHtml(classeDisplay)}</div>` : '';
+                
+                tabsHtml += `
+                    <div class="enfant-tab ${enfant.id === currentEnfantId ? 'active' : ''}" 
+                         onclick="selectEnfant('${enfant.id}')">
+                        <div class="enfant-avatar">
+                            ${escapeHtml(initial)}
+                        </div>
+                        <div class="enfant-tab-info">
+                            <div class="enfant-tab-name">${escapeHtml(cleanName)}</div>
+                            ${classHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div class="enfants-tabs" id="enfantsTabs">
+                    ${tabsHtml}
+                    <button class="enfant-tab" onclick="rafraichirNotes()" style="background: transparent; border: 1px solid #4ca896;">
+                        <span>🔄</span>
+                        <span>Rafraîchir</span>
+                    </button>
+                </div>
+                <div id="notesContent">
+                    <div class="loading">Chargement des notes...</div>
+                </div>
+            `;
+            
+            afficherNotesEnfant();
+        }
+
+        async function exporterPDF() {
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const cleanName = cleanChildName(enfant?.prenom, enfant?.nom);
+            
+            const element = document.getElementById('notesContent');
+            if (!element) return;
+            
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `Bulletin_${cleanName}_${new Date().toLocaleDateString('fr-FR')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            const originalContent = element.innerHTML;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = originalContent;
+            
+            tempDiv.querySelectorAll('.btn-export').forEach(btn => btn.remove());
+            
+            const title = document.createElement('div');
+            title.style.textAlign = 'center';
+            title.style.marginBottom = '20px';
+            title.style.padding = '20px';
+            title.style.background = 'linear-gradient(135deg, #4ca896, #2d6b63)';
+            title.style.color = 'white';
+            title.style.borderRadius = '15px';
+            title.innerHTML = `
+                <h1 style="margin: 0;">📊 Bulletin Scolaire</h1>
+                <h2 style="margin: 10px 0 0 0;">${escapeHtml(cleanName)}</h2>
+                <p style="margin: 5px 0 0 0;">${formatClassName(enfant) || ''}</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">Généré le ${new Date().toLocaleDateString('fr-FR')}</p>
+            `;
+            
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(title);
+            wrapper.appendChild(tempDiv);
+            
+            html2pdf().set(opt).from(wrapper).save();
+        }
+        
+        function exporterExcel() {
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const cleanName = cleanChildName(enfant?.prenom, enfant?.nom);
+            const notes = notesData[currentEnfantId];
+            
+            if (!notes || !notes.detailsParMatiere || notes.detailsParMatiere.length === 0) {
+                alert('Aucune donnée à exporter');
+                return;
+            }
+            
+            const workbook = XLSX.utils.book_new();
+            
+            const resumeData = [
+                ['BULLETIN SCOLAIRE'],
+                ['Élève', cleanName],
+                ['Classe', formatClassName(enfant) || 'Non définie'],
+                ['Date d\'exportation', new Date().toLocaleDateString('fr-FR')],
+                [''],
+                ['RÉSUMÉ GÉNÉRAL'],
+                ['Moyenne Générale', notes.moyenneGenerale.toFixed(2) + ' / 20'],
+                ['Nombre total de notes', notes.nombreNotes],
+                ['Nombre de matières', notes.detailsParMatiere.length],
+                ['']
+            ];
+            
+            const appreciation = getAppreciation(notes.moyenneGenerale);
+            resumeData.push(['Appréciation', appreciation.text]);
+            resumeData.push(['']);
+            
+            const feuilleResume = XLSX.utils.aoa_to_sheet(resumeData);
+            XLSX.utils.book_append_sheet(workbook, feuilleResume, 'Résumé');
+            
+            const notesDataRows = [
+                ['DÉTAIL DES NOTES PAR MATIÈRE'],
+                ['Matière', 'Moyenne', 'Coefficient', 'Nombre de notes', 'Appréciation']
+            ];
+            
+            for (const matiere of notes.detailsParMatiere) {
+                const matiereAppreciation = getAppreciation(matiere.moyenne);
+                notesDataRows.push([
+                    matiere.matiereNom,
+                    matiere.moyenne.toFixed(2) + ' / 20',
+                    matiere.coefficient || 1,
+                    (matiere.notes || []).length,
+                    matiereAppreciation.text
+                ]);
+            }
+            
+            notesDataRows.push([''], ['DÉTAIL COMPLET DES NOTES']);
+            notesDataRows.push(['Matière', 'Type', 'Date', 'Note', 'Commentaire']);
+            
+            for (const matiere of notes.detailsParMatiere) {
+                if (matiere.notes && matiere.notes.length > 0) {
+                    for (const note of matiere.notes) {
+                        notesDataRows.push([
+                            matiere.matiereNom,
+                            note.type || 'Devoir',
+                            formatDate(note.date),
+                            note.valeur.toFixed(1) + ' / 20',
+                            note.commentaire || ''
+                        ]);
+                    }
+                } else {
+                    notesDataRows.push([matiere.matiereNom, '', '', 'Aucune note', '']);
+                }
+            }
+            
+            const feuilleNotes = XLSX.utils.aoa_to_sheet(notesDataRows);
+            
+            feuilleNotes['!cols'] = [
+                { wch: 20 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 15 },
+                { wch: 30 }
+            ];
+            
+            XLSX.utils.book_append_sheet(workbook, feuilleNotes, 'Détail des notes');
+            
+            XLSX.writeFile(workbook, `Notes_${cleanName}_${new Date().toLocaleDateString('fr-FR')}.xlsx`);
+        }
+
+        function afficherNotesEnfant() {
+            if (!currentEnfantId) return;
+            
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const cleanChild = cleanChildName(enfant?.prenom, enfant?.nom);
+            
+            const notes = notesData[currentEnfantId];
+            
+            if (!notes) {
+                document.getElementById('notesContent').innerHTML = '<div class="loading">Chargement des notes...</div>';
+                chargerNotesEnfant(currentEnfantId).then(() => afficherNotesEnfant());
+                return;
+            }
+            
+            const appreciation = getAppreciation(notes.moyenneGenerale);
+            const matieres = notes.detailsParMatiere || [];
+            const totalNotes = matieres.reduce((sum, m) => sum + (m.notes?.length || 0), 0);
+            
+            let meilleureNote = 0;
+            let meilleureMatiere = '';
+            let pireNote = 20;
+            let pireMatiere = '';
+            
+            matieres.forEach(m => {
+                if (m.moyenne > meilleureNote) {
+                    meilleureNote = m.moyenne;
+                    meilleureMatiere = m.matiereNom;
+                }
+                if (m.moyenne < pireNote && m.moyenne > 0) {
+                    pireNote = m.moyenne;
+                    pireMatiere = m.matiereNom;
+                }
+            });
+            
+            const container = document.getElementById('notesContent');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="moyenne-generale-card">
+                    <div>
+                        <div class="moyenne-value">${notes.moyenneGenerale.toFixed(2)} / 20</div>
+                        <div class="moyenne-label">Moyenne générale</div>
+                        <div class="progress-bar-container" style="margin-top: 1rem; width: 200px;">
+                            <div class="progress-bar" style="width: ${(notes.moyenneGenerale / 20) * 100}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="appreciation-badge" style="background: ${appreciation.bg}; color: ${appreciation.color};">
+                            ${appreciation.text}
+                        </div>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem;">
+                            ${notes.nombreNotes} note(s) au total
+                        </div>
+                    </div>
+                    <div class="export-buttons">
+                        <button class="btn-export btn-export-pdf" onclick="exporterPDF()">
+                            📄 Exporter PDF
+                        </button>
+                        <button class="btn-export btn-export-excel" onclick="exporterExcel()">
+                            📊 Exporter Excel
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${matieres.length}</div>
+                        <div class="stat-label">Matières</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalNotes}</div>
+                        <div class="stat-label">Notes enregistrées</div>
+                    </div>
+                    ${meilleureMatiere ? `
+                    <div class="stat-card">
+                        <div class="stat-number">${meilleureNote.toFixed(1)}</div>
+                        <div class="stat-label">Meilleure moyenne<br>${escapeHtml(meilleureMatiere)}</div>
+                    </div>
+                    ` : ''}
+                    ${pireMatiere && pireNote < 20 ? `
+                    <div class="stat-card">
+                        <div class="stat-number">${pireNote.toFixed(1)}</div>
+                        <div class="stat-label">Moyenne à améliorer<br>${escapeHtml(pireMatiere)}</div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="matieres-grid">
+                    ${matieres.length === 0 ? `
+                        <div class="empty-state" style="grid-column: 1/-1;">
+                            <div class="empty-state-icon">📊</div>
+                            <h3>Aucune note enregistrée</h3>
+                            <p style="color: #5a9d91;">Les notes de ${escapeHtml(cleanChild)} apparaîtront ici dès qu'elles seront disponibles.</p>
+                        </div>
+                    ` : matieres.map(matiere => {
+                        const matiereAppreciation = getAppreciation(matiere.moyenne);
+                        const notesList = matiere.notes || [];
+                        const moyenneBarWidth = (matiere.moyenne / 20) * 100;
+                        
+                        return `
+                            <div class="matiere-card">
+                                <div class="matiere-header">
+                                    <div>
+                                        <div class="matiere-nom">
+                                            📚 ${escapeHtml(matiere.matiereNom)}
+                                            <span class="matiere-coeff">coeff ${matiere.coefficient || 1}</span>
+                                        </div>
+                                    </div>
+                                    <div class="matiere-moyenne" style="background: ${matiereAppreciation.bg}; color: ${matiereAppreciation.color};">
+                                        ${matiere.moyenne.toFixed(2)}
+                                    </div>
+                                </div>
+                                <div class="progress-bar-container" style="margin: 0 1.5rem; width: calc(100% - 3rem);">
+                                    <div class="progress-bar" style="width: ${moyenneBarWidth}%; background: ${matiere.moyenne >= 10 ? '#4ca896' : '#f59e0b'};"></div>
+                                </div>
+                                <div class="notes-list">
+                                    ${notesList.length === 0 ? `
+                                        <div style="text-align: center; padding: 1rem; color: #5a9d91;">
+                                            Aucune note enregistrée pour cette matière
+                                        </div>
+                                    ` : notesList.map(note => `
+                                        <div class="note-item">
+                                            <div class="note-info">
+                                                <span class="note-type">${escapeHtml(note.type || 'Devoir')}</span>
+                                                <span class="note-date">${formatDate(note.date)}</span>
+                                                ${note.commentaire ? `<span class="note-commentaire">"${escapeHtml(note.commentaire)}"</span>` : ''}
+                                            </div>
+                                            <div class="note-valeur ${getNoteClass(note.valeur)}">
+                                                ${note.valeur.toFixed(1)} / 20
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div style="padding: 0.8rem 1.5rem 1.2rem; border-top: 1px solid #e0e9e7; background: #fafdfc;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #5a9d91;">
+                                        <span>📊 ${notesList.length} note(s)</span>
+                                        <span>⚖️ Coefficient ${matiere.coefficient || 1}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function selectEnfant(eleveId) {
+            currentEnfantId = eleveId;
+            
+            document.querySelectorAll('.enfant-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            const tabs = document.querySelectorAll('.enfant-tab');
+            for (let i = 0; i < enfants.length; i++) {
+                if (enfants[i].id === eleveId && tabs[i]) {
+                    tabs[i].classList.add('active');
+                    break;
+                }
+            }
+            
+            afficherNotesEnfant();
+        }
+
+        function afficherErreur(message) {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                    ⚠️ ${escapeHtml(message)}
+                </div>
+                <button class="enfant-tab" onclick="location.reload()" style="background: #4ca896; color: white; border: none;">
+                    🔄 Réessayer
+                </button>
+            `;
+        }
+
+        function afficherAucunEnfant() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👧🧒</div>
+                    <h3>Aucun enfant associé à votre compte</h3>
+                    <p style="color: #5a9d91; margin-top: 0.5rem;">
+                        Si vous pensez qu'il s'agit d'une erreur, veuillez contacter l'administration.
+                    </p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            token = getAuthToken();
+            console.log('📱 Page parent-notes initialisée');
+            
+            if (token) {
+                chargerEnfants();
+            } else {
+                requestTokenFromParent();
+                setTimeout(() => {
+                    if (!token) {
+                        token = getAuthToken();
+                        if (token) chargerEnfants();
+                        else afficherErreur('Impossible de récupérer votre session. Veuillez vous reconnecter.');
+                    }
+                }, 1000);
+            }
+        });
+
+        window.selectEnfant = selectEnfant;
+        window.rafraichirNotes = rafraichirNotes;
+        window.getAuthToken = getAuthToken;
+        window.exporterPDF = exporterPDF;
+        window.exporterExcel = exporterExcel;
+
+    </script>
+</body>
+</html>

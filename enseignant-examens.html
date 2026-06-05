@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes examens de surveillance</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        body { background: var(--gray-bg); padding: 1.5rem; }
+        
+        .page-header { margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .page-title h1 { font-size: 1.8rem; color: var(--text-dark); display: flex; align-items: center; gap: 0.8rem; }
+        .badge { background: var(--primary-green); color: white; padding: 0.3rem 0.8rem; border-radius: 30px; font-size: 0.8rem; }
+        .btn-refresh { background: var(--primary-green); border: none; padding: 0.6rem 1.2rem; border-radius: 12px; color: white; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-refresh:hover { background: var(--primary-dark); }
+        .btn-pdf { background: linear-gradient(135deg, #dc2626, #b91c1c); border: none; padding: 0.6rem 1.2rem; border-radius: 12px; color: white; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-pdf:hover { background: linear-gradient(135deg, #b91c1c, #991b1b); }
+        .header-actions { display: flex; gap: 0.8rem; }
+        
+        .stats-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .stat-card { background: white; border-radius: 20px; padding: 1rem 1.5rem; box-shadow: var(--shadow-sm); flex: 1; min-width: 150px; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--gray-border); }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--primary-green); }
+        .stat-label { font-size: 0.8rem; color: var(--text-soft); }
+        
+        .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
+        .filter-select { padding: 0.5rem 1rem; border: 2px solid var(--gray-border); border-radius: 12px; background: white; cursor: pointer; }
+        .search-input { padding: 0.5rem 1rem; border: 2px solid var(--gray-border); border-radius: 12px; width: 250px; }
+        
+        .welcome-banner { background: linear-gradient(135deg, var(--primary-green), var(--primary-dark)); color: white; padding: 1rem 1.5rem; border-radius: 16px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        
+        .exam-table-wrapper { overflow-x: auto; border-radius: 16px; }
+        .exam-table { width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
+        .exam-table th, .exam-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--gray-border); }
+        .exam-table th { background: linear-gradient(135deg, var(--primary-green), var(--primary-dark)); color: white; font-weight: 600; font-size: 0.85rem; }
+        .exam-table tr:hover { background: rgba(76, 168, 150, 0.05); }
+        
+        .room-badge { background: #e3f2fd; color: #1565c0; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; display: inline-block; }
+        .duration-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .duration-2h { background: #e8f5e9; color: #2e7d32; }
+        .duration-1h { background: #fff3e0; color: #e65100; }
+        .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .status-planifie { background: #e3f2fd; color: #1565c0; }
+        .status-termine { background: #e8f5e9; color: #2e7d32; }
+        .status-en-cours { background: #fff3e0; color: #e65100; }
+        
+        .loader { display: flex; justify-content: center; padding: 3rem; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--gray-border); border-top-color: var(--primary-green); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state { text-align: center; padding: 3rem; background: white; border-radius: 20px; }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; }
+        
+        @media (max-width: 768px) {
+            .exam-table th, .exam-table td { padding: 0.5rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="page-title">
+            <h1>📋 Mes examens de surveillance</h1>
+            <span class="badge" id="totalExamsBadge">0</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn-refresh" id="refreshBtn">🔄 Actualiser</button>
+            <button class="btn-pdf" id="pdfBtn">📄 Exporter PDF</button>
+        </div>
+    </div>
+
+    <div class="welcome-banner" id="welcomeBanner">
+        <h2>👨‍🏫 Chargement...</h2>
+        <div>📋 Examens où vous êtes surveillant</div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card"><div class="stat-number" id="statTotal">0</div><div class="stat-label">Total examens</div></div>
+        <div class="stat-card"><div class="stat-number" id="statThisWeek">0</div><div class="stat-label">Cette semaine</div></div>
+        <div class="stat-card"><div class="stat-number" id="statSalles">0</div><div class="stat-label">Salles différentes</div></div>
+        <div class="stat-card"><div class="stat-number" id="statHeures">0</div><div class="stat-label">Heures totales</div></div>
+    </div>
+
+    <div class="filters">
+        <select id="periodeFilter" class="filter-select">
+            <option value="all">📅 Toutes les périodes</option>
+        </select>
+        <select id="statusFilter" class="filter-select">
+            <option value="all">📌 Tous les statuts</option>
+            <option value="planifie">📝 Planifiés</option>
+            <option value="en-cours">🔄 En cours</option>
+            <option value="termine">✅ Terminés</option>
+        </select>
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher matière, classe, salle...">
+    </div>
+
+    <div id="examsContainer"><div class="loader"><div class="spinner"></div></div></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5267/api';
+        let mesExamens = [];
+        let allExamens = [];
+        let currentUser = null;
+        let sallesMap = new Map();
+
+        document.addEventListener('DOMContentLoaded', () => { loadCurrentUser(); });
+        document.getElementById('pdfBtn')?.addEventListener('click', () => exporterExamensPDF());
+
+        async function loadCurrentUser() {
+            try {
+                let userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) {
+                    currentUser = JSON.parse(userStr);
+                    const nom = `${currentUser.prenom || ''} ${currentUser.nom || ''}`.trim();
+                    document.getElementById('welcomeBanner').innerHTML = `<h2>👨‍🏫 ${nom || currentUser.email}</h2><div>📋 Mes examens de surveillance</div>`;
+                    console.log(`✅ Enseignant connecté: ${nom} (ID: ${currentUser.id})`);
+                } else {
+                    currentUser = { id: null };
+                }
+                await loadSalles();
+                await loadMesExamens();
+            } catch (error) { console.error(error); }
+        }
+
+        async function loadSalles() {
+            try {
+                console.log(`📡 Chargement des salles...`);
+                const response = await fetch(`${API_BASE_URL}/Salle/public`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    let salles = [];
+                    if (Array.isArray(data)) {
+                        salles = data;
+                    } else if (data.Data && Array.isArray(data.Data)) {
+                        salles = data.Data;
+                    } else if (data.data && Array.isArray(data.data)) {
+                        salles = data.data;
+                    } else if (data.$values && Array.isArray(data.$values)) {
+                        salles = data.$values;
+                    }
+                    
+                    console.log(`📊 ${salles.length} salles trouvées`);
+                    
+                    sallesMap.clear();
+                    salles.forEach(s => {
+                        const id = s.Id || s.id || s._id;
+                        const nom = s.NomSalle || s.nomSalle || s.nom || s.Nom;
+                        if (id && nom) {
+                            sallesMap.set(id, nom);
+                            console.log(`  📌 ${nom} (ID: ${id})`);
+                        }
+                    });
+                    console.log(`✅ ${sallesMap.size} salles chargées`);
+                } else {
+                    console.log(`❌ Erreur chargement salles: ${response.status}`);
+                }
+            } catch (error) { 
+                console.error(`❌ Erreur chargement salles: ${error.message}`);
+            }
+        }
+
+        function extractDateFromExam(exam) {
+            if (exam.Date) return new Date(exam.Date);
+            if (exam.date) return new Date(exam.date);
+            return null;
+        }
+
+        function formatDate(dateObj) {
+            if (!dateObj || isNaN(dateObj.getTime())) return 'Date inconnue';
+            return dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        async function loadMesExamens() {
+            const container = document.getElementById('examsContainer');
+            container.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+            
+            try {
+                const userId = currentUser?.id;
+                const response = await fetch(`${API_BASE_URL}/Examen/enseignant/${userId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    let exams = data.Data || data.data || data || [];
+                    if (!Array.isArray(exams)) exams = [];
+                    
+                    console.log(`📊 ${exams.length} examens reçus`);
+                    
+                    if (exams.length > 0) {
+                        console.log('🔍 Premier examen:', exams[0]);
+                        console.log('🔍 Salle ID:', exams[0].Salle || exams[0].salle);
+                    }
+                    
+                    allExamens = exams.map(exam => {
+                        const dateObj = extractDateFromExam(exam);
+                        const dateStr = formatDate(dateObj);
+                        
+                        let salleId = exam.Salle || exam.salle;
+                        let salleNom = '—';
+                        
+                        if (salleId) {
+                            if (sallesMap.has(salleId)) {
+                                salleNom = sallesMap.get(salleId);
+                            } else {
+                                salleNom = salleId.substring(0, 8) + '...';
+                            }
+                        }
+                        
+                        let duree = exam.duree || 60;
+                        const matiereNom = (exam.MatiereNom || exam.matiereNom || '').toLowerCase();
+                        if (matiereNom.includes('arabe') || matiereNom.includes('franc') || 
+                            matiereNom.includes('anglais') || matiereNom.includes('math')) {
+                            duree = 120;
+                        }
+                        
+                        let status = 'planifie';
+                        if (dateObj && !isNaN(dateObj.getTime())) {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (dateObj < today) status = 'termine';
+                            else if (dateObj.toDateString() === today.toDateString()) status = 'en-cours';
+                        }
+                        
+                        return {
+                            id: exam.Id || exam.id || exam._id,
+                            matiereNom: exam.MatiereNom || exam.matiereNom || 'Matière',
+                            classeNom: exam.ClasseNom || exam.classeNom || 'Classe',
+                            date: dateObj,
+                            dateStr: dateStr,
+                            heureDebut: exam.HeureDebut || exam.heureDebut || '08:00',
+                            heureFin: exam.HeureFin || exam.heureFin || '10:00',
+                            duree: duree,
+                            coefficient: exam.Coefficient || exam.coefficient || 1,
+                            salle: salleNom,
+                            periodeId: exam.PeriodeId || exam.periodeId,
+                            status: status
+                        };
+                    });
+                    
+                    allExamens.sort((a, b) => {
+                        if (!a.date) return 1;
+                        if (!b.date) return -1;
+                        return a.date - b.date;
+                    });
+                    
+                    mesExamens = [...allExamens];
+                    updateStats();
+                    renderExamens();
+                } else {
+                    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div>Erreur de chargement</div></div>`;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div>Erreur: ${error.message}</div></div>`;
+            }
+        }
+
+        function updateStats() {
+            const total = mesExamens.length;
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            const thisWeek = mesExamens.filter(e => {
+                if (!e.date) return false;
+                return e.date >= startOfWeek && e.date <= endOfWeek;
+            }).length;
+            
+            const sallesUniques = new Set(mesExamens.map(e => e.salle).filter(s => s && s !== '—'));
+            let heures = 0;
+            mesExamens.forEach(e => {
+                const [h1, m1] = (e.heureDebut || '08:00').split(':').map(Number);
+                const [h2, m2] = (e.heureFin || '10:00').split(':').map(Number);
+                heures += (h2 - h1) + (m2 - m1) / 60;
+            });
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statThisWeek').textContent = thisWeek;
+            document.getElementById('statSalles').textContent = sallesUniques.size;
+            document.getElementById('statHeures').textContent = Math.round(heures);
+            document.getElementById('totalExamsBadge').textContent = `${total} examen(s)`;
+        }
+
+        function applyFilters() {
+            const periodeFilter = document.getElementById('periodeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            mesExamens = allExamens.filter(exam => {
+                if (periodeFilter !== 'all' && exam.periodeId !== periodeFilter) return false;
+                if (statusFilter !== 'all' && exam.status !== statusFilter) return false;
+                if (searchTerm) {
+                    return exam.matiereNom.toLowerCase().includes(searchTerm) ||
+                           exam.classeNom.toLowerCase().includes(searchTerm) ||
+                           exam.salle.toLowerCase().includes(searchTerm);
+                }
+                return true;
+            });
+            
+            updateStats();
+            renderExamens();
+        }
+
+        function renderExamens() {
+            const container = document.getElementById('examsContainer');
+            
+            if (mesExamens.length === 0) {
+                container.innerHTML = `<div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <div>Aucun examen de surveillance trouvé</div>
+                </div>`;
+                return;
+            }
+            
+            let html = `<div class="exam-table-wrapper"><table class="exam-table" id="examTableToExport"><thead>
+                <tr><th>📅 Date</th><th>⏰ Horaire</th><th>📚 Matière</th><th>🏫 Classe</th><th>🏛️ Salle</th><th>⏱️ Durée</th><th>⚙️ Coef</th><th>📌 Statut</th></tr>
+            </thead><tbody>`;
+            
+            for (const exam of mesExamens) {
+                const dureeClass = exam.duree === 120 ? 'duration-2h' : 'duration-1h';
+                const dureeText = exam.duree === 120 ? '2h' : '1h';
+                const statusClass = exam.status === 'planifie' ? 'status-planifie' : (exam.status === 'en-cours' ? 'status-en-cours' : 'status-termine');
+                const statusText = exam.status === 'planifie' ? '📝 Planifié' : (exam.status === 'en-cours' ? '🔄 En cours' : '✅ Terminé');
+                
+                html += `<tr>
+                    <td><strong>${exam.dateStr}</strong></td>
+                    <td>${exam.heureDebut} - ${exam.heureFin}</td>
+                    <td><strong>${exam.matiereNom}</strong></td>
+                    <td>${exam.classeNom}</td>
+                    <td><span class="room-badge">🏛️ ${exam.salle}</span></td>
+                    <td><span class="duration-badge ${dureeClass}">${dureeText}</span></td>
+                    <td>${exam.coefficient}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                </tr>`;
+            }
+            
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
+        // Fonction d'export PDF
+        async function exporterExamensPDF() {
+            if (mesExamens.length === 0) {
+                alert('❌ Aucun examen à exporter');
+                return;
+            }
+
+            const btnPDF = document.getElementById('pdfBtn');
+            const originalText = btnPDF.innerHTML;
+            btnPDF.innerHTML = '<span>⏳</span> Génération PDF...';
+            btnPDF.disabled = true;
+
+            try {
+                const nomEnseignant = currentUser ? `${currentUser.prenom || ''} ${currentUser.nom || ''}`.trim() : 'Enseignant';
+                const stats = {
+                    total: mesExamens.length,
+                    heures: document.getElementById('statHeures').textContent,
+                    salles: document.getElementById('statSalles').textContent,
+                    thisWeek: document.getElementById('statThisWeek').textContent
+                };
+                
+                const pdfContent = document.createElement('div');
+                pdfContent.style.padding = '20px';
+                pdfContent.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+                pdfContent.style.backgroundColor = 'white';
+                
+                pdfContent.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #4ca896; padding-bottom: 15px;">
+                        <h1 style="color: #1e3b36; margin: 0; font-size: 24px;">📋 EXAMENS DE SURVEILLANCE</h1>
+                        <h2 style="color: #4ca896; margin: 8px 0 5px; font-size: 18px;">${nomEnseignant}</h2>
+                        <p style="color: #5a9d91; margin: 3px 0;">Liste des examens où vous êtes surveillant</p>
+                        <p style="color: #868e96; font-size: 10px;">Généré le ${new Date().toLocaleString('fr-FR')}</p>
+                    </div>
+                `;
+                
+                pdfContent.innerHTML += `
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px;">
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 12px; text-align: center; border-left: 3px solid #ff9466;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ff9466;">${stats.total}</div>
+                            <div style="font-size: 11px; color: #5a9d91;">Total examens</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 12px; text-align: center; border-left: 3px solid #4ca896;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ff9466;">${stats.thisWeek}</div>
+                            <div style="font-size: 11px; color: #5a9d91;">Cette semaine</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 12px; text-align: center; border-left: 3px solid #8b5cf6;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ff9466;">${stats.salles}</div>
+                            <div style="font-size: 11px; color: #5a9d91;">Salles différentes</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 12px; text-align: center; border-left: 3px solid #f59e0b;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ff9466;">${stats.heures}</div>
+                            <div style="font-size: 11px; color: #5a9d91;">Heures totales</div>
+                        </div>
+                    </div>
+                `;
+                
+                let tableHtml = `
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #4ca896, #3d8a7f); color: white;">
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">📅 Date</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">⏰ Horaire</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">📚 Matière</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">🏫 Classe</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">🏛️ Salle</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">⏱️ Durée</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">⚙️ Coef</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #e0e9e7;">📌 Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                let rowNum = 0;
+                for (const exam of mesExamens) {
+                    const dureeText = exam.duree === 120 ? '2h' : '1h';
+                    const statusText = exam.status === 'planifie' ? 'Planifié' : (exam.status === 'en-cours' ? 'En cours' : 'Terminé');
+                    const bgColor = rowNum % 2 === 0 ? '#ffffff' : '#f9fafb';
+                    
+                    tableHtml += `
+                        <tr style="background-color: ${bgColor};">
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7;"><strong>${exam.dateStr}</strong></td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">${exam.heureDebut} - ${exam.heureFin}</td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">${exam.matiereNom}</td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">${exam.classeNom}</td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">🏛️ ${exam.salle}</td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7; text-align: center;">${dureeText}</td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7; text-align: center;">${exam.coefficient}</td>
+                            <td style="padding: 8px 10px; border: 1px solid #e0e9e7;">${statusText}</td>
+                        </tr>
+                    `;
+                    rowNum++;
+                }
+                
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+                
+                pdfContent.innerHTML += tableHtml;
+                
+                pdfContent.innerHTML += `
+                    <div style="margin-top: 25px; padding-top: 15px; border-top: 2px solid #e0e9e7; text-align: center;">
+                        <p style="font-size: 12px; color: #1e3b36; font-weight: 600;">📊 TOTAL: ${stats.total} examens • ${stats.heures} heures</p>
+                        <p style="font-size: 9px; color: #868e96; margin-top: 8px;">SAGHIRY - Système de Gestion d'Examens</p>
+                    </div>
+                `;
+                
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: `Examens_surveillance_${nomEnseignant.replace(/\s/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                };
+                
+                await html2pdf().set(opt).from(pdfContent).save();
+                alert('✅ Export PDF des examens réussi !');
+                
+            } catch (error) {
+                console.error('Erreur export PDF:', error);
+                alert('❌ Erreur lors de la génération du PDF: ' + error.message);
+            } finally {
+                btnPDF.innerHTML = originalText;
+                btnPDF.disabled = false;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('refreshBtn')?.addEventListener('click', () => loadMesExamens());
+        document.getElementById('periodeFilter')?.addEventListener('change', () => applyFilters());
+        document.getElementById('statusFilter')?.addEventListener('change', () => applyFilters());
+        document.getElementById('searchInput')?.addEventListener('input', () => applyFilters());
+    </script>
+</body>
+</html>

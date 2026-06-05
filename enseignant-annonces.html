@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes Annonces | Espace Enseignant</title>
+    <style>
+        /* ====================================================
+           STYLE MODERNE - ESPACE ENSEIGNANT
+           ==================================================== */
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --accent-purple: #9b6b9b;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: white;
+            padding: 1.2rem 1.8rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-title-badge {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .enseignant-badge {
+            background: var(--primary-deep);
+            color: white;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .refresh-btn {
+            background: white;
+            border: 2px solid var(--gray-border);
+            padding: 0.7rem 1.2rem;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-soft);
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--primary-green);
+            background: #f8fdfc;
+            color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-icon.total { background: #e3f2fd; color: #1976d2; }
+        .stat-icon.non-lues { background: #fff3e0; color: #f57c00; }
+        .stat-icon.urgentes { background: #ffebee; color: #c62828; }
+        .stat-icon.mes-classes { background: #e8f5e9; color: #2e7d32; }
+
+        .stat-info h3 {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-info .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.2rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filter-input {
+            padding: 0.7rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 14px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+            width: 100%;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 52%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+        }
+
+        .tabs-container {
+            background: white;
+            border-radius: 50px;
+            border: 1px solid var(--gray-border);
+            display: inline-flex;
+            gap: 0.3rem;
+            padding: 0.3rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tab {
+            padding: 0.6rem 1.3rem;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab:hover {
+            color: var(--primary-green);
+            background: rgba(76, 168, 150, 0.1);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 8px rgba(76, 168, 150, 0.3);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .tab.active .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .annonces-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .annonce-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .annonce-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .annonce-card.urgent {
+            border-left: 5px solid var(--accent-orange);
+        }
+
+        .annonce-card.urgent::before {
+            content: '⚠️';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+
+        .annonce-card.non-lue {
+            background: linear-gradient(to bottom, white, #fffbf5);
+        }
+
+        .annonce-header {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafdfc;
+        }
+
+        .annonce-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .type-badge {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .urgent-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .non-lue-badge {
+            background: #ffb74d;
+            color: white;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .annonce-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .annonce-body {
+            padding: 1.2rem;
+        }
+
+        .annonce-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .annonce-preview {
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .annonce-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-light);
+        }
+
+        .cibles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .cible-tag {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid var(--primary-green);
+        }
+
+        .annonce-footer {
+            padding: 0.8rem 1.2rem;
+            background: #f8fafc;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-mini {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .btn-icon {
+            background: white;
+            border: 1px solid var(--gray-border);
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-icon:hover {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid var(--gray-border);
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .page-item:hover:not(.active) {
+            background: rgba(76, 168, 150, 0.1);
+            border-color: var(--primary-green);
+            color: var(--primary-dark);
+        }
+
+        .page-item.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        /* ====================================================
+           STYLE MODAL AMÉLIORÉ
+           ==================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 750px;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 32px 32px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-header h2::before {
+            content: "📢";
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+            background: #fefefe;
+        }
+
+        .annonce-detail-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .annonce-detail-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+            border-left: 4px solid var(--primary-green);
+            padding-left: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--gray-border);
+            transition: all 0.2s ease;
+        }
+
+        .info-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            word-break: break-word;
+        }
+
+        .motif-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .classes-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .classe-chip {
+            background: rgba(76, 168, 150, 0.15);
+            color: var(--primary-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid var(--primary-green);
+        }
+
+        .urgent-banner {
+            background: linear-gradient(135deg, #ffebee 0%, #ffe0e0 100%);
+            border-left: 4px solid #c62828;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .urgent-banner span {
+            color: #c62828;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .annonce-detail-content {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-border);
+            line-height: 1.7;
+            color: var(--text-soft);
+            font-size: 1rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .modal-footer {
+            padding: 1rem 2rem;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: white;
+            border-radius: 0 0 32px 32px;
+        }
+
+        .modal-footer .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-footer .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 168, 150, 0.3);
+        }
+
+        .modal-footer .btn-secondary {
+            background: #f1f3f5;
+            color: var(--text-soft);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-footer .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 14px;
+            background: white;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            border-left: 5px solid;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { border-left-color: var(--primary-green); }
+        .toast.error { border-left-color: #ff6b6b; }
+        .toast.info { border-left-color: var(--blue-light); }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(76, 168, 150, 0.2);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: 30px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .empty-text {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .annonces-grid { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; align-items: stretch; }
+            .modal { width: 95%; }
+            .modal-body { padding: 1.2rem; }
+            .annonce-detail-title { font-size: 1.3rem; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>📢 Mes Annonces</h1>
+                <span class="page-title-badge" id="totalAnnonces">0</span>
+                <span class="enseignant-badge" id="enseignantBadge">Chargement...</span>
+            </div>
+            <button class="refresh-btn" onclick="loadAllData()">
+                <span>🔄</span> Actualiser
+            </button>
+        </div>
+
+        <div class="stats-grid" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-icon total">📢</div>
+                <div class="stat-info">
+                    <h3>Total annonces</h3>
+                    <div class="stat-number" id="statTotal">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon non-lues">🔔</div>
+                <div class="stat-info">
+                    <h3>Non lues</h3>
+                    <div class="stat-number" id="statNonLues">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon urgentes">⚠️</div>
+                <div class="stat-info">
+                    <h3>Urgentes</h3>
+                    <div class="stat-number" id="statUrgentes">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon mes-classes">🏫</div>
+                <div class="stat-info">
+                    <h3>Mes classes</h3>
+                    <div class="stat-number" id="statMesClasses">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="search-box filter-group">
+                    <label>Recherche</label>
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="Titre, contenu...">
+                </div>
+                <div class="filter-group">
+                    <label>Filtrer par</label>
+                    <select class="filter-input" id="typeFilter">
+                        <option value="all">Toutes</option>
+                        <option value="urgent">Urgentes</option>
+                        <option value="non-lues">Non lues</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Période</label>
+                    <select class="filter-input" id="periodeFilter">
+                        <option value="all">Toutes</option>
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <button class="tab active" data-tab="all">📋 Toutes <span class="tab-badge" id="tabAllCount">0</span></button>
+            <button class="tab" data-tab="non-lues">🔔 Non lues <span class="tab-badge" id="tabNonLuesCount">0</span></button>
+            <button class="tab" data-tab="urgentes">⚠️ Urgentes <span class="tab-badge" id="tabUrgentesCount">0</span></button>
+        </div>
+
+        <div id="annoncesContainer">
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- MODAL AMÉLIORÉE -->
+    <div id="detailModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Détail de l'annonce</h2>
+                <button class="modal-close" onclick="closeDetailModal()">×</button>
+            </div>
+            <div class="modal-body" id="detailContent"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDetailModal()">Fermer</button>
+                <button class="btn-primary" id="marquerLuBtn" onclick="marquerCommeLueFromDetail()">✓ Marquer comme lue</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        const API_BASE_URL = 'http://localhost:5267/api';
+        
+        let currentUser = null;
+        let currentUserId = null;
+        let currentUserNom = '';
+        let currentUserClasses = []; // [{ id, nom }]
+        let allAnnonces = [];
+        let annoncesFiltrees = [];
+        let annoncesLues = new Set();
+        let currentPage = 1;
+        let pageSize = 12;
+        let currentTab = 'all';
+        let currentFilters = { search: '', type: 'all', periode: 'all' };
+        let debounceTimeout = null;
+        let currentDetailAnnonceId = null;
+        
+        // Cache pour les détails des classes (pour éviter des appels API répétés)
+        let classesDetailsCache = new Map(); // id -> { nom, niveau, nomComplet }
+
+        // ============================================
+        // UTILITAIRES
+        // ============================================
+        function getToken() {
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        function getAnnonceId(annonce) {
+            if (annonce.id) return annonce.id;
+            if (annonce._id) {
+                if (typeof annonce._id === 'object' && annonce._id.$oid) {
+                    return annonce._id.$oid;
+                }
+                return annonce._id;
+            }
+            if (annonce.Id) return annonce.Id;
+            return '';
+        }
+
+        function getAnnonceClassesCibles(annonce) {
+            if (annonce.classesCibles && Array.isArray(annonce.classesCibles)) {
+                return annonce.classesCibles.map(c => {
+                    if (typeof c === 'object' && c.$oid) return c.$oid;
+                    return c;
+                });
+            }
+            return [];
+        }
+
+        function getAnnonceDate(annonce, field) {
+            const value = annonce[field];
+            if (!value) return null;
+            if (typeof value === 'object' && value.$date) {
+                return value.$date;
+            }
+            return value;
+        }
+
+        function normalizeAnnonce(rawAnnonce) {
+            return {
+                id: getAnnonceId(rawAnnonce),
+                titre: rawAnnonce.titre || rawAnnonce.Titre || '',
+                contenu: rawAnnonce.contenu || rawAnnonce.Contenu || '',
+                auteurId: rawAnnonce.auteurId || rawAnnonce.AuteurId || '',
+                auteurNom: rawAnnonce.auteurNom || rawAnnonce.AuteurNom || 'Administration',
+                publicCible: rawAnnonce.publicCible || rawAnnonce.PublicCible || 'tous',
+                classesCibles: getAnnonceClassesCibles(rawAnnonce),
+                datePublication: getAnnonceDate(rawAnnonce, 'datePublication') || getAnnonceDate(rawAnnonce, 'DatePublication'),
+                dateExpiration: getAnnonceDate(rawAnnonce, 'dateExpiration') || getAnnonceDate(rawAnnonce, 'DateExpiration'),
+                estUrgent: rawAnnonce.estUrgent || rawAnnonce.EstUrgent || false,
+                motif: rawAnnonce.motif || rawAnnonce.Motif || '',
+                statut: rawAnnonce.statut || rawAnnonce.Statut || 'publiee',
+                piecesJointes: rawAnnonce.piecesJointes || rawAnnonce.PiecesJointes || []
+            };
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Date inconnue';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            } catch {
+                return dateString;
+            }
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'Date inconnue';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch {
+                return dateString;
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            toastMessage.textContent = message;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            toastIcon.textContent = icons[type] || 'ℹ️';
+            
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ============================================
+        // RÉCUPÉRATION DES DÉTAILS D'UNE CLASSE
+        // ============================================
+        async function getClasseDetails(classeId) {
+            // Vérifier dans le cache
+            if (classesDetailsCache.has(classeId)) {
+                return classesDetailsCache.get(classeId);
+            }
+            
+            try {
+                const token = getToken();
+                if (!token) return { id: classeId, nom: classeId, niveau: '', nomComplet: classeId };
+                
+                const response = await fetch(`${API_BASE_URL}/Classe/${classeId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    console.warn(`⚠️ Impossible de récupérer la classe ${classeId}`);
+                    return { id: classeId, nom: classeId, niveau: '', nomComplet: classeId };
+                }
+                
+                const data = await response.json();
+                const classe = data.data || data;
+                
+                // Extraire le nom et le niveau
+                const nomClasse = classe.nomClasse || classe.NomClasse || classe.nom || '';
+                const niveau = classe.niveau || classe.Niveau || '';
+                
+                // Formater le nom complet: "3ème A" ou "Terminale C" ou "6ème B"
+                let nomComplet = nomClasse;
+                if (niveau && niveau !== nomClasse) {
+                    // Si le niveau est différent du nom, on le combine
+                    nomComplet = `${niveau} ${nomClasse}`.trim();
+                } else if (niveau) {
+                    nomComplet = niveau;
+                } else if (nomClasse) {
+                    nomComplet = nomClasse;
+                } else {
+                    nomComplet = classeId;
+                }
+                
+                const classeDetails = {
+                    id: classeId,
+                    nom: nomClasse,
+                    niveau: niveau,
+                    nomComplet: nomComplet
+                };
+                
+                classesDetailsCache.set(classeId, classeDetails);
+                return classeDetails;
+                
+            } catch (error) {
+                console.error(`❌ Erreur récupération classe ${classeId}:`, error);
+                return { id: classeId, nom: classeId, niveau: '', nomComplet: classeId };
+            }
+        }
+        
+        // ============================================
+        // FORMATAGE DES CLASSES POUR L'AFFICHAGE
+        // ============================================
+        async function formatClassesForDisplay(classeIds) {
+            const formattedClasses = [];
+            for (const classeId of classeIds) {
+                const details = await getClasseDetails(classeId);
+                formattedClasses.push(details.nomComplet);
+            }
+            return formattedClasses;
+        }
+
+        // ============================================
+        // CHARGEMENT DES CLASSES DE L'ENSEIGNANT
+        // ============================================
+        async function loadEnseignantClasses() {
+            try {
+                const token = getToken();
+                if (!token || !currentUserId) {
+                    console.warn('⚠️ Pas de token ou userId manquant');
+                    return [];
+                }
+
+                const anneeScolaire = '2025-2026';
+                
+                console.log(`🔍 Récupération de l'emploi du temps pour enseignant ${currentUserId}`);
+                
+                const response = await fetch(`${API_BASE_URL}/EmploiDuTemps/enseignant/${currentUserId}?anneeScolaire=${anneeScolaire}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    console.warn(`⚠️ Erreur ${response.status} lors de la récupération de l'emploi du temps`);
+                    return [];
+                }
+
+                const data = await response.json();
+                console.log('📦 Emploi enseignant reçu:', data);
+
+                const classesSet = new Set();
+                
+                let creneaux = [];
+                
+                if (data.success && data.data) {
+                    creneaux = data.data.Creneaux || data.data.creneaux || [];
+                    console.log(`📊 ${creneaux.length} créneaux trouvés dans data.data.Creneaux`);
+                } else if (data.data) {
+                    creneaux = data.data.Creneaux || data.data.creneaux || [];
+                } else if (data.Creneaux) {
+                    creneaux = data.Creneaux;
+                } else if (data.creneaux) {
+                    creneaux = data.creneaux;
+                }
+                
+                for (const creneau of creneaux) {
+                    const classeId = creneau.classeId || creneau.ClasseId;
+                    const classeNom = creneau.classeNom || creneau.ClasseNom;
+                    
+                    if (classeId && classeNom) {
+                        // Récupérer les détails complets de la classe
+                        const details = await getClasseDetails(classeId);
+                        const classeKey = JSON.stringify({ id: classeId, nom: details.nomComplet });
+                        if (!classesSet.has(classeKey)) {
+                            classesSet.add(classeKey);
+                            console.log(`✅ Classe trouvée: ${details.nomComplet} (${classeId})`);
+                        }
+                    }
+                }
+
+                const classes = Array.from(classesSet).map(c => JSON.parse(c));
+                console.log(`📚 ${classes.length} classes trouvées pour l'enseignant:`, classes);
+                
+                return classes;
+            } catch (error) {
+                console.error('❌ Erreur chargement classes:', error);
+                return [];
+            }
+        }
+
+        // ============================================
+        // CHARGEMENT DE L'UTILISATEUR
+        // ============================================
+        async function loadCurrentUser() {
+            try {
+                const token = getToken();
+                if (!token) return false;
+
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) {
+                    try {
+                        const user = JSON.parse(userStr);
+                        currentUserId = user.id || user._id || user.Id;
+                        if (currentUserId && typeof currentUserId === 'object' && currentUserId.$oid) {
+                            currentUserId = currentUserId.$oid;
+                        }
+                        currentUserNom = user.prenom && user.nom ? `${user.prenom} ${user.nom}` : (user.nom || user.prenom || 'Enseignant');
+                        document.getElementById('enseignantBadge').textContent = currentUserNom;
+                        console.log(`👤 Utilisateur chargé: ${currentUserNom} (${currentUserId})`);
+                        return true;
+                    } catch (e) {
+                        console.error('Erreur parsing user:', e);
+                    }
+                }
+
+                const response = await fetch(`${API_BASE_URL}/Auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.data || data;
+                    currentUserId = user.id || user._id || user.userId;
+                    if (currentUserId && typeof currentUserId === 'object' && currentUserId.$oid) {
+                        currentUserId = currentUserId.$oid;
+                    }
+                    currentUserNom = user.prenom && user.nom ? `${user.prenom} ${user.nom}` : (user.nom || 'Enseignant');
+                    document.getElementById('enseignantBadge').textContent = currentUserNom;
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ Erreur loadCurrentUser:', error);
+            }
+            return false;
+        }
+
+        // ============================================
+        // FILTRAGE DES ANNONCES PAR CLASSES
+        // ============================================
+        function isAnnonceVisibleForTeacher(annonce) {
+            if (annonce.publicCible === 'tous' || annonce.publicCible === 'all') {
+                return true;
+            }
+            
+            if (annonce.publicCible === 'enseignants') {
+                return true;
+            }
+            
+            if (annonce.publicCible === 'classes' && annonce.classesCibles && annonce.classesCibles.length > 0) {
+                const isVisible = currentUserClasses.some(classe => 
+                    annonce.classesCibles.includes(classe.id) || 
+                    annonce.classesCibles.includes(classe.nom)
+                );
+                return isVisible;
+            }
+            
+            return false;
+        }
+
+        // ============================================
+        // CHARGEMENT DES ANNONCES
+        // ============================================
+        async function loadAnnonces() {
+            try {
+                const token = getToken();
+                if (!token) {
+                    showToast('Non authentifié', 'error');
+                    return false;
+                }
+
+                console.log('📢 Chargement des annonces...');
+                const response = await fetch(`${API_BASE_URL}/Annonce`, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📦 Réponse API annonces:', data);
+                
+                let rawAnnonces = [];
+                if (data.data && Array.isArray(data.data)) {
+                    rawAnnonces = data.data;
+                } else if (data.success && data.data && Array.isArray(data.data)) {
+                    rawAnnonces = data.data;
+                } else if (Array.isArray(data)) {
+                    rawAnnonces = data;
+                } else {
+                    for (const key in data) {
+                        if (Array.isArray(data[key])) {
+                            rawAnnonces = data[key];
+                            console.log(`📦 Annonces trouvées dans data.${key}`);
+                            break;
+                        }
+                    }
+                }
+
+                console.log(`📢 ${rawAnnonces.length} annonces brutes reçues`);
+
+                const normalizedAnnonces = rawAnnonces.map(a => normalizeAnnonce(a));
+                console.log('📢 Annonces normalisées:', normalizedAnnonces);
+
+                const storageKey = `annonces_lues_${currentUserId}`;
+                const lues = localStorage.getItem(storageKey);
+                if (lues) {
+                    annoncesLues = new Set(JSON.parse(lues));
+                }
+
+                allAnnonces = normalizedAnnonces.filter(annonce => isAnnonceVisibleForTeacher(annonce));
+                
+                console.log(`📢 ${allAnnonces.length} annonces visibles pour l'enseignant`);
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Erreur chargement annonces:', error);
+                allAnnonces = [];
+                showToast('Erreur chargement des annonces', 'error');
+                return false;
+            }
+        }
+
+        // ============================================
+        // CHARGEMENT COMPLET
+        // ============================================
+        async function loadAllData() {
+            showLoading();
+            
+            const userLoaded = await loadCurrentUser();
+            if (!userLoaded) {
+                document.getElementById('annoncesContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔒</div>
+                        <h2 class="empty-title">Non authentifié</h2>
+                        <p class="empty-text">Veuillez vous connecter pour accéder à vos annonces</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            currentUserClasses = await loadEnseignantClasses();
+            document.getElementById('statMesClasses').textContent = currentUserClasses.length;
+            
+            const loaded = await loadAnnonces();
+            if (!loaded) return;
+            
+            updateStats();
+            filterAnnonces();
+        }
+
+        // ============================================
+        // STATISTIQUES
+        // ============================================
+        function updateStats() {
+            const nonLues = allAnnonces.filter(a => !annoncesLues.has(a.id)).length;
+            const urgentes = allAnnonces.filter(a => a.estUrgent).length;
+            
+            document.getElementById('statTotal').textContent = allAnnonces.length;
+            document.getElementById('statNonLues').textContent = nonLues;
+            document.getElementById('statUrgentes').textContent = urgentes;
+            document.getElementById('totalAnnonces').textContent = allAnnonces.length;
+        }
+
+        function updateTabsCounts() {
+            const nonLues = allAnnonces.filter(a => !annoncesLues.has(a.id)).length;
+            const urgentes = allAnnonces.filter(a => a.estUrgent).length;
+            
+            document.getElementById('tabAllCount').textContent = allAnnonces.length;
+            document.getElementById('tabNonLuesCount').textContent = nonLues;
+            document.getElementById('tabUrgentesCount').textContent = urgentes;
+        }
+
+        // ============================================
+        // FILTRAGE
+        // ============================================
+        function filterAnnonces() {
+            let filtered = [...allAnnonces];
+
+            if (currentFilters.search) {
+                const searchLower = currentFilters.search.toLowerCase();
+                filtered = filtered.filter(a => 
+                    (a.titre || '').toLowerCase().includes(searchLower) ||
+                    (a.contenu || '').toLowerCase().includes(searchLower)
+                );
+            }
+
+            if (currentFilters.type === 'urgent') {
+                filtered = filtered.filter(a => a.estUrgent);
+            } else if (currentFilters.type === 'non-lues') {
+                filtered = filtered.filter(a => !annoncesLues.has(a.id));
+            }
+
+            if (currentFilters.periode !== 'all') {
+                const now = new Date();
+                filtered = filtered.filter(a => {
+                    if (!a.datePublication) return false;
+                    const datePub = new Date(a.datePublication);
+                    switch(currentFilters.periode) {
+                        case 'today': return datePub.toDateString() === now.toDateString();
+                        case 'week': {
+                            const weekAgo = new Date(now);
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            return datePub >= weekAgo;
+                        }
+                        case 'month': {
+                            const monthAgo = new Date(now);
+                            monthAgo.setMonth(monthAgo.getMonth() - 1);
+                            return datePub >= monthAgo;
+                        }
+                        default: return true;
+                    }
+                });
+            }
+
+            if (currentTab === 'non-lues') {
+                filtered = filtered.filter(a => !annoncesLues.has(a.id));
+            } else if (currentTab === 'urgentes') {
+                filtered = filtered.filter(a => a.estUrgent);
+            }
+
+            annoncesFiltrees = filtered;
+            updateTabsCounts();
+
+            const start = (currentPage - 1) * pageSize;
+            const paginated = filtered.slice(start, start + pageSize);
+
+            renderAnnonces(paginated);
+            renderPagination(filtered.length);
+        }
+
+        // ============================================
+        // RENDU
+        // ============================================
+        async function renderAnnonces(annoncesToRender) {
+            const container = document.getElementById('annoncesContainer');
+            
+            if (!annoncesToRender || annoncesToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h2 class="empty-title">Aucune annonce</h2>
+                        <p class="empty-text">Aucune annonce ne vous est destinée pour le moment</p>
+                        ${currentUserClasses.length === 0 ? '<p class="empty-text" style="font-size: 0.8rem;">⚠️ Aucune classe trouvée dans votre emploi du temps</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="annonces-grid">';
+            
+            for (const annonce of annoncesToRender) {
+                const estLue = annoncesLues.has(annonce.id);
+                const datePub = formatDate(annonce.datePublication);
+                const urgentClass = annonce.estUrgent ? 'urgent' : '';
+                const nonLueClass = !estLue ? 'non-lue' : '';
+                
+                let typeLabel = 'Tous';
+                if (annonce.publicCible === 'enseignants') typeLabel = 'Enseignants';
+                else if (annonce.publicCible === 'classes') typeLabel = 'Classes';
+                
+                // Formater les noms des classes
+                let classesHtml = '';
+                if (annonce.classesCibles && annonce.classesCibles.length > 0) {
+                    const formattedClasses = await formatClassesForDisplay(annonce.classesCibles);
+                    classesHtml = `
+                    <div class="cibles">
+                        ${formattedClasses.map(c => `<span class="cible-tag">${escapeHtml(c)}</span>`).join('')}
+                    </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="annonce-card ${urgentClass} ${nonLueClass}" onclick="showDetail('${annonce.id}')">
+                        <div class="annonce-header">
+                            <div class="annonce-type">
+                                <span class="type-badge">${typeLabel}</span>
+                                ${annonce.estUrgent ? '<span class="urgent-badge">URGENT</span>' : ''}
+                                ${!estLue ? '<span class="non-lue-badge">Nouveau</span>' : ''}
+                            </div>
+                            <div class="annonce-date">📅 ${datePub}</div>
+                        </div>
+                        <div class="annonce-body">
+                            <h3 class="annonce-title">${escapeHtml(annonce.titre || 'Sans titre')}</h3>
+                            <p class="annonce-preview">${escapeHtml((annonce.contenu || '').substring(0, 150))}${(annonce.contenu || '').length > 150 ? '...' : ''}</p>
+                            <div class="annonce-meta">
+                                <span class="meta-item">👤 ${escapeHtml(annonce.auteurNom || 'Administration')}</span>
+                            </div>
+                            ${classesHtml}
+                        </div>
+                        <div class="annonce-footer">
+                            <div class="stats-mini">
+                                ${!estLue ? '<span>🔔 Non lue</span>' : '<span>✓ Lue</span>'}
+                            </div>
+                            <button class="btn-icon" onclick="event.stopPropagation(); marquerCommeLue('${annonce.id}')">✓</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderPagination(total) {
+            const pages = Math.ceil(total / pageSize);
+            const pagination = document.getElementById('pagination');
+            
+            if (pages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            const maxPages = Math.min(pages, 10);
+            for (let i = 1; i <= maxPages; i++) {
+                html += `<div class="page-item ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</div>`;
+            }
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            filterAnnonces();
+        }
+
+        // ============================================
+        // INTERACTIONS
+        // ============================================
+        function marquerCommeLue(annonceId) {
+            if (!annonceId) return;
+            
+            annoncesLues.add(annonceId);
+            const storageKey = `annonces_lues_${currentUserId}`;
+            localStorage.setItem(storageKey, JSON.stringify(Array.from(annoncesLues)));
+            
+            updateStats();
+            filterAnnonces();
+            showToast('Annonce marquée comme lue', 'success');
+        }
+
+        function marquerCommeLueFromDetail() {
+            if (currentDetailAnnonceId) {
+                marquerCommeLue(currentDetailAnnonceId);
+                closeDetailModal();
+            }
+        }
+
+        async function showDetail(annonceId) {
+            const annonce = allAnnonces.find(a => a.id === annonceId);
+            if (!annonce) return;
+            
+            if (!annoncesLues.has(annonceId)) {
+                marquerCommeLue(annonceId);
+            }
+            
+            currentDetailAnnonceId = annonceId;
+            
+            const datePub = formatDateTime(annonce.datePublication);
+            const dateExp = annonce.dateExpiration ? formatDate(annonce.dateExpiration) : 'Pas d\'expiration';
+            
+            // Formater les noms des classes pour la modale
+            let classesHtml = '';
+            if (annonce.classesCibles && annonce.classesCibles.length > 0) {
+                const formattedClasses = await formatClassesForDisplay(annonce.classesCibles);
+                classesHtml = `
+                    <div class="info-card">
+                        <div class="info-label">🏫 Classes concernées</div>
+                        <div class="classes-container">
+                            ${formattedClasses.map(c => `<span class="classe-chip">${escapeHtml(c)}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Construction du contenu HTML avec le style amélioré
+            let html = `
+                <div class="annonce-detail-header">
+                    <div class="annonce-detail-title">${escapeHtml(annonce.titre || 'Sans titre')}</div>
+                    ${annonce.estUrgent ? `
+                    <div class="urgent-banner">
+                        <span>⚠️</span>
+                        <span>URGENT - À lire immédiatement</span>
+                    </div>
+                    ` : ''}
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-label">📅 Publication</div>
+                            <div class="info-value">${datePub}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">⏰ Expiration</div>
+                            <div class="info-value">${dateExp}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">👤 Auteur</div>
+                            <div class="info-value">${escapeHtml(annonce.auteurNom || 'Administration')}</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">🎯 Public cible</div>
+                            <div class="info-value">${annonce.publicCible === 'tous' ? 'Tous' : (annonce.publicCible === 'enseignants' ? 'Enseignants' : 'Classes spécifiques')}</div>
+                        </div>
+            `;
+            
+            if (annonce.motif) {
+                html += `
+                        <div class="info-card">
+                            <div class="info-label">📌 Motif</div>
+                            <div class="info-value"><span class="motif-badge">${escapeHtml(annonce.motif)}</span></div>
+                        </div>
+                `;
+            }
+            
+            html += classesHtml;
+            
+            html += `
+                    </div>
+                </div>
+                <div class="annonce-detail-content">
+                    ${escapeHtml(annonce.contenu || 'Aucun contenu')}
+                </div>
+            `;
+            
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+            currentDetailAnnonceId = null;
+        }
+
+        function showLoading() {
+            document.getElementById('annoncesContainer').innerHTML = `
+                <div class="loading-spinner"><div class="spinner"></div></div>
+            `;
+        }
+
+        // ============================================
+        // ÉVÉNEMENTS
+        // ============================================
+        function setupEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabValue = tab.getAttribute('data-tab');
+                    currentTab = tabValue;
+                    currentPage = 1;
+                    
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    filterAnnonces();
+                });
+            });
+            
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    currentFilters.search = e.target.value;
+                    currentPage = 1;
+                    filterAnnonces();
+                }, 500);
+            });
+            
+            document.getElementById('typeFilter').addEventListener('change', (e) => {
+                currentFilters.type = e.target.value;
+                currentPage = 1;
+                filterAnnonces();
+            });
+            
+            document.getElementById('periodeFilter').addEventListener('change', (e) => {
+                currentFilters.periode = e.target.value;
+                currentPage = 1;
+                filterAnnonces();
+            });
+        }
+
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Initialisation de la page Annonces Enseignant');
+            setupEventListeners();
+            loadAllData();
+        });
+    </script>
+</body>
+</html>

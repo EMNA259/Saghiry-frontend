@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Espace Enseignant / Permanent</title>
+    <style>
+        /* ============ VARIABLES SAGHIRY ============ */
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 50%, var(--primary-deep) 100%);
+            min-height: 100vh;
+            display: flex;
+            position: relative;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+        }
+
+        body.dark-mode .saghiry-sidebar {
+            background: #16213e;
+            border-right-color: #2d2d44;
+        }
+
+        body.dark-mode .sidebar-header {
+            background: linear-gradient(to bottom, #16213e, #1a1a2e);
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .sidebar-logo-text {
+            color: #6abfad;
+        }
+
+        body.dark-mode .user-profile-card {
+            background: linear-gradient(135deg, #1e2a3a 0%, #16213e 100%);
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .profile-name {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .sidebar-search .search-input {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .nav-item {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .nav-item:hover {
+            background: rgba(76, 168, 150, 0.15);
+            color: #6abfad;
+        }
+
+        body.dark-mode .nav-section-title {
+            color: #6abfad;
+        }
+
+        body.dark-mode .sidebar-session {
+            background: rgba(76, 168, 150, 0.15);
+            color: #6abfad;
+        }
+
+        body.dark-mode .quick-actions {
+            border-top-color: #2d2d44;
+        }
+
+        body.dark-mode .logout-section .logout-btn {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.2);
+        }
+
+        body.dark-mode .notifications-dropdown {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .notification-item {
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .notification-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .notifications-footer {
+            background: #1a1a2e;
+            border-top-color: #2d2d44;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .saghiry-sidebar {
+            width: 300px;
+            background: white;
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.8rem 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+            background: linear-gradient(to bottom, white, #fcfdfd);
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 4px 8px rgba(45, 107, 99, 0.2));
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-deep);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .sidebar-session {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            background: rgba(76, 168, 150, 0.1);
+            border-radius: 12px;
+            color: var(--primary-dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .session-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
+        .sidebar-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            background: rgba(76, 168, 150, 0.1);
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-icon:hover {
+            background: rgba(76, 168, 150, 0.2);
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-orange);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .user-profile-card {
+            margin: 1.5rem 1.5rem;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #f8fdfc 0%, #eff9f7 100%);
+            border-radius: 20px;
+            border: 1px solid #c8e0dc;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(255, 148, 102, 0.25);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-email {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-search {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            background: #f8faf9;
+            border: 2px solid var(--gray-border);
+            border-radius: 16px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(76, 168, 150, 0.1);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .nav-section-title {
+            color: var(--text-light);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: var(--text-soft);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item i, .nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(76, 168, 150, 0.08);
+            color: var(--primary-deep);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.25);
+        }
+
+        .nav-item.active .nav-icon {
+            color: white;
+        }
+
+        .nav-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: auto;
+            min-width: 22px;
+            text-align: center;
+        }
+
+        .nav-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .quick-actions {
+            padding: 1.5rem 1.5rem;
+            border-top: 1px solid var(--gray-border);
+            margin-top: auto;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 14px rgba(255, 148, 102, 0.35);
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(255, 148, 102, 0.45);
+        }
+
+        .logout-section {
+            padding: 0 1.5rem 1.8rem;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            background: rgba(255, 107, 107, 0.05);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.15);
+            color: #c92a2a;
+        }
+
+        .main-content-area {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            width: calc(100% - 300px);
+            background: transparent;
+        }
+
+        .dynamic-iframe {
+            width: 100%;
+            border: none;
+            background: white;
+            border-radius: 16px;
+            min-height: calc(100vh - 4rem);
+            height: auto;
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .saghiry-sidebar { width: 280px; }
+            .main-content-area { margin-left: 280px; width: calc(100% - 280px); }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .saghiry-sidebar { position: relative; width: 100%; border-right: none; border-bottom: 1px solid var(--gray-border); }
+            .main-content-area { margin-left: 0; width: 100%; }
+        }
+
+        .hidden { display: none !important; }
+        .text-accent { color: var(--accent-orange); }
+        .page-transition { animation: fadeInPage 0.4s ease; }
+
+        @keyframes fadeInPage {
+            from { opacity: 0.7; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notifications-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .notifications-overlay.show {
+            display: block;
+        }
+
+        .notifications-dropdown {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 550px;
+            max-height: 80vh;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            display: none;
+            overflow: hidden;
+            border: 1px solid var(--gray-border);
+            flex-direction: column;
+        }
+
+        body.dark-mode .notifications-dropdown {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        .notifications-dropdown.show { 
+            display: flex; 
+            animation: fadeIn 0.3s ease; 
+        }
+
+        .notifications-header {
+            padding: 1.2rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .mark-all-read {
+            cursor: pointer;
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            transition: background 0.2s;
+        }
+
+        .mark-all-read:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .close-notifications {
+            cursor: pointer;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .close-notifications:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .notifications-list { 
+            flex: 1;
+            overflow-y: auto; 
+            padding: 0.5rem 0;
+        }
+
+        .notification-item { 
+            padding: 1rem 1.2rem; 
+            border-bottom: 1px solid var(--gray-border); 
+            cursor: pointer; 
+            transition: background 0.2s ease;
+            margin: 0.3rem 0.8rem;
+            border-radius: 16px;
+        }
+
+        body.dark-mode .notification-item {
+            border-bottom-color: #2d2d44;
+        }
+
+        .notification-item:hover { 
+            background: var(--gray-bg); 
+        }
+
+        .notification-item.unread { 
+            background: rgba(76, 168, 150, 0.1); 
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon-type {
+            font-size: 1.3rem;
+        }
+
+        .notification-type-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-message { background: #e3f2fd; color: #1976d2; }
+        .badge-absence { background: #ffebee; color: #c62828; }
+        .badge-retard { background: #fff8e1; color: #f57c00; }
+        .badge-note { background: #e8f5e9; color: #2e7d32; }
+        .badge-annonce { background: #f3e5f5; color: #7b1fa2; }
+
+        .notification-title { 
+            font-weight: 700; 
+            color: var(--text-dark); 
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .notification-message { 
+            font-size: 0.85rem; 
+            color: var(--text-soft); 
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .notification-time { 
+            font-size: 0.7rem; 
+            color: var(--text-light);
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .notifications-empty { 
+            padding: 3rem 2rem; 
+            text-align: center; 
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .notifications-footer { 
+            padding: 1rem; 
+            text-align: center; 
+            border-top: 1px solid var(--gray-border); 
+            background: var(--gray-bg);
+            position: sticky;
+            bottom: 0;
+        }
+
+        body.dark-mode .notifications-footer {
+            background: #1a1a2e;
+            border-top-color: #2d2d44;
+        }
+
+        .notifications-footer button { 
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notifications-footer button:hover {
+            background: var(--primary-dark);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .notification-toast {
+            background: var(--primary-green);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            cursor: pointer;
+            min-width: 280px;
+            max-width: 350px;
+        }
+
+        .notification-toast:hover {
+            transform: scale(1.02);
+        }
+
+        .notification-toast strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .notification-toast small {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 4rem);
+            background: white;
+            border-radius: 16px;
+        }
+
+        body.dark-mode .loading-container {
+            background: #1a1a2e;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+    </style>
+</head>
+<body>
+    <aside class="saghiry-sidebar" id="saghirySidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-top">
+                <div class="logo-wrapper">
+                    <img src="public/images/Logo-saghiry.png" alt="SAGHIRY" class="sidebar-logo" onerror="this.style.display='none'">
+                    <span class="sidebar-logo-text">SAGHIRY</span>
+                </div>
+                <div class="notification-icon" id="notificationIcon">
+                    <span>🔔</span>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+            </div>
+            <div class="sidebar-session">
+                <span id="sessionLabelText">📅 SESSION ACTIVE:</span>
+                <strong id="sessionYear">2025 - 2026</strong>
+                <span class="session-badge" id="roleBadgeText">Enseignant</span>
+            </div>
+        </div>
+
+        <div class="user-profile-card" id="userProfileCard">
+            <div class="profile-avatar" id="profileAvatar">EN</div>
+            <div class="profile-info">
+                <div class="profile-name" id="profileName">Chargement...</div>
+                <span class="profile-role" id="profileRoleText">Enseignant</span>
+                <div class="profile-email" id="profileEmail">enseignant@saghiry.edu.ma</div>
+            </div>
+        </div>
+
+        <div class="sidebar-search">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="globalSearch" 
+                       placeholder="Rechercher une classe, un élève..." 
+                       autocomplete="off">
+            </div>
+        </div>
+
+        <nav class="sidebar-nav" id="sidebarNav">
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionMySpace">MON ESPACE</div>
+                <a href="#" class="nav-item" data-page="enseignant-accueil" id="navHome">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text" id="navHomeText">Accueil</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-emploi" id="navSchedule">
+                    <span class="nav-icon">⏰</span>
+                    <span class="nav-text" id="navScheduleText">Mon emploi du temps</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-examens" id="navExams">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text" id="navExamsText">Mes examens</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-voeux" id="navWishes">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text" id="navWishesText">Mes vœux</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-propositions" id="navProposals">
+                    <span class="nav-icon">🎯</span>
+                    <span class="nav-text" id="navProposalsText">Mes propositions</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-conge" id="navLeave">
+                    <span class="nav-icon">🏖️</span>
+                    <span class="nav-text" id="navLeaveText">Demande de congé</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-calendrier" id="navSchoolCalendar">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text" id="navCalendarText">Calendrier scolaire</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionPedagogical">PÉDAGOGIQUE</div>
+                <a href="#" class="nav-item" data-page="enseignant-classes" id="navClasses">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text" id="navClassesText">Mes classes</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-matieres" id="navSubjects">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text" id="navSubjectsText">Mes matières</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-cahier-texte" id="navNotebook">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-text" id="navNotebookText">Cahier de texte</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionCommunication">COMMUNICATION</div>
+                <a href="#" class="nav-item" data-page="enseignant-messages" id="navMessages">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text" id="navMessagesText">Messages</span>
+                    <span class="nav-badge" id="messagesBadge" style="display: none;">0</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-annonces" id="navAnnouncements">
+                    <span class="nav-icon">📢</span>
+                    <span class="nav-text" id="navAnnouncementsText">Annonces</span>
+                </a>
+                <a href="#" class="nav-item" data-page="enseignant-donation" id="navDonation">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text" id="navDonationText">Donation</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionSettings">RÉGLAGES</div>
+                <a href="#" class="nav-item" data-page="enseignant-parametres" id="navParameters">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text" id="navParametersText">Paramètres</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="quick-actions">
+            <button class="quick-action-btn" id="quickActionBtn">
+                <span>📋</span>
+                <span id="quickActionText">Faire mes vœux</span>
+            </button>
+        </div>
+
+        <div class="logout-section">
+            <div class="logout-btn" id="logoutBtn">
+                <span>🚪</span>
+                <span id="logoutText">Déconnexion</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content-area" id="mainContentArea">
+        <div id="dynamicContent" class="page-transition">
+            <div class="loading-container">
+                <div style="text-align: center;">
+                    <div class="loading-spinner"></div>
+                    <p id="loadingMsg" style="margin-top: 1rem; color: var(--text-light);">Chargement de l'espace enseignant...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="notifications-overlay" id="notificationsOverlay"></div>
+
+    <div class="notifications-dropdown" id="notificationsDropdown">
+        <div class="notifications-header">
+            <span id="notifHeaderTitle">🔔 Mes notifications</span>
+            <div style="display: flex; gap: 10px;">
+                <span class="mark-all-read" id="markAllReadBtn">✓ Tout marquer lu</span>
+                <span class="close-notifications" id="closeNotificationsBtn">✕</span>
+            </div>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+            <div class="notifications-empty" id="noNotifMsg">📭 Aucune notification</div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION ENSEIGNANT/PERMANENT COMPLÈTE
+        // ============================================
+        
+        const ENSEIGNANT_CONFIG = {
+            currentPage: 'enseignant-accueil',
+            user: { name: 'Enseignant', role: 'Enseignant', email: '', initials: 'EN', id: null, isPermanent: false },
+            token: null,
+            sessionYear: '2025 - 2026',
+            notifications: [],
+            unreadCount: 0,
+            unreadMessagesCount: 0,
+            isInWishesPeriod: false,
+            isInProposalsPeriod: false,
+            permanentPeriods: {
+                wishesStart: '2024-06-01',
+                wishesEnd: '2024-07-15',
+                proposalsStart: '2024-08-01',
+                proposalsEnd: '2024-08-30'
+            }
+        };
+
+        const notificationTypeConfig = {
+            'message': { label: 'Message', class: 'badge-message', icon: '💬' },
+            'absence': { label: 'Absence', class: 'badge-absence', icon: '❌' },
+            'retard': { label: 'Retard', class: 'badge-retard', icon: '⏰' },
+            'note': { label: 'Information', class: 'badge-note', icon: '📝' },
+            'annonce': { label: 'Annonce', class: 'badge-annonce', icon: '📢' },
+            'evenement': { label: 'Événement', class: 'badge-note', icon: '📅' }
+        };
+
+        let currentLang = 'fr';
+        let appSettings = {
+            theme: localStorage.getItem('saghiry_theme') || 'clair',
+            langue: localStorage.getItem('saghiry_langue') || 'fr',
+            couleurPrimaire: localStorage.getItem('saghiry_primary_color') || '#4ca896',
+            couleurSecondaire: localStorage.getItem('saghiry_secondary_color') || '#ff9466'
+        };
+
+        const translations = {
+            fr: {
+                sessionLabel: "📅 SESSION ACTIVE:", roleBadgeEnseignant: "Enseignant", roleBadgePermanent: "Permanent",
+                notifHeaderTitle: "🔔 Mes notifications", markAllRead: "✓ Tout marquer lu", noNotifMsg: "📭 Aucune notification",
+                searchPlaceholder: "Rechercher une classe, un élève...",
+                sectionMySpace: "MON ESPACE", navHomeText: "Accueil", navScheduleText: "Mon emploi du temps", navExamsText: "Mes examens",
+                navWishesText: "Mes vœux", navProposalsText: "Mes propositions", navLeaveText: "Demande de congé", navCalendarText: "Calendrier scolaire",
+                sectionPedagogical: "PÉDAGOGIQUE", navClassesText: "Mes classes", navSubjectsText: "Mes matières", navNotebookText: "Cahier de texte",
+                sectionCommunication: "COMMUNICATION", navMessagesText: "Messages", navAnnouncementsText: "Annonces", navDonationText: "Donation",
+                sectionSettings: "RÉGLAGES", navParametersText: "Paramètres",
+                quickActionText: "Faire mes vœux", logoutText: "Déconnexion", nouveau: "Nouveau", profileRoleEnseignant: "Enseignant", profileRolePermanent: "Permanent", loading: "Chargement...",
+                periodWarning: "⚠️ La période des vœux est terminée", proposalsPeriodWarning: "⚠️ La période des propositions est terminée"
+            },
+            en: {
+                sessionLabel: "📅 ACTIVE SESSION:", roleBadgeEnseignant: "Teacher", roleBadgePermanent: "Permanent",
+                notifHeaderTitle: "🔔 My notifications", markAllRead: "✓ Mark all as read", noNotifMsg: "📭 No notifications",
+                searchPlaceholder: "Search for a class, student...",
+                sectionMySpace: "MY SPACE", navHomeText: "Home", navScheduleText: "My schedule", navExamsText: "My exams",
+                navWishesText: "My wishes", navProposalsText: "My proposals", navLeaveText: "Leave request", navCalendarText: "School calendar",
+                sectionPedagogical: "PEDAGOGICAL", navClassesText: "My classes", navSubjectsText: "My subjects", navNotebookText: "Notebook",
+                sectionCommunication: "COMMUNICATION", navMessagesText: "Messages", navAnnouncementsText: "Announcements", navDonationText: "Donation",
+                sectionSettings: "SETTINGS", navParametersText: "Settings",
+                quickActionText: "Make my wishes", logoutText: "Logout", nouveau: "New", profileRoleEnseignant: "Teacher", profileRolePermanent: "Permanent", loading: "Loading...",
+                periodWarning: "⚠️ The wishes period is over", proposalsPeriodWarning: "⚠️ The proposals period is over"
+            },
+            ar: {
+                sessionLabel: "📅 جلسة نشطة:", roleBadgeEnseignant: "معلم", roleBadgePermanent: "دائم",
+                notifHeaderTitle: "🔔 إشعاراتي", markAllRead: "✓ تحديد الكل كمقروء", noNotifMsg: "📭 لا توجد إشعارات",
+                searchPlaceholder: "بحث عن فصل، طالب...",
+                sectionMySpace: "مساحتي", navHomeText: "الرئيسية", navScheduleText: "جدول أعمالي", navExamsText: "امتحاناتي",
+                navWishesText: "رغباتي", navProposalsText: "اقتراحاتي", navLeaveText: "طلب إجازة", navCalendarText: "التقويم الدراسي",
+                sectionPedagogical: "بيداغوجي", navClassesText: "فصولي", navSubjectsText: "موادي", navNotebookText: "دفتر النصوص",
+                sectionCommunication: "تواصل", navMessagesText: "رسائل", navAnnouncementsText: "إعلانات", navDonationText: "تبرع",
+                sectionSettings: "إعدادات", navParametersText: "إعدادات",
+                quickActionText: "تقديم رغباتي", logoutText: "تسجيل خروج", nouveau: "جديد", profileRoleEnseignant: "معلم", profileRolePermanent: "دائم", loading: "جاري التحميل...",
+                periodWarning: "⚠️ انتهت فترة الرغبات", proposalsPeriodWarning: "⚠️ انتهت فترة الاقتراحات"
+            }
+        };
+
+        // ============ FONCTIONS UTILITAIRES ============
+        
+        function checkPermanentPeriods() {
+            const now = new Date();
+            const userRole = ENSEIGNANT_CONFIG.user.role?.toLowerCase();
+            const isPermanent = userRole === 'permanent';
+            
+            if (isPermanent) {
+                const wishesStart = new Date(ENSEIGNANT_CONFIG.permanentPeriods.wishesStart);
+                const wishesEnd = new Date(ENSEIGNANT_CONFIG.permanentPeriods.wishesEnd);
+                ENSEIGNANT_CONFIG.isInWishesPeriod = now >= wishesStart && now <= wishesEnd;
+                
+                const proposalsStart = new Date(ENSEIGNANT_CONFIG.permanentPeriods.proposalsStart);
+                const proposalsEnd = new Date(ENSEIGNANT_CONFIG.permanentPeriods.proposalsEnd);
+                ENSEIGNANT_CONFIG.isInProposalsPeriod = now >= proposalsStart && now <= proposalsEnd;
+                
+                const wishesNav = document.querySelector('.nav-item[data-page="enseignant-voeux"]');
+                const proposalsNav = document.querySelector('.nav-item[data-page="enseignant-propositions"]');
+                const quickBtn = document.getElementById('quickActionBtn');
+                
+                if (!ENSEIGNANT_CONFIG.isInWishesPeriod) {
+                    if (wishesNav && !wishesNav.classList.contains('disabled')) {
+                        wishesNav.classList.add('disabled');
+                        wishesNav.title = translations[currentLang]?.periodWarning || 'Période des vœux terminée';
+                    }
+                    if (quickBtn) {
+                        quickBtn.style.opacity = '0.5';
+                        quickBtn.style.pointerEvents = 'none';
+                        quickBtn.title = translations[currentLang]?.periodWarning || 'Période des vœux terminée';
+                    }
+                } else {
+                    if (wishesNav) wishesNav.classList.remove('disabled');
+                    if (quickBtn) {
+                        quickBtn.style.opacity = '1';
+                        quickBtn.style.pointerEvents = 'auto';
+                    }
+                }
+                
+                if (!ENSEIGNANT_CONFIG.isInProposalsPeriod) {
+                    if (proposalsNav && !proposalsNav.classList.contains('disabled')) {
+                        proposalsNav.classList.add('disabled');
+                        proposalsNav.title = translations[currentLang]?.proposalsPeriodWarning || 'Période des propositions terminée';
+                    }
+                } else {
+                    if (proposalsNav) proposalsNav.classList.remove('disabled');
+                }
+                
+                console.log(`📅 Périodes - Vœux: ${ENSEIGNANT_CONFIG.isInWishesPeriod ? 'Active' : 'Inactive'}, Propositions: ${ENSEIGNANT_CONFIG.isInProposalsPeriod ? 'Active' : 'Inactive'}`);
+            } else {
+                ENSEIGNANT_CONFIG.isInWishesPeriod = true;
+                ENSEIGNANT_CONFIG.isInProposalsPeriod = true;
+            }
+        }
+
+        function applyTranslation() {
+            const t = translations[currentLang];
+            if (!t) return;
+            
+            const isPermanent = ENSEIGNANT_CONFIG.user.role?.toLowerCase() === 'permanent';
+            const roleBadgeText = isPermanent ? t.roleBadgePermanent : t.roleBadgeEnseignant;
+            const profileRoleText = isPermanent ? t.profileRolePermanent : t.profileRoleEnseignant;
+
+            const elements = {
+                'sessionLabelText': t.sessionLabel, 'roleBadgeText': roleBadgeText,
+                'notifHeaderTitle': t.notifHeaderTitle, 'markAllReadBtn': t.markAllRead, 'noNotifMsg': t.noNotifMsg,
+                'globalSearch': t.searchPlaceholder,
+                'sectionMySpace': t.sectionMySpace, 'navHomeText': t.navHomeText, 'navScheduleText': t.navScheduleText,
+                'navExamsText': t.navExamsText, 'navWishesText': t.navWishesText, 'navProposalsText': t.navProposalsText,
+                'navLeaveText': t.navLeaveText, 'navCalendarText': t.navCalendarText,
+                'sectionPedagogical': t.sectionPedagogical, 'navClassesText': t.navClassesText, 'navSubjectsText': t.navSubjectsText,
+                'navNotebookText': t.navNotebookText,
+                'sectionCommunication': t.sectionCommunication, 'navMessagesText': t.navMessagesText, 'navAnnouncementsText': t.navAnnouncementsText,
+                'navDonationText': t.navDonationText,
+                'sectionSettings': t.sectionSettings, 'navParametersText': t.navParametersText,
+                'quickActionText': t.quickActionText, 'logoutText': t.logoutText, 'profileRoleText': profileRoleText, 'loadingMsg': t.loading
+            };
+
+            for (const [id, text] of Object.entries(elements)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            }
+        }
+
+        function applyTheme() {
+            let theme = appSettings.theme;
+            if (theme === 'systeme') {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'sombre' : 'clair';
+            }
+            document.body.classList.toggle('dark-mode', theme === 'sombre');
+            document.documentElement.style.setProperty('--primary-green', appSettings.couleurPrimaire);
+            document.documentElement.style.setProperty('--accent-orange', appSettings.couleurSecondaire);
+        }
+
+        function getAuthToken() {
+            try {
+                let token = localStorage.getItem('authToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                token = sessionStorage.getItem('authToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                return null;
+            } catch(e) { return null; }
+        }
+
+        function getCurrentUser() {
+            try {
+                let userStr = localStorage.getItem('currentUser');
+                if (!userStr || userStr === 'undefined') userStr = sessionStorage.getItem('currentUser');
+                if (userStr && userStr !== 'undefined') return JSON.parse(userStr);
+                return null;
+            } catch(e) { return null; }
+        }
+
+        function getInitials(prenom, nom) {
+            if (prenom && nom) return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
+            if (prenom) return prenom.charAt(0).toUpperCase();
+            if (nom) return nom.charAt(0).toUpperCase();
+            return 'EN';
+        }
+
+        function updateProfileDisplay() {
+            const user = ENSEIGNANT_CONFIG.user;
+            const avatarEl = document.getElementById('profileAvatar');
+            const nameEl = document.getElementById('profileName');
+            const emailEl = document.getElementById('profileEmail');
+            if (avatarEl) avatarEl.textContent = user.initials;
+            if (nameEl) nameEl.textContent = user.name;
+            if (emailEl) emailEl.textContent = user.email;
+        }
+
+        function showToast(title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast';
+            toast.innerHTML = `<strong>${title}</strong><small>${message}</small>`;
+            toast.onclick = () => toast.remove();
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        function getNotificationTypeInfo(type) {
+            const key = (type || 'note').toLowerCase();
+            return notificationTypeConfig[key] || notificationTypeConfig['note'];
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const now = new Date();
+            const diffMins = Math.floor((now - d) / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'À l\'instant';
+            if (diffMins < 60) return `Il y a ${diffMins} min`;
+            if (diffHours < 24) return `Il y a ${diffHours} h`;
+            if (diffDays === 1) return 'Hier';
+            if (diffDays < 7) return `Il y a ${diffDays} jours`;
+            return d.toLocaleDateString('fr-FR');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // ============ NOTIFICATIONS ============
+
+        async function fetchEnseignantIdByEmail(email) {
+            try {
+                const token = ENSEIGNANT_CONFIG.token;
+                if (!token || !email) return null;
+                
+                const endpoints = [
+                    `http://localhost:5267/api/User/email/${encodeURIComponent(email)}`,
+                    `http://localhost:5267/api/Users/email/${encodeURIComponent(email)}`,
+                    `http://localhost:5267/api/Auth/user/by-email/${encodeURIComponent(email)}`,
+                    `http://localhost:5267/api/Enseignants/email/${encodeURIComponent(email)}`
+                ];
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            let user = data.data || data;
+                            if (user && user.id) {
+                                console.log(`✅ ID enseignant trouvé: ${user.id}`);
+                                ENSEIGNANT_CONFIG.user.id = user.id;
+                                localStorage.setItem('enseignantId', user.id);
+                                return user.id;
+                            }
+                        }
+                    } catch (err) {
+                        // Continuer avec le prochain endpoint
+                    }
+                }
+                
+                const tokenParts = token.split('.');
+                if (tokenParts.length === 3) {
+                    try {
+                        const payload = JSON.parse(atob(tokenParts[1]));
+                        if (payload.nameid || payload.sub) {
+                            const idFromToken = payload.nameid || payload.sub;
+                            console.log(`🆔 ID enseignant trouvé dans le token: ${idFromToken}`);
+                            ENSEIGNANT_CONFIG.user.id = idFromToken;
+                            localStorage.setItem('enseignantId', idFromToken);
+                            return idFromToken;
+                        }
+                    } catch (err) {}
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Erreur recherche ID enseignant:', error);
+                return null;
+            }
+        }
+
+        async function loadNotifications() {
+            try {
+                const token = ENSEIGNANT_CONFIG.token;
+                if (!token) return;
+                
+                const email = ENSEIGNANT_CONFIG.user.email;
+                const userId = ENSEIGNANT_CONFIG.user.id;
+                
+                let allNotifications = [];
+                
+                // STRATÉGIE 1: Récupérer TOUTES les notifications et filtrer par email
+                try {
+                    const response = await fetch(`http://localhost:5267/api/Notification`, {
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        let notifications = [];
+                        
+                        if (data.success && data.data) notifications = data.data;
+                        else if (data.Success && data.Data) notifications = data.Data;
+                        else if (Array.isArray(data)) notifications = data;
+                        else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                        else if (data.$values) notifications = data.$values;
+                        
+                        const filteredByEmail = notifications.filter(n => {
+                            const notifEmail = n.destinataireEmail || n.DestinataireEmail;
+                            return notifEmail && notifEmail.toLowerCase() === email.toLowerCase();
+                        });
+                        
+                        allNotifications.push(...filteredByEmail);
+                        console.log(`📧 ${filteredByEmail.length} notification(s) trouvée(s) par email`);
+                    }
+                } catch (err) {
+                    console.warn('Erreur récupération toutes notifications:', err);
+                }
+                
+                // STRATÉGIE 2: Par email directement
+                if (email) {
+                    try {
+                        const response = await fetch(`http://localhost:5267/api/Notification/destinataire/${encodeURIComponent(email)}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            let notifications = [];
+                            
+                            if (data.success && data.data) notifications = data.data;
+                            else if (data.Success && data.Data) notifications = data.Data;
+                            else if (Array.isArray(data)) notifications = data;
+                            else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                            else if (data.$values) notifications = data.$values;
+                            
+                            allNotifications.push(...notifications);
+                            console.log(`📧 ${notifications.length} notification(s) trouvée(s) par endpoint email`);
+                        }
+                    } catch (err) {
+                        console.warn('Erreur récupération par email:', err);
+                    }
+                }
+                
+                // STRATÉGIE 3: Par ID
+                if (userId && userId !== 'null' && userId !== 'undefined') {
+                    try {
+                        const response = await fetch(`http://localhost:5267/api/Notification/destinataire/${userId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            let notifications = [];
+                            
+                            if (data.success && data.data) notifications = data.data;
+                            else if (data.Success && data.Data) notifications = data.Data;
+                            else if (Array.isArray(data)) notifications = data;
+                            else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                            else if (data.$values) notifications = data.$values;
+                            
+                            allNotifications.push(...notifications);
+                            console.log(`🆔 ${notifications.length} notification(s) trouvée(s) par ID`);
+                        }
+                    } catch (err) {
+                        console.warn('Erreur récupération par ID:', err);
+                    }
+                }
+                
+                // STRATÉGIE 4: Recherche par message contenant l'email
+                try {
+                    const response = await fetch(`http://localhost:5267/api/Notification`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        let notifications = [];
+                        
+                        if (data.success && data.data) notifications = data.data;
+                        else if (Array.isArray(data)) notifications = data;
+                        else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                        
+                        const filteredByMessage = notifications.filter(n => {
+                            const message = (n.message || n.Message || '').toLowerCase();
+                            return message.includes(email.toLowerCase());
+                        });
+                        
+                        const existingIds = new Set(allNotifications.map(n => n.id || n._id || n.Id));
+                        const newNotifications = filteredByMessage.filter(n => {
+                            const id = n.id || n._id || n.Id;
+                            return !existingIds.has(id);
+                        });
+                        
+                        allNotifications.push(...newNotifications);
+                        console.log(`💬 ${newNotifications.length} notification(s) trouvée(s) par message`);
+                    }
+                } catch (err) {
+                    console.warn('Erreur recherche par message:', err);
+                }
+                
+                // Déduplication
+                const uniqueNotifications = [];
+                const seenIds = new Set();
+                
+                for (const notif of allNotifications) {
+                    const notifId = notif.id || notif._id || notif.Id;
+                    if (notifId && !seenIds.has(notifId)) {
+                        seenIds.add(notifId);
+                        uniqueNotifications.push(notif);
+                    }
+                }
+                
+                uniqueNotifications.sort((a, b) => {
+                    const dateA = new Date(a.date || a.Date || a.createdAt || 0);
+                    const dateB = new Date(b.date || b.Date || b.createdAt || 0);
+                    return dateB - dateA;
+                });
+                
+                ENSEIGNANT_CONFIG.notifications = uniqueNotifications.slice(0, 50);
+                ENSEIGNANT_CONFIG.unreadCount = uniqueNotifications.filter(n => !n.lu).length;
+                
+                console.log(`✅ Total: ${ENSEIGNANT_CONFIG.notifications.length} notifications, ${ENSEIGNANT_CONFIG.unreadCount} non lues`);
+                
+                updateNotificationBadge();
+                renderNotificationsDropdown();
+                
+                if (ENSEIGNANT_CONFIG.unreadCount > 0) {
+                    const lastNotif = uniqueNotifications[0];
+                    if (lastNotif && !lastNotif.lu) {
+                        const titre = lastNotif.titre || lastNotif.Titre || 'Nouvelle notification';
+                        showToast('🔔 Nouvelle notification', titre);
+                    }
+                }
+                
+            } catch (error) { 
+                console.error('❌ Erreur chargement notifications:', error); 
+            }
+        }
+
+        async function loadUnreadMessagesCount() {
+            try {
+                const token = ENSEIGNANT_CONFIG.token;
+                if (!token) return;
+                
+                const userId = ENSEIGNANT_CONFIG.user.id;
+                const email = ENSEIGNANT_CONFIG.user.email;
+                
+                let totalCount = 0;
+                
+                if (userId) {
+                    try {
+                        const response = await fetch(`http://localhost:5267/api/Notification/messages/unread-count/${userId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            totalCount += (data.data || data || 0);
+                        }
+                    } catch (err) {}
+                }
+                
+                if (email) {
+                    try {
+                        const response = await fetch(`http://localhost:5267/api/Notification/messages/unread-count/${encodeURIComponent(email)}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (response.ok) {
+                            const data = await response.json();
+                            totalCount += (data.data || data || 0);
+                        }
+                    } catch (err) {}
+                }
+                
+                ENSEIGNANT_CONFIG.unreadMessagesCount = totalCount;
+                
+                const messagesBadge = document.getElementById('messagesBadge');
+                if (messagesBadge) {
+                    if (totalCount > 0) {
+                        messagesBadge.textContent = totalCount > 99 ? '99+' : totalCount;
+                        messagesBadge.style.display = 'inline-block';
+                    } else {
+                        messagesBadge.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement messages non lus:', error);
+            }
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                const count = ENSEIGNANT_CONFIG.unreadCount;
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        }
+
+        function renderNotificationsDropdown() {
+            const listContainer = document.getElementById('notificationsList');
+            if (!listContainer) return;
+            
+            if (!ENSEIGNANT_CONFIG.notifications.length) {
+                listContainer.innerHTML = '<div class="notifications-empty">📭 Aucune notification</div>';
+                return;
+            }
+            
+            let html = '';
+            for (const notif of ENSEIGNANT_CONFIG.notifications) {
+                const notifId = notif.id || notif._id || notif.Id;
+                if (!notifId) continue;
+                
+                const date = notif.date || notif.Date || notif.createdAt;
+                const timeAgo = formatDate(date);
+                const unreadClass = !notif.lu ? 'unread' : '';
+                const titre = notif.titre || notif.Titre || 'Notification';
+                const message = notif.message || notif.Message || '';
+                const typeNotif = notif.typeNotification || notif.TypeNotification || 'note';
+                const typeInfo = getNotificationTypeInfo(typeNotif);
+                
+                html += `<div class="notification-item ${unreadClass}" data-id="${notifId}" onclick="window.handleNotificationClick('${notifId}')">
+                            <div class="notification-header">
+                                <div class="notification-icon-type">${typeInfo.icon}</div>
+                                <span class="notification-type-badge ${typeInfo.class}">${typeInfo.label}</span>
+                            </div>
+                            <div class="notification-title">${escapeHtml(titre)}</div>
+                            <div class="notification-message">${escapeHtml(message.substring(0, 150))}${message.length > 150 ? '...' : ''}</div>
+                            <div class="notification-time">
+                                <span>📅</span> ${timeAgo}
+                            </div>
+                        </div>`;
+            }
+            listContainer.innerHTML = html;
+        }
+
+        async function markAsRead(notificationId) {
+            if (!notificationId || notificationId === 'undefined' || notificationId === 'null') return false;
+            
+            try {
+                const token = ENSEIGNANT_CONFIG.token;
+                if (!token) return false;
+                
+                const response = await fetch(`http://localhost:5267/api/Notification/${notificationId}/marquer-lue`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const notif = ENSEIGNANT_CONFIG.notifications.find(n => (n.id || n._id || n.Id) === notificationId);
+                    if (notif && !notif.lu) {
+                        notif.lu = true;
+                        ENSEIGNANT_CONFIG.unreadCount = Math.max(0, ENSEIGNANT_CONFIG.unreadCount - 1);
+                        updateNotificationBadge();
+                        renderNotificationsDropdown();
+                    }
+                    return true;
+                }
+                return false;
+            } catch (error) { 
+                console.error('Erreur marquage notification:', error); 
+                return false;
+            }
+        }
+
+        async function handleNotificationClick(notificationId) {
+            if (!notificationId) return;
+            await markAsRead(notificationId);
+            closeNotificationsModal();
+        }
+
+        async function markAllNotificationsAsRead() {
+            try {
+                const token = ENSEIGNANT_CONFIG.token;
+                if (!token) return;
+                
+                const email = ENSEIGNANT_CONFIG.user.email;
+                if (email) {
+                    await fetch(`http://localhost:5267/api/Notification/destinataire/${encodeURIComponent(email)}/marquer-toutes-lues`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                
+                const userId = ENSEIGNANT_CONFIG.user.id;
+                if (userId) {
+                    await fetch(`http://localhost:5267/api/Notification/destinataire/${userId}/marquer-toutes-lues`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                
+                ENSEIGNANT_CONFIG.notifications.forEach(n => n.lu = true);
+                ENSEIGNANT_CONFIG.unreadCount = 0;
+                updateNotificationBadge();
+                renderNotificationsDropdown();
+            } catch (error) { 
+                console.error('Erreur marquage toutes notifications:', error); 
+            }
+        }
+
+        function openNotificationsModal() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const overlay = document.getElementById('notificationsOverlay');
+            if (dropdown && overlay) {
+                loadNotifications();
+                dropdown.classList.add('show');
+                overlay.classList.add('show');
+            }
+        }
+
+        function closeNotificationsModal() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const overlay = document.getElementById('notificationsOverlay');
+            if (dropdown) dropdown.classList.remove('show');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function startNotificationPolling() { 
+            setInterval(() => {
+                loadNotifications();
+                loadUnreadMessagesCount();
+            }, 30000);
+        }
+
+        // ============ NAVIGATION ============
+
+        function loadPageContent(pageName) {
+            const contentDiv = document.getElementById('dynamicContent');
+            
+            const pageFiles = {
+                'enseignant-accueil': 'enseignant-accueil.html',
+                'enseignant-emploi': 'enseignant-emploi.html',
+                'enseignant-voeux': 'enseignant-voeux.html',
+                'enseignant-propositions': 'enseignant-propositions.html',
+                'enseignant-conge': 'enseignant-conge.html',
+                'enseignant-classes': 'enseignant-classes.html',
+                'enseignant-matieres': 'enseignant-matieres.html',
+                'enseignant-cahier-texte': 'enseignant-cahier-texte.html',
+                'enseignant-messages': 'enseignant-messages.html',
+                'enseignant-annonces': 'enseignant-annonces.html',
+                'enseignant-donation': 'enseignant-donation.html',
+                'enseignant-parametres': 'enseignant-parametres.html',
+                'enseignant-notifications': 'enseignant-notifications.html',
+                'enseignant-calendrier': 'enseignant-calendrier.html',
+                'enseignant-examens': 'enseignant-examens.html',
+            };
+            
+            const filePath = pageFiles[pageName] || `${pageName}.html`;
+            
+            const isPermanent = ENSEIGNANT_CONFIG.user.role?.toLowerCase() === 'permanent';
+            if (isPermanent) {
+                if (pageName === 'enseignant-voeux' && !ENSEIGNANT_CONFIG.isInWishesPeriod) {
+                    showToast('⚠️ Période fermée', 'La période des vœux est terminée');
+                    return;
+                }
+                if (pageName === 'enseignant-propositions' && !ENSEIGNANT_CONFIG.isInProposalsPeriod) {
+                    showToast('⚠️ Période fermée', 'La période des propositions est terminée');
+                    return;
+                }
+            }
+            
+            ENSEIGNANT_CONFIG.currentPage = pageName;
+            sessionStorage.setItem('currentEnseignantPage', pageName);
+            
+            contentDiv.innerHTML = `<div class="loading-container">
+                                        <div style="text-align: center;">
+                                            <div class="loading-spinner"></div>
+                                            <p style="margin-top: 1rem; color: var(--text-light);">${translations[currentLang]?.loading || 'Chargement...'}</p>
+                                        </div>
+                                    </div>`;
+            
+            setTimeout(() => {
+                contentDiv.innerHTML = `<iframe src="${filePath}" class="dynamic-iframe" id="contentFrame" title="Contenu"></iframe>`;
+                setTimeout(() => {
+                    const iframe = document.getElementById('contentFrame');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({ type: 'saghiry-settings-response', settings: appSettings }, '*');
+                        if (ENSEIGNANT_CONFIG.token) {
+                            iframe.contentWindow.postMessage({ 
+                                type: 'SET_TOKEN', 
+                                token: ENSEIGNANT_CONFIG.token, 
+                                user: ENSEIGNANT_CONFIG.user,
+                                isPermanent: ENSEIGNANT_CONFIG.user.role?.toLowerCase() === 'permanent',
+                                wishesPeriodActive: ENSEIGNANT_CONFIG.isInWishesPeriod,
+                                proposalsPeriodActive: ENSEIGNANT_CONFIG.isInProposalsPeriod
+                            }, '*');
+                        }
+                    }
+                }, 500);
+            }, 300);
+        }
+
+        function updateActiveNavItem(pageName) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.dataset.page === pageName) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // ============ INITIALISATION ============
+
+        function initializeSidebar() {
+            console.log('🚀 Initialisation de l\'espace Enseignant/Permanent...');
+            
+            const token = getAuthToken();
+            const user = getCurrentUser();
+            
+            if (!token || !user) {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            
+            const role = (user.role || '').toLowerCase();
+            const isPermanent = role === 'permanent';
+            const isEnseignant = role === 'enseignant';
+            
+            if (!isPermanent && !isEnseignant) {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            
+            ENSEIGNANT_CONFIG.token = token;
+            
+            localStorage.setItem('authToken', token);
+            sessionStorage.setItem('authToken', token);
+            
+            const savedId = localStorage.getItem('enseignantId');
+            
+            let fullName = '';
+            if (user.prenom && user.nom) fullName = `${user.prenom} ${user.nom}`;
+            else if (user.prenom) fullName = user.prenom;
+            else if (user.nom) fullName = user.nom;
+            else if (user.email) fullName = user.email.split('@')[0];
+            else fullName = isPermanent ? 'Permanent' : 'Enseignant';
+            
+            ENSEIGNANT_CONFIG.user = {
+                name: fullName,
+                role: isPermanent ? 'Permanent' : 'Enseignant',
+                email: user.email || '',
+                initials: getInitials(user.prenom, user.nom),
+                id: savedId || user.id || null,
+                isPermanent: isPermanent
+            };
+            
+            const savedLang = localStorage.getItem('saghiry_langue');
+            if (savedLang && ['fr', 'en', 'ar'].includes(savedLang)) {
+                currentLang = savedLang;
+                appSettings.langue = savedLang;
+            }
+            
+            const savedTheme = localStorage.getItem('saghiry_theme');
+            if (savedTheme) appSettings.theme = savedTheme;
+            
+            const savedPrimary = localStorage.getItem('saghiry_primary_color');
+            if (savedPrimary) appSettings.couleurPrimaire = savedPrimary;
+            
+            const savedSecondary = localStorage.getItem('saghiry_secondary_color');
+            if (savedSecondary) appSettings.couleurSecondaire = savedSecondary;
+            
+            applyTheme();
+            checkPermanentPeriods();
+            applyTranslation();
+            updateProfileDisplay();
+            
+            if (!ENSEIGNANT_CONFIG.user.id && ENSEIGNANT_CONFIG.user.email) {
+                fetchEnseignantIdByEmail(ENSEIGNANT_CONFIG.user.email).then(() => {
+                    const savedPage = sessionStorage.getItem('currentEnseignantPage') || 'enseignant-accueil';
+                    loadPageContent(savedPage);
+                    updateActiveNavItem(savedPage);
+                    loadNotifications();
+                    loadUnreadMessagesCount();
+                });
+            } else {
+                const savedPage = sessionStorage.getItem('currentEnseignantPage') || 'enseignant-accueil';
+                loadPageContent(savedPage);
+                updateActiveNavItem(savedPage);
+                loadNotifications();
+                loadUnreadMessagesCount();
+            }
+            
+            startNotificationPolling();
+            
+            if (isPermanent) {
+                if (!ENSEIGNANT_CONFIG.isInWishesPeriod) {
+                    showToast('📅 Période des vœux', 'La période des vœux est actuellement fermée');
+                }
+                if (!ENSEIGNANT_CONFIG.isInProposalsPeriod) {
+                    showToast('📅 Période des propositions', 'La période des propositions est actuellement fermée');
+                }
+            }
+        }
+
+        function attachEventListeners() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    if (!page) return;
+                    
+                    if (this.classList.contains('disabled')) {
+                        showToast('⚠️ Accès restreint', this.title || 'Cette fonctionnalité n\'est pas disponible actuellement');
+                        return;
+                    }
+                    
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    loadPageContent(page);
+                    closeNotificationsModal();
+                });
+            });
+            
+            const notificationIcon = document.getElementById('notificationIcon');
+            if (notificationIcon) {
+                notificationIcon.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    openNotificationsModal(); 
+                });
+            }
+            
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    markAllNotificationsAsRead(); 
+                });
+            }
+            
+            const closeBtn = document.getElementById('closeNotificationsBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    closeNotificationsModal(); 
+                });
+            }
+            
+            const overlay = document.getElementById('notificationsOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() { 
+                    closeNotificationsModal(); 
+                });
+            }
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) { 
+                    e.preventDefault(); 
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.href = 'saghiry-auth.html';
+                });
+            }
+            
+            const quickActionBtn = document.getElementById('quickActionBtn');
+            if (quickActionBtn) {
+                quickActionBtn.addEventListener('click', function() {
+                    const isPermanent = ENSEIGNANT_CONFIG.user.role?.toLowerCase() === 'permanent';
+                    if (isPermanent && !ENSEIGNANT_CONFIG.isInWishesPeriod) {
+                        showToast('⚠️ Période fermée', 'La période des vœux est terminée');
+                        return;
+                    }
+                    const navItem = document.querySelector('.nav-item[data-page="enseignant-voeux"]');
+                    if (navItem && !navItem.classList.contains('disabled')) navItem.click();
+                });
+            }
+            
+            const globalSearch = document.getElementById('globalSearch');
+            if (globalSearch) {
+                globalSearch.addEventListener('keyup', function(e) {
+                    document.dispatchEvent(new CustomEvent('saghiryGlobalSearch', { 
+                        detail: { term: e.target.value, page: ENSEIGNANT_CONFIG.currentPage } 
+                    }));
+                });
+            }
+            
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const theme = localStorage.getItem('saghiry_theme');
+                if (theme === 'systeme') {
+                    applyTheme();
+                }
+            });
+            
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'saghiry-settings-update') {
+                    if (event.data.settings) {
+                        appSettings = { ...appSettings, ...event.data.settings };
+                        localStorage.setItem('saghiry_theme', appSettings.theme);
+                        localStorage.setItem('saghiry_langue', appSettings.langue);
+                        localStorage.setItem('saghiry_primary_color', appSettings.couleurPrimaire);
+                        localStorage.setItem('saghiry_secondary_color', appSettings.couleurSecondaire);
+                        currentLang = appSettings.langue;
+                        applyTheme();
+                        checkPermanentPeriods();
+                        applyTranslation();
+                    }
+                }
+                
+                if (event.data && event.data.type === 'REQUEST_TOKEN' && event.source) {
+                    event.source.postMessage({
+                        type: 'SET_TOKEN',
+                        token: ENSEIGNANT_CONFIG.token,
+                        user: ENSEIGNANT_CONFIG.user,
+                        isPermanent: ENSEIGNANT_CONFIG.user.role?.toLowerCase() === 'permanent'
+                    }, '*');
+                }
+                
+                if (event.data && event.data.type === 'newMessage') {
+                    loadUnreadMessagesCount();
+                    showToast('📩 Nouveau message', event.data.senderName + ' vous a envoyé un message');
+                }
+            });
+        }
+
+        // Exposer les fonctions globales
+        window.handleNotificationClick = handleNotificationClick;
+        window.markAsRead = markAsRead;
+        window.EnseignantSpace = {
+            getToken: () => ENSEIGNANT_CONFIG.token,
+            getCurrentUser: () => ENSEIGNANT_CONFIG.user,
+            refreshNotifications: loadNotifications,
+            refreshMessagesCount: loadUnreadMessagesCount,
+            isPermanent: () => ENSEIGNANT_CONFIG.user.role?.toLowerCase() === 'permanent',
+            isWishesPeriodActive: () => ENSEIGNANT_CONFIG.isInWishesPeriod,
+            isProposalsPeriodActive: () => ENSEIGNANT_CONFIG.isInProposalsPeriod
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSidebar();
+            attachEventListeners();
+        });
+    </script>
+</body>
+</html>

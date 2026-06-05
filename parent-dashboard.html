@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Tableau de bord Parent</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ============ STYLES MODERNES INSPIRÉS ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ============ PAGE HEADER ============ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '📊';
+            font-size: 2rem;
+            -webkit-text-fill-color: initial;
+            color: var(--primary-green);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 14px rgba(76, 168, 150, 0.3);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(76, 168, 150, 0.4);
+        }
+
+        /* ============ STATISTIQUES ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-dark);
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* ============ ONGLETS ENFANTS ============ */
+        .enfant-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .enfant-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            border: 2px solid transparent;
+        }
+
+        .enfant-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76,168,150,0.2);
+            border-color: var(--primary-green);
+        }
+
+        .enfant-tab.active {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            box-shadow: 0 8px 25px rgba(76,168,150,0.4);
+        }
+
+        .enfant-tab.active .enfant-tab-name {
+            color: white;
+        }
+
+        .enfant-avatar {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .enfant-tab-name {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .enfant-tab-class {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* ============ GRILLE PRINCIPALE ============ */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 1rem;
+        }
+
+        canvas {
+            max-height: 250px;
+            width: 100%;
+        }
+
+        /* ============ MATIÈRES ============ */
+        .matiere-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .matiere-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .matiere-item:hover {
+            background: #e0f2f1;
+            transform: translateX(5px);
+        }
+
+        .matiere-info {
+            flex: 2;
+        }
+
+        .matiere-nom {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .matiere-coeff {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-left: 0.5rem;
+        }
+
+        .matiere-barre {
+            flex: 3;
+            height: 8px;
+            background: var(--gray-border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .matiere-progress {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .matiere-note {
+            font-weight: 700;
+            min-width: 50px;
+            text-align: right;
+            color: var(--primary-dark);
+        }
+
+        /* ============ EXAMENS ============ */
+        .examen-list, .absence-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .examen-item, .absence-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: var(--gray-bg);
+            border-radius: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .examen-item:hover, .absence-item:hover {
+            background: #e0f2f1;
+            transform: translateX(5px);
+        }
+
+        .examen-date, .absence-date {
+            min-width: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-green);
+        }
+
+        .examen-info, .absence-info {
+            flex: 1;
+        }
+
+        .examen-matiere, .absence-matiere {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .examen-salle, .absence-detail {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        /* ============ BADGES ABSENCES ============ */
+        .absence-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .absence-badge.presence {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .absence-badge.retard {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .absence-badge.absence {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-planifie {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        /* ============ JAUGE ============ */
+        .gauge-container {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .gauge-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .gauge-bar {
+            height: 12px;
+            background: var(--gray-border);
+            border-radius: 20px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+
+        .appreciation {
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* ============ ÉTATS VIDES ============ */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ MODAL ============ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-title {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .absence-detail {
+            background: var(--gray-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .absence-detail p {
+            margin-bottom: 0.5rem;
+        }
+
+        .validation-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ============ ALERTES ============ */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .alert-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .enfant-tab {
+                padding: 0.5rem 1rem;
+            }
+
+            .enfant-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            .examen-date, .absence-date {
+                min-width: 70px;
+                font-size: 0.7rem;
+            }
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container" id="dashboardContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Modal pour les détails d'absence -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 Détails de l'absence</h2>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+            <div class="validation-buttons">
+                <button class="btn-outline" onclick="closeDetailModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        let enfants = [];
+        let currentEnfantId = null;
+        
+        let notesData = {};
+        let absencesData = {};
+        let examensData = {};
+        let sallesMap = new Map();
+        let enseignantsCache = {};
+        
+        let chartNotes = null;
+        let chartRepartition = null;
+
+        // ========== FONCTIONS UTILITAIRES ==========
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                let dateStr = dateValue;
+                if (typeof dateValue === 'object' && dateValue.$date) {
+                    dateStr = dateValue.$date;
+                }
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Date inconnue';
+                return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        function formatDateLong(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                let dateStr = dateValue;
+                if (typeof dateValue === 'object' && dateValue.$date) {
+                    dateStr = dateValue.$date;
+                }
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Date inconnue';
+                return date.toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        function getAppreciation(moyenne) {
+            if (moyenne >= 16) return { text: '🏆 Excellent', color: '#065f46', bg: '#d1fae5' };
+            if (moyenne >= 14) return { text: '🌟 Très bien', color: '#1e40af', bg: '#dbeafe' };
+            if (moyenne >= 12) return { text: '👍 Bien', color: '#3f6212', bg: '#d9f99d' };
+            if (moyenne >= 10) return { text: '✅ Passable', color: '#9b2c1d', bg: '#fed7aa' };
+            if (moyenne >= 8) return { text: '⚠️ Insuffisant', color: '#b45309', bg: '#ffedd5' };
+            return { text: '❌ Faible', color: '#b91c1c', bg: '#fee2e2' };
+        }
+
+        function getProgressColor(moyenne) {
+            if (moyenne >= 16) return '#10b981';
+            if (moyenne >= 14) return '#3b82f6';
+            if (moyenne >= 12) return '#8b5cf6';
+            if (moyenne >= 10) return '#f59e0b';
+            return '#ef4444';
+        }
+
+        function getTypeBadge(type) {
+            const types = {
+                'presence': '<span class="absence-badge presence">✅ Présent</span>',
+                'retard': '<span class="absence-badge retard">⏰ Retard</span>',
+                'absence': '<span class="absence-badge absence">❌ Absent</span>'
+            };
+            return types[type] || `<span class="absence-badge">${type}</span>`;
+        }
+
+        function getEnseignantName(enseignantId) {
+            if (!enseignantId) return 'Non spécifié';
+            return enseignantsCache[enseignantId] || `Enseignant`;
+        }
+
+        // ========== RÉCUPÉRATION DU TOKEN ==========
+        
+        function getAuthToken() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    const parentToken = window.parent.ParentSpace.getToken();
+                    if (parentToken) return parentToken;
+                }
+                if (window.ParentSpace && typeof window.ParentSpace.getToken === 'function') {
+                    const globalToken = window.ParentSpace.getToken();
+                    if (globalToken) return globalToken;
+                }
+            } catch(e) {}
+            
+            return localStorage.getItem('authToken') || 
+                   localStorage.getItem('parentAuthToken') || 
+                   sessionStorage.getItem('authToken');
+        }
+
+        function requestTokenFromParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'REQUEST_TOKEN' }, '*');
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'SET_TOKEN') {
+                token = event.data.token;
+                console.log('✅ Token reçu du parent');
+                chargerEnfants();
+            }
+        });
+
+        // ========== CHARGEMENT DES SALLES ==========
+        
+        async function chargerSalles() {
+            try {
+                console.log('📡 Chargement des salles...');
+                const response = await fetch(`${API_BASE}/api/Salle/public`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let salles = [];
+                    if (data.Data && Array.isArray(data.Data)) salles = data.Data;
+                    else if (data.data && Array.isArray(data.data)) salles = data.data;
+                    else if (data.$values && Array.isArray(data.$values)) salles = data.$values;
+                    else if (Array.isArray(data)) salles = data;
+                    
+                    sallesMap.clear();
+                    salles.forEach(s => {
+                        const id = s.id || s._id || s.Id;
+                        const nom = s.nomSalle || s.nom || s.NomSalle || s.Nom;
+                        if (id && nom) sallesMap.set(id, nom);
+                    });
+                    console.log(`✅ ${sallesMap.size} salles chargées`);
+                }
+            } catch (error) {
+                console.error('Erreur chargement salles:', error);
+            }
+        }
+
+        // ========== CHARGEMENT DES ENSEIGNANTS ==========
+        
+        async function chargerEnseignants() {
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enseignants-noms`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data) {
+                        enseignantsCache = data.data;
+                        console.log(`✅ ${Object.keys(enseignantsCache).length} enseignant(s) chargé(s)`);
+                        return true;
+                    }
+                }
+            } catch(e) {
+                console.error('Erreur chargement enseignants:', e);
+            }
+            return false;
+        }
+
+        // ========== CHARGEMENT DES ENFANTS ==========
+        
+        async function chargerEnfants() {
+            if (!token) {
+                token = getAuthToken();
+                if (!token) {
+                    requestTokenFromParent();
+                    setTimeout(() => chargerEnfants(), 500);
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enfants`, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}`);
+                }
+
+                const data = await response.json();
+                enfants = data.data || data || [];
+                
+                console.log(`📊 ${enfants.length} enfant(s) trouvé(s)`);
+                
+                enfants.forEach(e => {
+                    console.log(`   - ${e.prenom} ${e.nom} (${e.niveau || 'Niveau?'})`);
+                });
+
+                if (enfants.length === 0) {
+                    afficherAucunEnfant();
+                    return;
+                }
+
+                await Promise.all([
+                    chargerSalles(),
+                    chargerEnseignants()
+                ]);
+                await chargerToutesDonnees();
+                
+                currentEnfantId = enfants[0].id;
+                afficherDashboard();
+
+            } catch (error) {
+                console.error('Erreur chargement enfants:', error);
+                afficherErreur('Impossible de charger la liste de vos enfants.');
+            }
+        }
+
+        // ========== CHARGEMENT DES DONNÉES ==========
+        
+        async function chargerToutesDonnees() {
+            for (const enfant of enfants) {
+                await Promise.all([
+                    chargerNotesEnfant(enfant.id),
+                    chargerAbsencesEnfant(enfant.id),
+                    chargerExamensEnfant(enfant.id)
+                ]);
+            }
+        }
+
+        async function chargerNotesEnfant(eleveId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/Note/eleve/${eleveId}/moyenne-detaillee`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    notesData[eleveId] = { moyenneGenerale: 0, nombreNotes: 0, detailsParMatiere: [] };
+                    return;
+                }
+                
+                const data = await response.json();
+                notesData[eleveId] = {
+                    moyenneGenerale: data.moyenneGenerale || 0,
+                    nombreNotes: data.nombreNotes || 0,
+                    detailsParMatiere: data.detailsParMatiere || []
+                };
+                console.log(`✅ Notes chargées pour ${eleveId}: ${notesData[eleveId].moyenneGenerale}/20`);
+            } catch (error) {
+                console.error(`Erreur notes pour ${eleveId}:`, error);
+                notesData[eleveId] = { moyenneGenerale: 0, nombreNotes: 0, detailsParMatiere: [] };
+            }
+        }
+
+        async function chargerAbsencesEnfant(eleveId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/Absence/eleve/${eleveId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    absencesData[eleveId] = [];
+                    return;
+                }
+                
+                const data = await response.json();
+                let absences = data.Success ? data.Data : (data.data ? data.data : (Array.isArray(data) ? data : []));
+                
+                absencesData[eleveId] = absences.map(a => ({
+                    id: a.Id || a.id,
+                    type: a.Type || a.type || 'absence',
+                    motif: a.Motif || a.motif || '-',
+                    date: a.Date || a.date,
+                    duree: a.Duree || a.duree || 1,
+                    enseignantId: a.EnseignantId || a.enseignantId,
+                    matiereNom: a.MatiereNom || a.matiereNom || 'Matière'
+                }));
+                
+                absencesData[eleveId].sort((a, b) => new Date(b.date) - new Date(a.date));
+                console.log(`✅ ${absencesData[eleveId].length} absence(s) chargées`);
+            } catch (error) {
+                console.error(`Erreur absences:`, error);
+                absencesData[eleveId] = [];
+            }
+        }
+
+        async function chargerExamensEnfant(eleveId) {
+            try {
+                console.log(`📊 Chargement des examens pour l'élève ${eleveId}`);
+                
+                const eleveResponse = await fetch(`${API_BASE}/api/Eleve/parent/${eleveId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!eleveResponse.ok) {
+                    examensData[eleveId] = [];
+                    return;
+                }
+                
+                const eleve = await eleveResponse.json();
+                const classeId = eleve.classeId || eleve.ClasseId;
+                
+                if (!classeId) {
+                    examensData[eleveId] = [];
+                    return;
+                }
+                
+                const examensResponse = await fetch(`${API_BASE}/api/Examen/public`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!examensResponse.ok) {
+                    examensData[eleveId] = [];
+                    return;
+                }
+                
+                const examensDataRaw = await examensResponse.json();
+                let exams = examensDataRaw.Data || examensDataRaw.data || examensDataRaw || [];
+                if (!Array.isArray(exams)) exams = [];
+                
+                const examsFiltres = exams.filter(exam => {
+                    const examClasseId = exam.ClasseId || exam.classeId;
+                    return examClasseId === classeId;
+                });
+                
+                examensData[eleveId] = examsFiltres.map(exam => {
+                    let dateValue = exam.Date || exam.date;
+                    if (dateValue && typeof dateValue === 'object' && dateValue.$date) {
+                        dateValue = dateValue.$date;
+                    }
+                    
+                    let salleNom = '—';
+                    const salleId = exam.Salle || exam.salle;
+                    if (salleId && sallesMap.has(salleId)) {
+                        salleNom = sallesMap.get(salleId);
+                    }
+                    
+                    let status = 'planifie';
+                    if (dateValue) {
+                        const dateObj = new Date(dateValue);
+                        if (!isNaN(dateObj.getTime())) {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (dateObj < today) status = 'termine';
+                        }
+                    }
+                    
+                    return {
+                        matiereNom: exam.MatiereNom || exam.matiereNom || 'Matière',
+                        date: dateValue,
+                        dateStr: formatDateLong(dateValue),
+                        heureDebut: exam.HeureDebut || exam.heureDebut || '08:00',
+                        heureFin: exam.HeureFin || exam.heureFin || '10:00',
+                        salle: salleNom,
+                        status: status
+                    };
+                });
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                examensData[eleveId] = examensData[eleveId]
+                    .filter(e => new Date(e.date) >= today)
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .slice(0, 4);
+                
+                console.log(`✅ ${examensData[eleveId].length} examens à venir`);
+            } catch (error) {
+                console.error(`Erreur examens:`, error);
+                examensData[eleveId] = [];
+            }
+        }
+
+        // ========== GRAPHIQUES ==========
+        
+        function creerGraphiqueNotes(matieres) {
+            const ctx = document.getElementById('chartNotes');
+            if (!ctx) return;
+            if (chartNotes) chartNotes.destroy();
+            if (!matieres.length) return;
+            
+            const labels = matieres.map(m => m.matiereNom);
+            const notes = matieres.map(m => m.moyenne);
+            const couleurs = notes.map(n => getProgressColor(n));
+            
+            chartNotes = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Moyenne /20',
+                        data: notes,
+                        backgroundColor: couleurs,
+                        borderRadius: 10,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 11 } } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toFixed(1)} / 20` } }
+                    },
+                    scales: {
+                        y: { min: 0, max: 20, grid: { color: '#e0e9e7' } }
+                    }
+                }
+            });
+        }
+
+        function creerGraphiqueRepartition(matieres) {
+            const ctx = document.getElementById('chartRepartition');
+            if (!ctx) return;
+            if (chartRepartition) chartRepartition.destroy();
+            
+            const toutesNotes = [];
+            matieres.forEach(m => {
+                if (m.notes) m.notes.forEach(n => toutesNotes.push(n.valeur));
+            });
+            
+            if (toutesNotes.length === 0) return;
+            
+            const categories = { 
+                'Excellent (16-20)': 0, 
+                'Très bien (14-16)': 0, 
+                'Bien (12-14)': 0, 
+                'Passable (10-12)': 0, 
+                'Insuffisant (<10)': 0 
+            };
+            
+            toutesNotes.forEach(n => {
+                if (n >= 16) categories['Excellent (16-20)']++;
+                else if (n >= 14) categories['Très bien (14-16)']++;
+                else if (n >= 12) categories['Bien (12-14)']++;
+                else if (n >= 10) categories['Passable (10-12)']++;
+                else categories['Insuffisant (<10)']++;
+            });
+            
+            const filtered = Object.fromEntries(Object.entries(categories).filter(([_, v]) => v > 0));
+            
+            chartRepartition = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(filtered),
+                    datasets: [{
+                        data: Object.values(filtered),
+                        backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }
+                }
+            });
+        }
+
+        // ========== AFFICHAGE DASHBOARD ==========
+        
+        function afficherDashboard() {
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            if (!enfant) return;
+            
+            const notes = notesData[currentEnfantId] || { moyenneGenerale: 0, detailsParMatiere: [] };
+            const absences = absencesData[currentEnfantId] || [];
+            const examens = examensData[currentEnfantId] || [];
+            const matieres = notes.detailsParMatiere || [];
+            
+            const appreciation = getAppreciation(notes.moyenneGenerale);
+            
+            const absencesCount = absences.filter(a => a.type === 'absence').length;
+            const retardsCount = absences.filter(a => a.type === 'retard').length;
+            const presencesCount = absences.filter(a => a.type === 'presence').length;
+            
+            // Onglets HTML
+            let tabsHtml = '';
+            enfants.forEach(e => {
+                const nomComplet = `${e.prenom || ''} ${e.nom || ''}`.trim() || 'Mon enfant';
+                const initial = (e.prenom?.charAt(0) || e.nom?.charAt(0) || 'E').toUpperCase();
+                tabsHtml += `
+                    <div class="enfant-tab ${e.id === currentEnfantId ? 'active' : ''}" onclick="selectEnfant('${e.id}')">
+                        <div class="enfant-avatar">${escapeHtml(initial)}</div>
+                        <div class="enfant-tab-info">
+                            <div class="enfant-tab-name">${escapeHtml(nomComplet)}</div>
+                            <div class="enfant-tab-class">${escapeHtml(e.niveau || '')}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            const container = document.getElementById('dashboardContainer');
+            container.innerHTML = `
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Tableau de bord</h1>
+                        <p class="page-subtitle">Suivi scolaire de ${escapeHtml(enfant.prenom || 'votre enfant')}</p>
+                    </div>
+                    <button class="btn-secondary" onclick="rafraichirDonnees()">
+                        <i class="fas fa-sync-alt"></i> Actualiser
+                    </button>
+                </div>
+                
+                <div class="enfant-tabs">
+                    ${tabsHtml}
+                </div>
+                
+                <!-- Statistiques -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Moyenne générale</div>
+                        <div class="stat-value">${notes.moyenneGenerale.toFixed(2)}<span style="font-size:1rem;">/20</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Matières</div>
+                        <div class="stat-value">${matieres.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Examens à venir</div>
+                        <div class="stat-value">${examens.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Absences</div>
+                        <div class="stat-value">${absences.length}</div>
+                        <div style="font-size:0.7rem;">❌ ${absencesCount} | ⏰ ${retardsCount} | ✅ ${presencesCount}</div>
+                    </div>
+                </div>
+                
+                <!-- Grille principale -->
+                <div class="main-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-simple"></i> Moyennes par matière</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartNotes"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tachometer-alt"></i> Performance générale</h3>
+                        </div>
+                        <div class="gauge-container">
+                            <div class="gauge-value">${notes.moyenneGenerale.toFixed(1)}<span style="font-size:1.2rem;">/20</span></div>
+                            <div class="gauge-bar">
+                                <div class="gauge-fill" style="width: ${(notes.moyenneGenerale / 20) * 100}%; background: ${getProgressColor(notes.moyenneGenerale)};"></div>
+                            </div>
+                            <div>
+                                <span class="appreciation" style="background: ${appreciation.bg}; color: ${appreciation.color};">${appreciation.text}</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <div class="matiere-list">
+                                ${matieres.slice(0, 5).map(m => `
+                                    <div class="matiere-item">
+                                        <div class="matiere-info">
+                                            <span class="matiere-nom">${escapeHtml(m.matiereNom)}</span>
+                                            <span class="matiere-coeff">coeff ${m.coefficient || 1}</span>
+                                        </div>
+                                        <div class="matiere-barre">
+                                            <div class="matiere-progress" style="width: ${(m.moyenne / 20) * 100}%; background: ${getProgressColor(m.moyenne)};"></div>
+                                        </div>
+                                        <div class="matiere-note">${m.moyenne.toFixed(1)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-pie"></i> Répartition des notes</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartRepartition"></canvas>
+                        </div>
+                        ${matieres.length === 0 ? '<div class="empty-state"><i class="fas fa-chart-pie"></i><p>Aucune note disponible</p></div>' : ''}
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-check"></i> Examens à venir</h3>
+                        </div>
+                        ${examens.length === 0 ? `
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-day"></i>
+                                <p>Aucun examen programmé</p>
+                            </div>
+                        ` : `
+                            <div class="examen-list">
+                                ${examens.map(e => `
+                                    <div class="examen-item">
+                                        <div class="examen-date">
+                                            <i class="fas fa-calendar-alt"></i> ${escapeHtml(e.dateStr.split(',')[0])}
+                                        </div>
+                                        <div class="examen-info">
+                                            <div class="examen-matiere">${escapeHtml(e.matiereNom)}</div>
+                                            <div class="examen-salle"><i class="fas fa-door-open"></i> ${escapeHtml(e.salle)}</div>
+                                        </div>
+                                        <div>
+                                            <span class="status-badge status-planifie">📝 ${escapeHtml(e.heureDebut)} - ${escapeHtml(e.heureFin)}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                </div>
+                
+                <!-- Absences récentes -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-clock"></i> Absences récentes</h3>
+                    </div>
+                    ${absences.length === 0 ? `
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>Aucune absence enregistrée</p>
+                        </div>
+                    ` : `
+                        <div class="absence-list">
+                            ${absences.slice(0, 5).map(a => `
+                                <div class="absence-item" onclick="showAbsenceDetail('${a.id}')">
+                                    <div class="absence-date">
+                                        <i class="fas fa-calendar-alt"></i> ${formatDate(a.date)}
+                                    </div>
+                                    <div class="absence-info">
+                                        <div class="absence-matiere">${escapeHtml(a.matiereNom || 'Matière')}</div>
+                                        <div class="absence-detail">${escapeHtml((a.motif || '-').substring(0, 50))}${(a.motif || '').length > 50 ? '...' : ''}</div>
+                                    </div>
+                                    <div>
+                                        ${getTypeBadge(a.type)}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                if (matieres.length > 0) {
+                    creerGraphiqueNotes(matieres);
+                    creerGraphiqueRepartition(matieres);
+                }
+            }, 100);
+        }
+
+        function showAbsenceDetail(absenceId) {
+            const absences = absencesData[currentEnfantId] || [];
+            const absence = absences.find(a => a.id === absenceId);
+            if (!absence) return;
+            
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const enfantName = enfant ? `${enfant.prenom || ''} ${enfant.nom || ''}`.trim() : 'Élève';
+            
+            const detailHtml = `
+                <div class="absence-detail">
+                    <p><strong>👤 Élève :</strong> ${escapeHtml(enfantName)}</p>
+                    <p><strong>📋 Type :</strong> ${getTypeBadge(absence.type)}</p>
+                    <p><strong>📚 Matière :</strong> ${escapeHtml(absence.matiereNom || 'Matière')}</p>
+                    <p><strong>📝 Motif :</strong> ${escapeHtml(absence.motif || '-')}</p>
+                    <p><strong>📅 Date :</strong> ${formatDateLong(absence.date)}</p>
+                    <p><strong>⏱️ Durée :</strong> ${absence.duree} heure(s)</p>
+                    <p><strong>👨‍🏫 Enseignant :</strong> ${escapeHtml(getEnseignantName(absence.enseignantId))}</p>
+                </div>
+            `;
+            document.getElementById('detailContent').innerHTML = detailHtml;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function selectEnfant(eleveId) {
+            currentEnfantId = eleveId;
+            afficherDashboard();
+        }
+
+        async function rafraichirDonnees() {
+            if (currentEnfantId) {
+                await Promise.all([
+                    chargerNotesEnfant(currentEnfantId),
+                    chargerAbsencesEnfant(currentEnfantId),
+                    chargerExamensEnfant(currentEnfantId)
+                ]);
+                afficherDashboard();
+                showMessage('✅ Données actualisées', 'success');
+            }
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function afficherErreur(message) {
+            const container = document.getElementById('dashboardContainer');
+            container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+                    <h3 style="margin: 1rem 0; color: #b45309;">${escapeHtml(message)}</h3>
+                    <button class="btn-primary" onclick="location.reload()" style="margin: 0 auto;">
+                        <i class="fas fa-redo"></i> Réessayer
+                    </button>
+                </div>
+            `;
+        }
+
+        function afficherAucunEnfant() {
+            const container = document.getElementById('dashboardContainer');
+            container.innerHTML = `
+                <div class="card" style="text-align: center; padding: 3rem;">
+                    <i class="fas fa-child" style="font-size: 3rem; color: var(--primary-green);"></i>
+                    <h3 style="margin: 1rem 0;">Aucun enfant associé</h3>
+                    <p style="color: var(--text-light);">Veuillez contacter l'administration.</p>
+                </div>
+            `;
+        }
+
+        // ========== INITIALISATION ==========
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📱 Dashboard parent initialisé');
+            token = getAuthToken();
+            
+            if (token) {
+                chargerEnfants();
+            } else {
+                requestTokenFromParent();
+                setTimeout(() => {
+                    token = getAuthToken();
+                    if (token) chargerEnfants();
+                    else afficherErreur('Session expirée. Veuillez vous reconnecter.');
+                }, 1000);
+            }
+        });
+
+        window.selectEnfant = selectEnfant;
+        window.rafraichirDonnees = rafraichirDonnees;
+        window.showAbsenceDetail = showAbsenceDetail;
+        window.closeDetailModal = closeDetailModal;
+    </script>
+</body>
+</html>

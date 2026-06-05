@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API SAGHIRY</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        pre { background: #f4f4f4; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Connexion API</h1>
+    
+    <div id="tokenInfo"></div>
+    <div id="result"></div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:5267';
+        
+        async function testConnection() {
+            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            
+            document.getElementById('tokenInfo').innerHTML = `
+                <h3>Token: ${token ? '✅ Présent' : '❌ Absent'}</h3>
+                <pre>${token ? token.substring(0, 50) + '...' : 'Aucun token'}</pre>
+                <h3>Utilisateur: ${userStr ? '✅ Présent' : '❌ Absent'}</h3>
+                <pre>${userStr || 'Aucun utilisateur'}</pre>
+            `;
+            
+            if (!token) {
+                document.getElementById('result').innerHTML = '<p class="error">❌ Connectez-vous d\'abord</p>';
+                return;
+            }
+            
+            // Test 1: Endpoint public
+            try {
+                const publicRes = await fetch(`${API_BASE_URL}/api/test`);
+                document.getElementById('result').innerHTML += `<p>✅ Endpoint public: ${publicRes.status}</p>`;
+            } catch (e) {
+                document.getElementById('result').innerHTML += `<p class="error">❌ Backend inaccessible</p>`;
+                return;
+            }
+            
+            // Test 2: Endpoint admin
+            try {
+                const adminRes = await fetch(`${API_BASE_URL}/api/admin/AdminUtilisateurs`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                document.getElementById('result').innerHTML += `<p>🔐 Endpoint admin: ${adminRes.status}</p>`;
+                
+                if (adminRes.status === 401) {
+                    document.getElementById('result').innerHTML += `<p class="error">❌ Token invalide ou expiré</p>`;
+                    
+                    // Décoder le token
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        document.getElementById('result').innerHTML += `<pre>Payload: ${JSON.stringify(payload, null, 2)}</pre>`;
+                        document.getElementById('result').innerHTML += `<p>Rôle dans token: ${payload.role || payload.Role || 'non trouvé'}</p>`;
+                    } catch (e) {}
+                }
+            } catch (e) {}
+        }
+        
+        testConnection();
+    </script>
+</body>
+</html>

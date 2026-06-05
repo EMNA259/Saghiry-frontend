@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Paramètres Parent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .settings-container,
+        body.dark-mode .settings-card,
+        body.dark-mode .settings-tabs,
+        body.dark-mode .modal-content {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .section-title,
+        body.dark-mode .settings-card-title,
+        body.dark-mode .form-group label,
+        body.dark-mode .toggle-label strong {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .info-text,
+        body.dark-mode .toggle-label span {
+            color: #b0b0b0;
+        }
+
+        body[dir="rtl"] .settings-card-title,
+        body[dir="rtl"] .toggle-label,
+        body[dir="rtl"] .form-group label {
+            text-align: right;
+        }
+
+        body[dir="rtl"] .action-buttons {
+            justify-content: flex-start;
+        }
+
+        body[dir="rtl"] .color-preview {
+            flex-direction: row-reverse;
+        }
+
+        .settings-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 0.8rem;
+            border-radius: 20px;
+            border: 1px solid #e0e9e7;
+        }
+
+        body.dark-mode .settings-tabs {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        .settings-tab {
+            padding: 0.7rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-tab:hover {
+            background: #e0f2f1;
+            color: #4ca896;
+        }
+
+        .settings-tab.active {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        body.dark-mode .settings-tab:hover {
+            background: #2d2d44;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(76, 168, 150, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            box-shadow: 0 8px 24px rgba(76, 168, 150, 0.1);
+        }
+
+        .settings-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        body.dark-mode .settings-card-title {
+            border-bottom-color: #2d2d44;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #5a9d91;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.7rem 1rem;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: #fefefe;
+            color: #1e3b36;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        .color-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .color-preview input {
+            width: 50px;
+            height: 40px;
+            padding: 0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e9e7;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(76, 168, 150, 0.3);
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        body[dir="rtl"] .alert {
+            right: auto;
+            left: 20px;
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            color: #2d6b63;
+            border-left: 4px solid #4ca896;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #e03131;
+        }
+
+        .alert-info {
+            background: #e7f5ff;
+            color: #1e88e5;
+            border-left: 4px solid #339af0;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .settings-tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .settings-tab { white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <h1 class="page-title">
+                <span>⚙️</span>
+                <span id="pageTitle">Mes paramètres</span>
+            </h1>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="exportConfig()">
+                    📤 <span id="exportBtn">Exporter</span>
+                </button>
+                <button class="btn-secondary" onclick="importConfig()">
+                    📥 <span id="importBtn">Importer</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="settings-tabs">
+            <button class="settings-tab active" data-tab="apparence">
+                🎨 <span id="tabApparence">Personnalisation</span>
+            </button>
+            <button class="settings-tab" data-tab="notifications">
+                🔔 <span id="tabNotifications">Notifications</span>
+            </button>
+            <button class="settings-tab" data-tab="securite">
+                🔐 <span id="tabSecurite">Sécurité</span>
+            </button>
+        </div>
+
+        <!-- Onglet Apparence -->
+        <div id="tab-apparence" class="tab-content active">
+            <div class="settings-card">
+                <div class="settings-card-title">
+                    <span>🎨</span> <span id="appearanceLabel">Personnalisation de l'interface</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label id="themeLabel">Thème</label>
+                        <select id="themeSelect">
+                            <option value="clair">☀️ Clair</option>
+                            <option value="sombre">🌙 Sombre</option>
+                            <option value="systeme">🖥️ Système</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label id="languageLabel">Langue</label>
+                        <select id="langueSelect">
+                            <option value="fr">🇫🇷 Français</option>
+                            <option value="en">🇬🇧 English</option>
+                            <option value="ar">🇸🇦 العربية</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label id="primaryColorLabel">Couleur principale</label>
+                        <div class="color-preview">
+                            <input type="color" id="couleurPrimaire" value="#4ca896">
+                            <span id="primaryColorValue">#4ca896</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="secondaryColorLabel">Couleur secondaire</label>
+                        <div class="color-preview">
+                            <input type="color" id="couleurSecondaire" value="#ff9466">
+                            <span id="secondaryColorValue">#ff9466</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Notifications -->
+        <div id="tab-notifications" class="tab-content">
+            <div class="settings-card">
+                <div class="settings-card-title">
+                    <span>📧</span> <span id="notificationChannelsLabel">Canaux de notification</span>
+                </div>
+                <div class="toggle-switch" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e9e7;">
+                    <div class="toggle-label">
+                        <strong id="emailNotifLabel">Notifications par email</strong>
+                        <span id="emailNotifDesc" style="font-size: 0.7rem; color: #5a9d91;">Recevoir les notifications par email</span>
+                    </div>
+                    <label class="toggle" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="activerEmail" checked style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+                <div class="toggle-switch" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e9e7;">
+                    <div class="toggle-label">
+                        <strong id="pushNotifLabel">Notifications push</strong>
+                        <span id="pushNotifDesc" style="font-size: 0.7rem; color: #5a9d91;">Notifications sur le navigateur</span>
+                    </div>
+                    <label class="toggle" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="activerPush" checked style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <div class="settings-card-title">
+                    <span>📋</span> <span id="notificationTypesLabel">Types de notifications</span>
+                </div>
+                <div class="toggle-switch" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e9e7;">
+                    <div class="toggle-label">
+                        <strong>📝 <span id="notesNotifLabel">Notes et évaluations</span></strong>
+                    </div>
+                    <label class="toggle" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="notifNotes" checked style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+                <div class="toggle-switch" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e9e7;">
+                    <div class="toggle-label">
+                        <strong>📢 <span id="announcementsNotifLabel">Annonces</span></strong>
+                    </div>
+                    <label class="toggle" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="notifAnnonces" checked style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+                <div class="toggle-switch" style="display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e0e9e7;">
+                    <div class="toggle-label">
+                        <strong>🚫 <span id="absencesNotifLabel">Absences et retards</span></strong>
+                    </div>
+                    <label class="toggle" style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                        <input type="checkbox" id="notifAbsences" checked style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglet Sécurité -->
+        <div id="tab-securite" class="tab-content">
+            <div class="settings-card">
+                <div class="settings-card-title">
+                    <span>🔐</span> <span id="securityLabel">Sécurité du compte</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label id="currentPasswordLabel">Mot de passe actuel</label>
+                        <input type="password" id="currentPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label id="newPasswordLabel">Nouveau mot de passe</label>
+                        <input type="password" id="newPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label id="confirmPasswordLabel">Confirmer le mot de passe</label>
+                        <input type="password" id="confirmPassword" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="info-text" id="passwordInfo" style="font-size: 0.75rem; color: #5a9d91; margin-top: 0.5rem;">* Minimum 8 caractères, une majuscule et un chiffre</div>
+                <button class="btn-secondary" id="changePasswordBtn" style="margin-top: 1rem;">
+                    🔒 <span id="changePasswordLabel">Changer le mot de passe</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-secondary" id="btnAnnuler"><span id="cancelLabel">Annuler</span></button>
+            <button class="btn-primary" id="btnEnregistrer"><span id="saveLabel">Enregistrer</span></button>
+        </div>
+    </div>
+
+    <script src="global-settings.js"></script>
+    <script>
+        // ============================================
+        // PARAMÈTRES PARENT - SYNCHRONISÉ AVEC GLOBAL-SETTINGS
+        // ============================================
+
+        let currentLang = 'fr';
+        let apiBaseUrl = 'http://localhost:5267';
+        let authToken = null;
+        let currentUser = null;
+
+        // Traductions pour la page paramètres parent
+        const translations = {
+            fr: {
+                pageTitle: "Mes paramètres", exportBtn: "Exporter", importBtn: "Importer",
+                tabApparence: "Personnalisation", tabNotifications: "Notifications", tabSecurite: "Sécurité",
+                appearanceLabel: "Personnalisation de l'interface", themeLabel: "Thème", languageLabel: "Langue",
+                primaryColorLabel: "Couleur principale", secondaryColorLabel: "Couleur secondaire",
+                notificationChannelsLabel: "Canaux de notification", emailNotifLabel: "Notifications par email",
+                emailNotifDesc: "Recevoir les notifications par email", pushNotifLabel: "Notifications push",
+                pushNotifDesc: "Notifications sur le navigateur", notificationTypesLabel: "Types de notifications",
+                notesNotifLabel: "Notes et évaluations", announcementsNotifLabel: "Annonces",
+                absencesNotifLabel: "Absences et retards", securityLabel: "Sécurité du compte",
+                currentPasswordLabel: "Mot de passe actuel", newPasswordLabel: "Nouveau mot de passe",
+                confirmPasswordLabel: "Confirmer le mot de passe", passwordInfo: "* Minimum 8 caractères, une majuscule et un chiffre",
+                changePasswordLabel: "Changer le mot de passe", cancelLabel: "Annuler", saveLabel: "Enregistrer",
+                light: "Clair", dark: "Sombre", system: "Système"
+            },
+            en: {
+                pageTitle: "My Settings", exportBtn: "Export", importBtn: "Import",
+                tabApparence: "Customization", tabNotifications: "Notifications", tabSecurite: "Security",
+                appearanceLabel: "Interface Customization", themeLabel: "Theme", languageLabel: "Language",
+                primaryColorLabel: "Primary color", secondaryColorLabel: "Secondary color",
+                notificationChannelsLabel: "Notification channels", emailNotifLabel: "Email notifications",
+                emailNotifDesc: "Receive notifications by email", pushNotifLabel: "Push notifications",
+                pushNotifDesc: "Browser notifications", notificationTypesLabel: "Notification types",
+                notesNotifLabel: "Grades and assessments", announcementsNotifLabel: "Announcements",
+                absencesNotifLabel: "Absences and delays", securityLabel: "Account Security",
+                currentPasswordLabel: "Current password", newPasswordLabel: "New password",
+                confirmPasswordLabel: "Confirm password", passwordInfo: "* Minimum 8 characters, one uppercase and one number",
+                changePasswordLabel: "Change password", cancelLabel: "Cancel", saveLabel: "Save",
+                light: "Light", dark: "Dark", system: "System"
+            },
+            ar: {
+                pageTitle: "إعداداتي", exportBtn: "تصدير", importBtn: "استيراد",
+                tabApparence: "تخصيص", tabNotifications: "الإشعارات", tabSecurite: "الأمان",
+                appearanceLabel: "تخصيص الواجهة", themeLabel: "السمة", languageLabel: "اللغة",
+                primaryColorLabel: "اللون الأساسي", secondaryColorLabel: "اللون الثانوي",
+                notificationChannelsLabel: "قنوات الإشعارات", emailNotifLabel: "إشعارات البريد الإلكتروني",
+                emailNotifDesc: "استلام الإشعارات عبر البريد الإلكتروني", pushNotifLabel: "إشعارات الدفع",
+                pushNotifDesc: "إشعارات المتصفح", notificationTypesLabel: "أنواع الإشعارات",
+                notesNotifLabel: "الدرجات والتقييمات", announcementsNotifLabel: "الإعلانات",
+                absencesNotifLabel: "الغيابات والتأخيرات", securityLabel: "أمان الحساب",
+                currentPasswordLabel: "كلمة المرور الحالية", newPasswordLabel: "كلمة المرور الجديدة",
+                confirmPasswordLabel: "تأكيد كلمة المرور", passwordInfo: "* الحد الأدنى 8 أحرف، حرف كبير ورقم واحد",
+                changePasswordLabel: "تغيير كلمة المرور", cancelLabel: "إلغاء", saveLabel: "حفظ",
+                light: "فاتح", dark: "داكن", system: "النظام"
+            }
+        };
+
+        // Styles pour les toggles
+        const style = document.createElement('style');
+        style.textContent = `
+            .toggle {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 26px;
+            }
+            .toggle input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: 0.3s;
+                border-radius: 34px;
+            }
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 20px;
+                width: 20px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.3s;
+                border-radius: 50%;
+            }
+            input:checked + .slider {
+                background-color: #4ca896;
+            }
+            input:checked + .slider:before {
+                transform: translateX(24px);
+            }
+            body.dark-mode .slider {
+                background-color: #4a4a6a;
+            }
+            .toggle-switch {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.8rem 0;
+                border-bottom: 1px solid #e0e9e7;
+            }
+            body.dark-mode .toggle-switch {
+                border-bottom-color: #2d2d44;
+            }
+            .toggle-label {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+            .toggle-label strong {
+                color: #1e3b36;
+                font-size: 0.95rem;
+            }
+            body.dark-mode .toggle-label strong {
+                color: #e0e0e0;
+            }
+            .toggle-label span {
+                font-size: 0.7rem;
+                color: #5a9d91;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialiser les toggles
+        function initToggles() {
+            const toggles = document.querySelectorAll('.toggle input');
+            toggles.forEach(toggle => {
+                const slider = toggle.nextElementSibling;
+                if (slider && slider.classList.contains('slider')) {
+                    // Déjà configuré
+                }
+            });
+        }
+
+        // Appliquer la traduction
+        function translatePage() {
+            const t = translations[currentLang];
+            if (!t) return;
+
+            const elementsToTranslate = [
+                'pageTitle', 'exportBtn', 'importBtn', 'tabApparence', 'tabNotifications', 'tabSecurite',
+                'appearanceLabel', 'themeLabel', 'languageLabel', 'primaryColorLabel', 'secondaryColorLabel',
+                'notificationChannelsLabel', 'emailNotifLabel', 'emailNotifDesc', 'pushNotifLabel', 'pushNotifDesc',
+                'notificationTypesLabel', 'notesNotifLabel', 'announcementsNotifLabel', 'absencesNotifLabel',
+                'securityLabel', 'currentPasswordLabel', 'newPasswordLabel', 'confirmPasswordLabel',
+                'passwordInfo', 'changePasswordLabel', 'cancelLabel', 'saveLabel'
+            ];
+
+            elementsToTranslate.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && t[id]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = t[id];
+                    } else {
+                        el.textContent = t[id];
+                    }
+                }
+            });
+
+            // Traduire les options du select de thème
+            const themeSelect = document.getElementById('themeSelect');
+            if (themeSelect && themeSelect.options) {
+                if (themeSelect.options[0]) themeSelect.options[0].text = '☀️ ' + (t.light || 'Clair');
+                if (themeSelect.options[1]) themeSelect.options[1].text = '🌙 ' + (t.dark || 'Sombre');
+                if (themeSelect.options[2]) themeSelect.options[2].text = '🖥️ ' + (t.system || 'Système');
+            }
+
+            // Direction RTL pour l'arabe
+            if (currentLang === 'ar') {
+                document.body.setAttribute('dir', 'rtl');
+                document.documentElement.lang = 'ar';
+            } else {
+                document.body.setAttribute('dir', 'ltr');
+                document.documentElement.lang = currentLang;
+            }
+        }
+
+        // Appliquer le thème localement
+        function applyLocalTheme() {
+            if (window.SaghirySettings) {
+                const primaryColor = window.SaghirySettings.getPrimaryColor();
+                const secondaryColor = window.SaghirySettings.getSecondaryColor();
+                const theme = window.SaghirySettings.getTheme();
+                
+                document.documentElement.style.setProperty('--primary-green', primaryColor);
+                document.documentElement.style.setProperty('--accent-orange', secondaryColor);
+                
+                let effectiveTheme = theme;
+                if (theme === 'systeme') {
+                    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'sombre' : 'clair';
+                }
+                
+                if (effectiveTheme === 'sombre') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+        }
+
+        // Charger les paramètres depuis global-settings
+        function loadSettings() {
+            if (window.SaghirySettings) {
+                const theme = window.SaghirySettings.getTheme();
+                const langue = window.SaghirySettings.getLangue();
+                const primaryColor = window.SaghirySettings.getPrimaryColor();
+                const secondaryColor = window.SaghirySettings.getSecondaryColor();
+                
+                currentLang = langue;
+                
+                document.getElementById('themeSelect').value = theme;
+                document.getElementById('langueSelect').value = langue;
+                document.getElementById('couleurPrimaire').value = primaryColor;
+                document.getElementById('couleurSecondaire').value = secondaryColor;
+                document.getElementById('primaryColorValue').textContent = primaryColor;
+                document.getElementById('secondaryColorValue').textContent = secondaryColor;
+                
+                applyLocalTheme();
+                translatePage();
+            }
+        }
+
+        // Sauvegarder et synchroniser
+        function saveAndSync() {
+            const newSettings = {
+                theme: document.getElementById('themeSelect').value,
+                langue: document.getElementById('langueSelect').value,
+                couleurPrimaire: document.getElementById('couleurPrimaire').value,
+                couleurSecondaire: document.getElementById('couleurSecondaire').value
+            };
+            
+            if (window.SaghirySettings) {
+                window.SaghirySettings.set(newSettings);
+            }
+            
+            // Sauvegarder dans localStorage
+            localStorage.setItem('saghiry_theme', newSettings.theme);
+            localStorage.setItem('saghiry_langue', newSettings.langue);
+            localStorage.setItem('saghiry_primary_color', newSettings.couleurPrimaire);
+            localStorage.setItem('saghiry_secondary_color', newSettings.couleurSecondaire);
+            
+            currentLang = newSettings.langue;
+            applyLocalTheme();
+            translatePage();
+            
+            showMessage('✅ Paramètres enregistrés avec succès', 'success');
+        }
+
+        // Sauvegarde immédiate
+        function saveImmediately(key, value) {
+            if (key === 'theme') {
+                if (window.SaghirySettings) window.SaghirySettings.set({ theme: value });
+                localStorage.setItem('saghiry_theme', value);
+                applyLocalTheme();
+            } else if (key === 'langue') {
+                currentLang = value;
+                if (window.SaghirySettings) window.SaghirySettings.set({ langue: value });
+                localStorage.setItem('saghiry_langue', value);
+                translatePage();
+                applyLocalTheme();
+            } else if (key === 'couleurPrimaire') {
+                if (window.SaghirySettings) window.SaghirySettings.set({ couleurPrimaire: value });
+                localStorage.setItem('saghiry_primary_color', value);
+                document.getElementById('primaryColorValue').textContent = value;
+                applyLocalTheme();
+            } else if (key === 'couleurSecondaire') {
+                if (window.SaghirySettings) window.SaghirySettings.set({ couleurSecondaire: value });
+                localStorage.setItem('saghiry_secondary_color', value);
+                document.getElementById('secondaryColorValue').textContent = value;
+                applyLocalTheme();
+            }
+            showQuickMessage('✓ Paramètre mis à jour');
+        }
+
+        function showQuickMessage(message) {
+            let toast = document.getElementById('quickToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'quickToast';
+                toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#4ca896; color:white; padding:8px 16px; border-radius:40px; font-size:0.8rem; z-index:10000; opacity:0; transition:opacity 0.3s; pointer-events:none;';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 1500);
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> ${message}`;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function initTabs() {
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(`tab-${tabName}`).classList.add('active');
+                });
+            });
+        }
+
+        function exportConfig() {
+            const settings = {
+                theme: document.getElementById('themeSelect').value,
+                langue: document.getElementById('langueSelect').value,
+                couleurPrimaire: document.getElementById('couleurPrimaire').value,
+                couleurSecondaire: document.getElementById('couleurSecondaire').value
+            };
+            const dataStr = JSON.stringify(settings, null, 2);
+            const link = document.createElement('a');
+            link.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            link.download = `saghiry-parent-config-${new Date().toISOString().slice(0,19)}.json`;
+            link.click();
+            showMessage('📥 Configuration exportée', 'success');
+        }
+
+        function importConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if (imported.theme) document.getElementById('themeSelect').value = imported.theme;
+                        if (imported.langue) document.getElementById('langueSelect').value = imported.langue;
+                        if (imported.couleurPrimaire) document.getElementById('couleurPrimaire').value = imported.couleurPrimaire;
+                        if (imported.couleurSecondaire) document.getElementById('couleurSecondaire').value = imported.couleurSecondaire;
+                        saveAndSync();
+                        showMessage('✅ Configuration importée', 'success');
+                    } catch(err) {
+                        showMessage('❌ Fichier invalide', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        async function changePassword() {
+            const currentPwd = document.getElementById('currentPassword').value;
+            const newPwd = document.getElementById('newPassword').value;
+            const confirmPwd = document.getElementById('confirmPassword').value;
+            
+            if (!currentPwd || !newPwd) { showMessage('Veuillez remplir tous les champs', 'error'); return; }
+            if (newPwd !== confirmPwd) { showMessage('Les mots de passe ne correspondent pas', 'error'); return; }
+            if (newPwd.length < 8) { showMessage('Le mot de passe doit contenir au moins 8 caractères', 'error'); return; }
+            
+            try {
+                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                if (!token) { showMessage('Vous devez être connecté', 'error'); return; }
+                
+                const email = document.getElementById('profileEmail')?.textContent || '';
+                
+                const response = await fetch(`${apiBaseUrl}/api/utilisateurs/change-password`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, ancienMotDePasse: currentPwd, nouveauMotDePasse: newPwd })
+                });
+                
+                if (response.ok) {
+                    showMessage('✅ Mot de passe modifié avec succès', 'success');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showMessage('❌ Erreur lors du changement', 'error');
+                }
+            } catch(e) { showMessage('❌ Erreur réseau', 'error'); }
+        }
+
+        // Écouter les changements de global-settings
+        function initGlobalSettingsListener() {
+            if (window.SaghirySettings) {
+                window.SaghirySettings.onLanguageChange(() => {
+                    currentLang = window.SaghirySettings.getLangue();
+                    loadSettings();
+                });
+                
+                document.addEventListener('settingsUpdated', (e) => {
+                    if (e.detail) {
+                        loadSettings();
+                    }
+                });
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            initGlobalSettingsListener();
+            loadSettings();
+            initTabs();
+            initToggles();
+            
+            document.getElementById('themeSelect').addEventListener('change', () => {
+                saveImmediately('theme', document.getElementById('themeSelect').value);
+            });
+            
+            document.getElementById('langueSelect').addEventListener('change', () => {
+                saveImmediately('langue', document.getElementById('langueSelect').value);
+            });
+            
+            document.getElementById('couleurPrimaire').addEventListener('input', () => {
+                saveImmediately('couleurPrimaire', document.getElementById('couleurPrimaire').value);
+            });
+            
+            document.getElementById('couleurSecondaire').addEventListener('input', () => {
+                saveImmediately('couleurSecondaire', document.getElementById('couleurSecondaire').value);
+            });
+            
+            document.getElementById('btnEnregistrer').addEventListener('click', saveAndSync);
+            document.getElementById('btnAnnuler').addEventListener('click', () => { loadSettings(); showMessage('Modifications annulées', 'info'); });
+            document.getElementById('changePasswordBtn').addEventListener('click', changePassword);
+            
+            // Configurer les toggles
+            document.getElementById('activerEmail').addEventListener('change', (e) => {
+                const val = e.target.checked;
+                localStorage.setItem('parent_email_notifications', val);
+                saveImmediately('emailNotif', val);
+            });
+            document.getElementById('activerPush').addEventListener('change', (e) => {
+                const val = e.target.checked;
+                localStorage.setItem('parent_push_notifications', val);
+                saveImmediately('pushNotif', val);
+            });
+            document.getElementById('notifNotes').addEventListener('change', (e) => {
+                localStorage.setItem('parent_notif_notes', e.target.checked);
+            });
+            document.getElementById('notifAnnonces').addEventListener('change', (e) => {
+                localStorage.setItem('parent_notif_annonces', e.target.checked);
+            });
+            document.getElementById('notifAbsences').addEventListener('change', (e) => {
+                localStorage.setItem('parent_notif_absences', e.target.checked);
+            });
+            
+            // Charger les valeurs des toggles
+            const emailNotif = localStorage.getItem('parent_email_notifications') !== 'false';
+            const pushNotif = localStorage.getItem('parent_push_notifications') !== 'false';
+            document.getElementById('activerEmail').checked = emailNotif;
+            document.getElementById('activerPush').checked = pushNotif;
+            document.getElementById('notifNotes').checked = localStorage.getItem('parent_notif_notes') !== 'false';
+            document.getElementById('notifAnnonces').checked = localStorage.getItem('parent_notif_annonces') !== 'false';
+            document.getElementById('notifAbsences').checked = localStorage.getItem('parent_notif_absences') !== 'false';
+        });
+
+        window.exportConfig = exportConfig;
+        window.importConfig = importConfig;
+    </script>
+</body>
+</html>

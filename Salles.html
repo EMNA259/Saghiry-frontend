@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des Salles</title>
+    <style>
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { background: var(--gray-bg); min-height: 100vh; padding: 2rem; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; background: white; padding: 1.5rem 2rem; border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); }
+
+        .header-title { display: flex; align-items: center; gap: 1rem; }
+
+        .header-title h1 { color: var(--text-dark); font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .btn-back { background: white; border: 1px solid var(--primary-green); color: var(--primary-green); padding: 0.5rem 1rem; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
+
+        .btn-back:hover { background: var(--primary-green); color: white; transform: translateY(-2px); }
+
+        .btn-primary { background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; }
+
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(76, 168, 150, 0.3); }
+
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-outline { background: white; border: 1px solid var(--primary-green); color: var(--primary-green); padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+
+        .btn-outline:hover { background: var(--primary-green); color: white; }
+
+        .btn-secondary { background: var(--gray-bg); border: 1px solid var(--gray-border); color: var(--text-dark); padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; }
+
+        .btn-secondary:hover { background: var(--primary-green); color: white; border-color: var(--primary-green); }
+
+        .btn-icon { width: 36px; height: 36px; border-radius: 10px; border: none; cursor: pointer; background: transparent; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+
+        .btn-icon:hover { background: var(--gray-bg); }
+
+        .btn-icon.delete-btn { color: #dc2626; }
+
+        .btn-icon.delete-btn:hover { background: #fee2e2; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+
+        .stat-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); transition: all 0.3s ease; position: relative; }
+
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+        .stat-card.editable { border: 2px solid var(--primary-green); background: linear-gradient(135deg, rgba(76, 168, 150, 0.05), white); cursor: pointer; }
+
+        .stat-value { color: var(--text-dark); font-size: 2rem; font-weight: 700; line-height: 1; margin-bottom: 0.3rem; }
+
+        .stat-label { color: var(--text-light); font-size: 0.8rem; font-weight: 500; }
+
+        .stat-edit-icon { position: absolute; top: 10px; right: 10px; font-size: 0.9rem; color: var(--primary-green); opacity: 0; transition: opacity 0.3s ease; }
+
+        .stat-card.editable:hover .stat-edit-icon { opacity: 1; }
+
+        .stat-badge { position: absolute; bottom: 10px; right: 10px; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 20px; }
+
+        .stat-badge.auto { color: #059669; background: #dcfce7; }
+
+        .stat-badge.editable { color: #b91c1c; background: #fee2e2; }
+
+        .progress-bar { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+
+        .progress-fill { height: 100%; transition: width 0.3s ease; }
+
+        .progress-fill.normal { background: linear-gradient(90deg, var(--primary-green), var(--primary-dark)); }
+
+        .progress-fill.warning { background: var(--warning); }
+
+        .progress-fill.danger { background: var(--danger); }
+
+        .filter-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; background: white; padding: 1rem 1.5rem; border-radius: 60px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); }
+
+        .filter-tab { padding: 0.6rem 1.5rem; background: transparent; border: 1px solid var(--gray-border); border-radius: 40px; font-size: 0.9rem; font-weight: 600; color: var(--text-soft); cursor: pointer; transition: all 0.3s ease; }
+
+        .filter-tab:hover { background: rgba(76, 168, 150, 0.1); border-color: var(--primary-green); }
+
+        .filter-tab.active { background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%); color: white; border-color: transparent; }
+
+        .salles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; }
+
+        .salle-card { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-border); transition: all 0.3s ease; position: relative; overflow: hidden; }
+
+        .salle-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--primary-green); }
+
+        .salle-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary-green), var(--accent-orange)); }
+
+        .salle-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+
+        .salle-nom { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+
+        .salle-type-badge { display: inline-block; padding: 0.2rem 0.8rem; background: rgba(76, 168, 150, 0.1); color: var(--primary-dark); border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin-top: 0.3rem; }
+
+        .salle-batiment-badge { display: inline-block; padding: 0.2rem 0.8rem; background: rgba(255, 148, 102, 0.1); color: var(--accent-orange-dark); border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin-left: 0.5rem; }
+
+        .salle-caracteristiques { display: flex; gap: 1rem; margin: 1rem 0; padding: 0.8rem 0; border-top: 1px solid var(--gray-border); border-bottom: 1px solid var(--gray-border); }
+
+        .caracteristique-item { text-align: center; flex: 1; }
+
+        .caracteristique-icon { font-size: 1.2rem; margin-bottom: 0.2rem; }
+
+        .caracteristique-label { color: var(--text-light); font-size: 0.65rem; font-weight: 500; }
+
+        .caracteristique-value { color: var(--text-dark); font-size: 1rem; font-weight: 700; }
+
+        .equipements { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.8rem 0; }
+
+        .equipement-tag { background: var(--gray-bg); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.7rem; color: var(--text-soft); }
+
+        .salle-description { font-size: 0.8rem; color: var(--text-soft); margin-top: 0.5rem; padding: 0.5rem; background: var(--gray-bg); border-radius: 10px; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; display: none; backdrop-filter: blur(4px); }
+
+        .modal.active { display: flex; }
+
+        .modal-content { background: white; border-radius: 24px; padding: 2rem; width: 90%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-border); }
+
+        .modal-header h2 { color: var(--text-dark); font-size: 1.4rem; }
+
+        .modal-close { background: var(--gray-bg); border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 1.3rem; cursor: pointer; }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        .form-label { display: block; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.85rem; color: var(--text-dark); }
+
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; }
+
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-green); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .preview-nom { background: var(--gray-bg); padding: 0.8rem; border-radius: 12px; text-align: center; font-weight: 600; margin-top: 0.5rem; }
+
+        .preview-nom.valid { color: var(--primary-green); background: #dcfce7; }
+
+        .preview-nom.invalid { color: var(--danger); background: #fee2e2; }
+
+        .equipements-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; background: var(--gray-bg); padding: 1rem; border-radius: 16px; }
+
+        .equipement-checkbox { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem; background: white; border-radius: 10px; font-size: 0.85rem; }
+
+        .alert { padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 1rem; }
+
+        .alert-success { background: #dcfce7; color: #059669; }
+
+        .alert-error { background: #fee2e2; color: #b91c1c; }
+
+        .alert-info { background: #dbeafe; color: #0284c7; }
+
+        .alert-warning { background: #fef3c7; color: #92400e; }
+
+        .loading { text-align: center; padding: 3rem; color: var(--text-light); }
+
+        .empty-state { text-align: center; padding: 3rem; background: white; border-radius: 24px; border: 2px dashed var(--gray-border); grid-column: 1/-1; }
+
+        .info-text { font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem; }
+
+        .auto-badge { background: linear-gradient(135deg, var(--primary-green), var(--primary-dark)); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; margin-left: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <button class="btn-back" onclick="window.parent.SaghirySidebar?.loadPage('dashboard')">← Retour</button>
+            <h1>🏢 Gestion des Salles <span class="auto-badge">🔁 Génération auto</span></h1>
+        </div>
+        <button class="btn-primary" id="btnNouvelleSalle" onclick="openCreateModal()">➕ Nouvelle salle</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="totalSalles">0</div>
+            <div class="stat-label">Total salles</div>
+            <div class="stat-badge auto">Auto</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="totalCapacite">0</div>
+            <div class="stat-label">Capacité totale</div>
+            <div class="stat-badge auto">Auto</div>
+        </div>
+        <div class="stat-card editable" onclick="editStat()">
+            <div class="stat-value" id="nombreMaxSalles">0</div>
+            <div class="stat-label">Nombre max de salles</div>
+            <div class="stat-edit-icon">✏️</div>
+            <div class="stat-badge editable">Admin</div>
+        </div>
+        <div class="stat-card" id="sallesRestantesCard">
+            <div class="stat-value" id="sallesRestantes">0</div>
+            <div class="stat-label">Salles restantes</div>
+            <div class="stat-badge auto">Auto</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-type="all">Toutes</button>
+        <button class="filter-tab" data-type="Classe">🏫 Salles de classe</button>
+        <button class="filter-tab" data-type="Informatique">💻 Salles informatiques</button>
+        <button class="filter-tab" data-type="Terrain">⚽ Terrains</button>
+        <button class="filter-tab" data-type="Autre">📦 Autres</button>
+    </div>
+
+    <div id="mainContainer" class="salles-grid"></div>
+
+    <!-- Modal Salle -->
+    <div class="modal" id="salleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">➕ Nouvelle salle</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalAlert"></div>
+            
+            <form id="salleForm" onsubmit="saveSalle(event)">
+                <input type="hidden" id="salleId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Type *</label>
+                        <select id="type" class="form-select" required>
+                            <option value="">Sélectionner</option>
+                            <option value="Classe">🏫 Salle de classe</option>
+                            <option value="Informatique">💻 Salle informatique</option>
+                            <option value="Terrain">⚽ Terrain</option>
+                            <option value="Autre">📦 Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bâtiment *</label>
+                        <select id="batiment" class="form-select" required>
+                            <option value="">Sélectionner</option>
+                            <option value="1">🏛️ Bâtiment 1</option>
+                            <option value="2">🏛️ Bâtiment 2</option>
+                            <option value="3">🏛️ Bâtiment 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Numéro de la salle <span style="color: var(--primary-green);">(généré automatiquement)</span></label>
+                    <input type="number" id="numeroSalle" class="form-input" readonly style="background: #f0f7f5; cursor: not-allowed;">
+                    <div class="preview-nom" id="previewNom">---</div>
+                    <div class="info-text" id="nomPreviewInfo">✅ Le numéro est généré automatiquement selon les salles existantes</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Capacité (places) *</label>
+                    <input type="number" id="capacite" class="form-input" min="1" value="30" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Étage</label>
+                    <input type="number" id="etage" class="form-input" min="-2" max="10" placeholder="Optionnel">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Équipements</label>
+                    <div class="equipements-grid">
+                        <label class="equipement-checkbox"><input type="checkbox" value="Projecteur"> 📽️ Projecteur</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="Tableau blanc"> 📝 Tableau blanc</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="Tableau interactif"> 💻 Tableau interactif</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="Ordinateurs"> 🖥️ Ordinateurs</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="Climatisation"> ❄️ Climatisation</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="Matériel sportif"> ⚽ Matériel sportif</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="Équipement audio"> 🔈 Équipement audio</label>
+                        <label class="equipement-checkbox"><input type="checkbox" value="WiFi"> 📶 WiFi</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="description" class="form-textarea" rows="2" placeholder="Informations complémentaires..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%;">💾 Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>🗑️ Confirmer la suppression</h2>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <p id="deleteMessage" style="margin: 1rem 0;">Supprimer cette salle ?</p>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn-outline" onclick="closeDeleteModal()">Annuler</button>
+                <button class="btn-primary" onclick="confirmDelete()" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="statModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>⚙️ Configuration</h2>
+                <button class="modal-close" onclick="closeStatModal()">&times;</button>
+            </div>
+            <div id="statModalAlert"></div>
+            <form id="statForm" onsubmit="saveStat(event)">
+                <div class="form-group">
+                    <label class="form-label">Nombre max de salles</label>
+                    <input type="number" id="statValue" class="form-input" min="0" required>
+                    <small class="info-text">Salles actuelles: <strong id="currentSallesCount">0</strong></small>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">💾 Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = null;
+        
+        try {
+            token = window.parent.SaghirySidebar?.getToken() || localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        } catch(e) {
+            token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        let allSalles = [];
+        let filteredSalles = [];
+        let currentType = 'all';
+        let deleteSalleId = null;
+        let deleteSalleName = '';
+        let nombreMaxSalles = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                window.parent.location.href = 'saghiry-auth.html';
+                return;
+            }
+            loadConfigFromBackend();
+            loadSalles();
+            
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => filterByType(tab.dataset.type));
+            });
+            
+            const typeSelect = document.getElementById('type');
+            const batimentSelect = document.getElementById('batiment');
+            
+            typeSelect.addEventListener('change', () => genererProchainNumero());
+            batimentSelect.addEventListener('change', () => genererProchainNumero());
+        });
+
+        // Comparaison insensible à la casse pour éviter doublons
+        function normalizeName(name) {
+            if (!name) return '';
+            return name.toLowerCase().trim().replace(/\s+/g, ' ');
+        }
+
+        function isNameExists(nomSalle, excludeId = null) {
+            const normalizedNew = normalizeName(nomSalle);
+            return allSalles.some(salle => {
+                if (excludeId && salle.id === excludeId) return false;
+                const existingName = salle.nomSalle || '';
+                const normalizedExisting = normalizeName(existingName);
+                // Vérifier aussi l'ancien format "Salle X"
+                const altName = nomSalle.startsWith('Salle ') ? nomSalle.substring(6) : `Salle ${nomSalle}`;
+                const normalizedAlt = normalizeName(altName);
+                return normalizedExisting === normalizedNew || normalizedExisting === normalizedAlt;
+            });
+        }
+// La fonction corrigée - remplacez l'ancienne genererProchainNumero par celle-ci
+
+function genererProchainNumero() {
+    const type = document.getElementById('type').value;
+    const batiment = document.getElementById('batiment').value;
+    
+    if (!type || !batiment) {
+        document.getElementById('numeroSalle').value = '';
+        document.getElementById('previewNom').innerHTML = '---';
+        document.getElementById('previewNom').className = 'preview-nom';
+        document.getElementById('nomPreviewInfo').innerHTML = 'Sélectionnez type + bâtiment pour générer automatiquement';
+        return;
+    }
+    
+    // Récupérer tous les numéros existants pour CE type ET CE bâtiment
+    let numerosExistants = new Set();
+    
+    for (const salle of allSalles) {
+        const typeSalle = salle.type || '';
+        const batimentSalle = salle.batiment?.toString() || '';
+        
+        // Ne compter que les salles du même type ET du même bâtiment
+        if (typeSalle === type && batimentSalle === batiment) {
+            const nom = salle.nomSalle || '';
+            let numero = null;
+            
+            // Format simple: "101" ou "01" ou "1"
+            const simpleNum = parseInt(nom);
+            if (!isNaN(simpleNum)) {
+                if (simpleNum >= 1 && simpleNum <= 99) {
+                    numero = simpleNum;
+                } else if (simpleNum >= 100 && simpleNum <= 999) {
+                    numero = simpleNum % 100;
+                }
+            }
+            
+            // Format "Salle 101"
+            const matchSalle = nom.match(/Salle\s*(\d+)/i);
+            if (matchSalle) {
+                let fullNum = parseInt(matchSalle[1]);
+                if (fullNum >= 100 && fullNum <= 999) fullNum = fullNum % 100;
+                if (fullNum >= 1 && fullNum <= 99) numero = fullNum;
+            }
+            
+            // Format "INFO-101", "TERRAIN-B101", "SALLE-B101"
+            const matchPrefix = nom.match(/^(?:INFO|TERRAIN-B|SALLE-B)-?(\d+)/i);
+            if (matchPrefix) {
+                let fullNum = parseInt(matchPrefix[1]);
+                if (fullNum >= 100 && fullNum <= 999) fullNum = fullNum % 100;
+                if (fullNum >= 1 && fullNum <= 99) numero = fullNum;
+            }
+            
+            if (numero !== null && numero >= 1 && numero <= 99) {
+                numerosExistants.add(numero);
+                console.log(`📌 Numéro existant détecté: ${numero} pour ${type} - Bâtiment ${batiment}`);
+            }
+        }
+    }
+    
+    // Trouver le PREMIER numéro disponible (1 à 99)
+    let prochainNumero = 1;
+    while (numerosExistants.has(prochainNumero) && prochainNumero <= 99) {
+        prochainNumero++;
+    }
+    
+    if (prochainNumero > 99) {
+        document.getElementById('numeroSalle').value = '';
+        document.getElementById('previewNom').innerHTML = '❌ Limite atteinte (99 salles max) pour ce type/bâtiment';
+        document.getElementById('previewNom').className = 'preview-nom invalid';
+        document.getElementById('nomPreviewInfo').innerHTML = '⚠️ Impossible d\'ajouter plus de 99 salles pour ce type et bâtiment';
+        return;
+    }
+    
+    // Appliquer le numéro trouvé
+    document.getElementById('numeroSalle').value = prochainNumero;
+    
+    // Générer l'aperçu
+    const numeroFormate = prochainNumero.toString().padStart(2, '0');
+    let nomStocke = "";
+    let nomAffiche = "";
+    
+    switch(type) {
+        case "Classe":
+            nomStocke = `${batiment}${numeroFormate}`;
+            nomAffiche = `Salle ${nomStocke}`;
+            break;
+        case "Informatique":
+            nomStocke = `INFO-${batiment}${numeroFormate}`;
+            nomAffiche = nomStocke;
+            break;
+        case "Terrain":
+            nomStocke = `TERRAIN-B${batiment}${numeroFormate}`;
+            nomAffiche = nomStocke;
+            break;
+        case "Autre":
+            nomStocke = `SALLE-B${batiment}${numeroFormate}`;
+            nomAffiche = nomStocke;
+            break;
+    }
+    
+    document.getElementById('previewNom').innerHTML = `✅ ${nomAffiche} - Disponible (numéro ${prochainNumero})`;
+    document.getElementById('previewNom').className = 'preview-nom valid';
+    
+    // Afficher les numéros pris si plusieurs
+    if (numerosExistants.size > 0) {
+        const pris = Array.from(numerosExistants).sort((a,b) => a-b).join(', ');
+        document.getElementById('nomPreviewInfo').innerHTML = `📊 ${type} - Bâtiment ${batiment}: numéros pris [${pris}] → prochain disponible: ${prochainNumero}`;
+    } else {
+        document.getElementById('nomPreviewInfo').innerHTML = `✨ Première salle de type "${type}" au bâtiment ${batiment} → numéro 1 disponible`;
+    }
+}
+
+        function mettreAJourPreview() {
+            const type = document.getElementById('type').value;
+            const batiment = document.getElementById('batiment').value;
+            const numero = parseInt(document.getElementById('numeroSalle').value);
+            const previewDiv = document.getElementById('previewNom');
+            const infoDiv = document.getElementById('nomPreviewInfo');
+            
+            if (!type || !batiment || isNaN(numero) || numero < 1 || numero > 99) {
+                previewDiv.innerHTML = '---';
+                previewDiv.className = 'preview-nom';
+                infoDiv.innerHTML = 'Sélectionnez type + bâtiment pour générer automatiquement';
+                return;
+            }
+            
+            const numeroFormate = numero.toString().padStart(2, '0');
+            let nomStocke = "";
+            let nomAffiche = "";
+            
+            switch(type) {
+                case "Classe":
+                    nomStocke = `${batiment}${numeroFormate}`;
+                    nomAffiche = `Salle ${nomStocke}`;
+                    break;
+                case "Informatique":
+                    nomStocke = `INFO-${batiment}${numeroFormate}`;
+                    nomAffiche = nomStocke;
+                    break;
+                case "Terrain":
+                    nomStocke = `TERRAIN-B${batiment}${numeroFormate}`;
+                    nomAffiche = nomStocke;
+                    break;
+                case "Autre":
+                    nomStocke = `SALLE-B${batiment}${numeroFormate}`;
+                    nomAffiche = nomStocke;
+                    break;
+                default:
+                    nomStocke = `${batiment}${numeroFormate}`;
+                    nomAffiche = nomStocke;
+            }
+            
+            const existe = isNameExists(nomStocke);
+            
+            if (existe) {
+                previewDiv.innerHTML = `❌ ${nomAffiche} - Déjà utilisé! Rafraîchissement...`;
+                previewDiv.className = 'preview-nom invalid';
+                infoDiv.innerHTML = '⚠️ Conflit détecté, génération d\'un nouveau numéro...';
+                // Regénérer un nouveau numéro
+                setTimeout(() => genererProchainNumero(), 100);
+            } else {
+                previewDiv.innerHTML = `✅ ${nomAffiche} - Disponible`;
+                previewDiv.className = 'preview-nom valid';
+                infoDiv.innerHTML = `✅ Salle prête à être créée (${type} - Bâtiment ${batiment})`;
+            }
+        }
+
+        async function loadConfigFromBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/AdminConfig/nombre-total-salles`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    nombreMaxSalles = data.nombreTotalSalles || 0;
+                    document.getElementById('nombreMaxSalles').textContent = nombreMaxSalles || 'À définir';
+                    if (allSalles.length > 0) updateStats();
+                    updateCreateButtonState();
+                }
+            } catch (error) { console.error('Erreur:', error); }
+        }
+
+        async function loadSalles() {
+            const container = document.getElementById('mainContainer');
+            if (container) container.innerHTML = '<div class="loading">🔄 Chargement...</div>';
+            try {
+                const response = await fetch(`${API_BASE}/Salle`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allSalles = Array.isArray(data) ? data.map(s => ({
+                        id: s.id || s._id || s.Id,
+                        nomSalle: s.nomSalle || s.NomSalle || 'Sans nom',
+                        type: s.type || s.Type || 'Autre',
+                        capacite: s.capacite || s.Capacite || 0,
+                        equipements: s.equipements || s.Equipements || [],
+                        batiment: s.batiment || s.Batiment,
+                        etage: s.etage !== undefined ? s.etage : s.Etage,
+                        description: s.description || s.Description
+                    })) : [];
+                    console.log(`✅ ${allSalles.length} salles chargées`);
+                    updateStats();
+                    filteredSalles = [...allSalles];
+                    renderSalles();
+                    updateCreateButtonState();
+                } else if (response.status === 401) {
+                    window.parent.location.href = 'saghiry-auth.html';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                if (container) container.innerHTML = '<div class="empty-state">❌ Erreur de connexion</div>';
+            }
+        }
+
+        function updateStats() {
+            const total = allSalles.length;
+            const totalCapacite = allSalles.reduce((sum, s) => sum + (s.capacite || 0), 0);
+            document.getElementById('totalSalles').textContent = total;
+            document.getElementById('totalCapacite').textContent = totalCapacite;
+            let sallesRestantes = 0;
+            let percentage = 0;
+            if (nombreMaxSalles > 0) {
+                sallesRestantes = Math.max(0, nombreMaxSalles - total);
+                document.getElementById('sallesRestantes').textContent = sallesRestantes;
+                percentage = Math.min(100, (total / nombreMaxSalles) * 100);
+                const progressFill = document.getElementById('progressFill');
+                const card = document.getElementById('sallesRestantesCard');
+                if (progressFill) progressFill.style.width = `${percentage}%`;
+                if (card) {
+                    if (total > nombreMaxSalles) {
+                        if (progressFill) progressFill.className = 'progress-fill danger';
+                        card.classList.add('danger');
+                    } else if (percentage >= 85) {
+                        if (progressFill) progressFill.className = 'progress-fill warning';
+                        card.classList.add('warning');
+                    } else {
+                        if (progressFill) progressFill.className = 'progress-fill normal';
+                        card.classList.remove('warning', 'danger');
+                    }
+                }
+            } else {
+                document.getElementById('sallesRestantes').textContent = '?';
+            }
+        }
+
+        function updateCreateButtonState() {
+            const btn = document.getElementById('btnNouvelleSalle');
+            if (btn && nombreMaxSalles > 0 && allSalles.length >= nombreMaxSalles) {
+                btn.disabled = true;
+                btn.title = `Limite atteinte: ${nombreMaxSalles} salles`;
+            } else if (btn) {
+                btn.disabled = false;
+            }
+        }
+
+        function filterByType(type) {
+            currentType = type;
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.type === type);
+            });
+            filteredSalles = type === 'all' ? [...allSalles] : allSalles.filter(s => s.type === type);
+            renderSalles();
+        }
+
+        function renderSalles() {
+            const container = document.getElementById('mainContainer');
+            if (!container) return;
+            if (filteredSalles.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div style="font-size: 3rem;">🏢</div><h3>Aucune salle</h3><button class="btn-primary" onclick="openCreateModal()">➕ Créer</button></div>`;
+                return;
+            }
+            container.innerHTML = filteredSalles.map(salle => {
+                let nomAffiche = salle.nomSalle;
+                if (salle.type === "Classe" && !isNaN(parseInt(nomAffiche)) && !nomAffiche.toLowerCase().startsWith('salle')) {
+                    nomAffiche = `Salle ${nomAffiche}`;
+                }
+                if (salle.type === "Classe" && /^\d{3}$/.test(nomAffiche) && !nomAffiche.toLowerCase().startsWith('salle')) {
+                    nomAffiche = `Salle ${nomAffiche}`;
+                }
+                return `
+                    <div class="salle-card">
+                        <div class="salle-header">
+                            <div>
+                                <div class="salle-nom">${escapeHtml(nomAffiche)}</div>
+                                <div>
+                                    <span class="salle-type-badge">${salle.type}</span>
+                                    ${salle.batiment ? `<span class="salle-batiment-badge">🏛️ Bâtiment ${salle.batiment}</span>` : ''}
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn-icon" onclick="editSalle('${salle.id}')" title="Modifier">✏️</button>
+                                <button class="btn-icon delete-btn" onclick="openDeleteModal('${salle.id}', '${escapeHtml(nomAffiche)}')" title="Supprimer">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="salle-caracteristiques">
+                            <div class="caracteristique-item"><div class="caracteristique-icon">👥</div><div class="caracteristique-value">${salle.capacite}</div><div class="caracteristique-label">Places</div></div>
+                            <div class="caracteristique-item"><div class="caracteristique-icon">🏛️</div><div class="caracteristique-value">${salle.batiment || '?'}</div><div class="caracteristique-label">Bâtiment</div></div>
+                            <div class="caracteristique-item"><div class="caracteristique-icon">📊</div><div class="caracteristique-value">${salle.etage !== undefined && salle.etage !== null ? salle.etage : '—'}</div><div class="caracteristique-label">Étage</div></div>
+                        </div>
+                        ${salle.equipements && salle.equipements.length > 0 ? `<div class="equipements">${salle.equipements.map(eq => `<span class="equipement-tag">${escapeHtml(eq)}</span>`).join('')}</div>` : ''}
+                        ${salle.description ? `<div class="salle-description">📝 ${escapeHtml(salle.description)}</div>` : ''}
+                    </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        function openCreateModal() {
+            if (nombreMaxSalles > 0 && allSalles.length >= nombreMaxSalles) {
+                showAlertGlobal('error', `❌ Limite atteinte: ${nombreMaxSalles} salles max`);
+                return;
+            }
+            document.getElementById('modalTitle').innerHTML = '➕ Nouvelle salle';
+            document.getElementById('salleId').value = '';
+            document.getElementById('salleForm').reset();
+            document.getElementById('capacite').value = '30';
+            document.querySelectorAll('.equipements-grid input').forEach(cb => cb.checked = false);
+            document.getElementById('numeroSalle').value = '';
+            document.getElementById('previewNom').innerHTML = '---';
+            document.getElementById('previewNom').className = 'preview-nom';
+            document.getElementById('nomPreviewInfo').innerHTML = 'Sélectionnez type + bâtiment pour générer automatiquement';
+            document.getElementById('salleModal').classList.add('active');
+            // Forcer la génération après ouverture
+            setTimeout(() => genererProchainNumero(), 100);
+        }
+
+        function editSalle(id) {
+            const salle = allSalles.find(s => s.id === id);
+            if (!salle) return;
+            
+            document.getElementById('modalTitle').innerHTML = '✏️ Modifier';
+            document.getElementById('salleId').value = salle.id;
+            document.getElementById('type').value = salle.type;
+            document.getElementById('batiment').value = salle.batiment?.toString() || '';
+            document.getElementById('capacite').value = salle.capacite;
+            document.getElementById('etage').value = salle.etage !== undefined ? salle.etage : '';
+            document.getElementById('description').value = salle.description || '';
+            
+            document.querySelectorAll('.equipements-grid input').forEach(cb => {
+                cb.checked = salle.equipements?.includes(cb.value) || false;
+            });
+            
+            // Extraire et afficher le numéro
+            let numero = null;
+            const nom = salle.nomSalle || '';
+            const simpleNum = parseInt(nom);
+            if (!isNaN(simpleNum) && simpleNum >= 1 && simpleNum <= 99) {
+                numero = simpleNum;
+            } else if (!isNaN(simpleNum) && simpleNum >= 100 && simpleNum <= 999) {
+                numero = simpleNum % 100;
+            }
+            const matchSalle = nom.match(/Salle\s*(\d+)/i);
+            if (matchSalle) {
+                let fullNum = parseInt(matchSalle[1]);
+                if (fullNum >= 100 && fullNum <= 999) fullNum = fullNum % 100;
+                if (fullNum >= 1 && fullNum <= 99) numero = fullNum;
+            }
+            const matchPrefix = nom.match(/^(?:INFO|TERRAIN-B|SALLE-B)-?(\d+)/i);
+            if (matchPrefix) {
+                let fullNum = parseInt(matchPrefix[1]);
+                if (fullNum >= 100 && fullNum <= 999) fullNum = fullNum % 100;
+                if (fullNum >= 1 && fullNum <= 99) numero = fullNum;
+            }
+            
+            document.getElementById('numeroSalle').value = numero || '';
+            
+            let nomAffiche = salle.nomSalle;
+            if (salle.type === "Classe" && !isNaN(parseInt(nomAffiche)) && !nomAffiche.toLowerCase().startsWith('salle')) {
+                nomAffiche = `Salle ${nomAffiche}`;
+            }
+            document.getElementById('previewNom').innerHTML = `✏️ Édition: ${nomAffiche}`;
+            document.getElementById('previewNom').className = 'preview-nom';
+            document.getElementById('nomPreviewInfo').innerHTML = '⚠️ Mode édition - le numéro ne peut pas être modifié';
+            document.getElementById('salleModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('salleModal').classList.remove('active');
+            document.getElementById('modalAlert').innerHTML = '';
+        }
+
+        function openDeleteModal(id, name) {
+            deleteSalleId = id;
+            deleteSalleName = name;
+            document.getElementById('deleteMessage').innerHTML = `Supprimer <strong>${escapeHtml(name)}</strong> ? Cette action est irréversible.`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteSalleId = null;
+        }
+
+        async function saveSalle(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('salleId').value;
+            const type = document.getElementById('type').value;
+            const batiment = document.getElementById('batiment').value;
+            const numero = parseInt(document.getElementById('numeroSalle').value);
+            
+            if (!type || !batiment) {
+                showAlert('modalAlert', 'error', 'Veuillez sélectionner un type et un bâtiment');
+                return;
+            }
+            
+            if (isNaN(numero) || numero < 1 || numero > 99) {
+                showAlert('modalAlert', 'error', 'Numéro invalide');
+                return;
+            }
+            
+            const numeroFormate = numero.toString().padStart(2, '0');
+            let nomSalle = "";
+            
+            switch(type) {
+                case "Classe": nomSalle = `${batiment}${numeroFormate}`; break;
+                case "Informatique": nomSalle = `INFO-${batiment}${numeroFormate}`; break;
+                case "Terrain": nomSalle = `TERRAIN-B${batiment}${numeroFormate}`; break;
+                case "Autre": nomSalle = `SALLE-B${batiment}${numeroFormate}`; break;
+                default: nomSalle = `${batiment}${numeroFormate}`;
+            }
+            
+            // Vérification insensible à la casse
+            if (isNameExists(nomSalle, id)) {
+                showAlert('modalAlert', 'error', `❌ La salle "${nomSalle}" existe déjà (vérification insensible à la casse)`);
+                genererProchainNumero();
+                return;
+            }
+            
+            const equipements = Array.from(document.querySelectorAll('.equipements-grid input:checked')).map(cb => cb.value);
+            
+            const data = {
+                nomSalle: nomSalle,
+                type: type,
+                capacite: parseInt(document.getElementById('capacite').value),
+                equipements: equipements,
+                batiment: batiment,
+                etage: document.getElementById('etage').value ? parseInt(document.getElementById('etage').value) : null,
+                description: document.getElementById('description').value.trim() || null
+            };
+            
+            try {
+                const url = id ? `${API_BASE}/Salle/${id}` : `${API_BASE}/Salle`;
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('modalAlert', 'success', `✅ ${result.message || 'Salle enregistrée'}`);
+                    setTimeout(() => {
+                        closeModal();
+                        loadSalles();
+                        loadConfigFromBackend();
+                    }, 1500);
+                } else {
+                    showAlert('modalAlert', 'error', result.message || result.title || '❌ Erreur');
+                    if (result.message?.includes('existe déjà') || result.title?.includes('Duplicate')) {
+                        genererProchainNumero();
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('modalAlert', 'error', '❌ Erreur de connexion');
+            }
+        }
+
+        async function confirmDelete() {
+            if (!deleteSalleId) return;
+            try {
+                const response = await fetch(`${API_BASE}/Salle/${deleteSalleId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    closeDeleteModal();
+                    loadSalles();
+                    loadConfigFromBackend();
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            } catch (error) {
+                alert('Erreur de connexion');
+            }
+        }
+
+        function editStat() {
+            document.getElementById('statValue').value = nombreMaxSalles || 0;
+            document.getElementById('currentSallesCount').textContent = allSalles.length;
+            document.getElementById('statModal').classList.add('active');
+        }
+
+        function closeStatModal() {
+            document.getElementById('statModal').classList.remove('active');
+            document.getElementById('statModalAlert').innerHTML = '';
+        }
+
+        async function saveStat(e) {
+            e.preventDefault();
+            const newValue = parseInt(document.getElementById('statValue').value);
+            if (isNaN(newValue) || newValue < 0) {
+                showAlert('statModalAlert', 'error', 'Valeur invalide');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/AdminConfig/nombre-total-salles`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ nombreTotalSalles: newValue })
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    nombreMaxSalles = newValue;
+                    document.getElementById('nombreMaxSalles').textContent = newValue;
+                    showAlert('statModalAlert', 'success', result.message || '✅ Configuré');
+                    setTimeout(() => {
+                        closeStatModal();
+                        updateStats();
+                        updateCreateButtonState();
+                    }, 1500);
+                } else {
+                    showAlert('statModalAlert', 'error', 'Erreur');
+                }
+            } catch (error) {
+                nombreMaxSalles = newValue;
+                document.getElementById('nombreMaxSalles').textContent = newValue;
+                showAlert('statModalAlert', 'success', '✅ Configuré (local)');
+                setTimeout(() => {
+                    closeStatModal();
+                    updateStats();
+                    updateCreateButtonState();
+                }, 1500);
+            }
+        }
+
+        function showAlert(containerId, type, message) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+                setTimeout(() => container.innerHTML = '', 3000);
+            }
+        }
+
+        let alertTimeout;
+        function showAlertGlobal(type, message) {
+            const container = document.getElementById('alertContainer');
+            if (!container) return;
+            if (alertTimeout) clearTimeout(alertTimeout);
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            alertTimeout = setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDeleteModal();
+                closeStatModal();
+            }
+        });
+    </script>
+</body>
+</html>

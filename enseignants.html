@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des Enseignants & Vacataires</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body { 
+            background: #f0f5f8; 
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: #1e3b36;
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title span {
+            background: #4ca896;
+            color: white;
+            font-size: 1rem;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            margin-left: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 50px;
+            display: inline-flex;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .tab.active {
+            background: #4ca896;
+            color: white;
+            box-shadow: 0 4px 8px rgba(76, 168, 150, 0.3);
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e3b36;
+        }
+
+        .stat-number {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #4ca896;
+        }
+
+        .enseignants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .enseignant-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid #4ca896;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enseignant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 50%, rgba(76, 168, 150, 0.1) 50%);
+            border-radius: 0 0 0 100px;
+        }
+
+        .enseignant-card.vacataire {
+            border-left-color: #ff9466;
+        }
+
+        .enseignant-card.vacataire::before {
+            background: linear-gradient(135deg, transparent 50%, rgba(255, 148, 102, 0.1) 50%);
+        }
+
+        .enseignant-card.en-remplacement {
+            border-left-color: #ffaa44;
+            opacity: 0.9;
+        }
+
+        .enseignant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .enseignant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .enseignant-nom {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3b36;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .enseignant-cin {
+            font-size: 0.8rem;
+            color: #5a9d91;
+            font-weight: 400;
+            background: #e0f2f1;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .enseignant-badge {
+            background: #4ca896;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(76, 168, 150, 0.3);
+        }
+
+        .enseignant-badge.vacataire {
+            background: #ff9466;
+            box-shadow: 0 2px 5px rgba(255, 148, 102, 0.3);
+        }
+
+        .enseignant-badge.remplacement-actif {
+            background: #ffaa44;
+            box-shadow: 0 2px 5px rgba(255, 170, 68, 0.3);
+        }
+
+        .enseignant-details {
+            margin: 1rem 0;
+            padding: 1rem 0;
+            border-top: 2px dashed #e0e9e7;
+            border-bottom: 2px dashed #e0e9e7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .detail-label {
+            color: #5a9d91;
+            font-size: 0.9rem;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .detail-value {
+            color: #1e3b36;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .specialites-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .specialite-tag {
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .specialite-tag:hover {
+            background: #ff9466;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .specialite-tag::before {
+            content: '📚';
+            font-size: 0.8rem;
+        }
+
+        .remplacement-info {
+            background: #fff3e6;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            border-left: 4px solid #ff9466;
+            font-size: 0.9rem;
+        }
+
+        .remplacement-info strong {
+            color: #ff9466;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-edit {
+            background: #e0f2f1;
+            color: #2d6b63;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-edit:hover {
+            background: #2d6b63;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .modal-title {
+            color: #1e3b36;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #5a9d91;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: rotate(90deg);
+        }
+
+        .form-section {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section-title {
+            color: #1e3b36;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-title::before {
+            content: '●';
+            color: #4ca896;
+            font-size: 1.2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #1e3b36;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: #dc2626;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e9e7;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #e0f2f1;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #4ca896;
+        }
+
+        .checkbox-item label {
+            font-size: 0.9rem;
+            color: #1e3b36;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            color: #2d6b63;
+            border: 1px solid #4ca896;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+
+        .alert-warning {
+            background: #fff3e6;
+            color: #ff9466;
+            border: 1px solid #ff9466;
+        }
+
+        .alert-info {
+            background: #e6f0ff;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .enseignants-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .enseignant-select-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            border: 2px solid #e0e9e7;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .enseignant-select-card:hover {
+            border-color: #4ca896;
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .enseignant-select-card.selected {
+            border-color: #ff9466;
+            background: #fff3e6;
+            box-shadow: 0 4px 12px rgba(255, 148, 102, 0.2);
+        }
+
+        .enseignant-select-card-title {
+            font-weight: 700;
+            color: #1e3b36;
+            font-size: 1rem;
+        }
+
+        .enseignant-select-card-subtitle {
+            font-size: 0.8rem;
+            color: #5a9d91;
+            margin-top: 0.3rem;
+        }
+
+        .enseignant-specialites {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+        }
+
+        .enseignant-specialite-badge {
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4ca896;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="page-title">
+            👨‍🏫 Gestion des Enseignants & Vacataires
+            <span id="totalCount">0</span>
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="openCreateModal()">
+                <span>➕</span> Nouvel utilisateur
+            </button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item"><span>📚 Total</span><span class="stat-number" id="statTotal">0</span></div>
+        <div class="stat-item"><span>👨‍🏫 Enseignants</span><span class="stat-number" id="statEnseignants">0</span></div>
+        <div class="stat-item"><span>🔄 Vacataires</span><span class="stat-number" id="statPermanents">0</span></div>
+        <div class="stat-item"><span>⚡ En remplacement</span><span class="stat-number" id="statEnRemplacement">0</span></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="filterByType('tous')">Tous</button>
+        <button class="tab" onclick="filterByType('enseignant')">Enseignants</button>
+        <button class="tab" onclick="filterByType('vacataire')">Vacataires</button>
+        <button class="tab" onclick="filterByType('en-remplacement')">En remplacement</button>
+    </div>
+
+    <div id="enseignantsContainer" class="enseignants-grid">
+        <div class="loading">Chargement...</div>
+    </div>
+
+    <!-- Modal Création/Édition -->
+    <div class="modal" id="enseignantModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><span id="modalIcon">➕</span><span id="modalTitleText">Nouvel utilisateur</span></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalAlert"></div>
+            <form id="enseignantForm" onsubmit="saveEnseignant(event)">
+                <input type="hidden" id="enseignantId">
+                <div class="form-section">
+                    <div class="form-section-title">Type de compte</div>
+                    <div class="form-group">
+                        <label class="form-label required">Type</label>
+                        <select id="role" class="form-select" required onchange="toggleTypeFields()">
+                            <option value="enseignant">👨‍🏫 Enseignant titulaire</option>
+                            <option value="permanent">🔄 Vacataire (remplaçant)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Informations personnelles</div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label required">CIN</label><input type="text" id="cin" class="form-input" required placeholder="Ex: 12345678"></div>
+                        <div class="form-group"><label class="form-label required">Téléphone</label><input type="tel" id="telephone" class="form-input" required placeholder="Ex: 06XXXXXXXX"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label required">Nom</label><input type="text" id="nom" class="form-input" required placeholder="Nom"></div>
+                        <div class="form-group"><label class="form-label required">Prénom</label><input type="text" id="prenom" class="form-input" required placeholder="Prénom"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label required">Email</label><input type="email" id="email" class="form-input" required placeholder="exemple@email.com"></div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Spécialités</div>
+                    <div class="form-group">
+                        <label class="form-label">Matières enseignées</label>
+                        <div id="specialitesContainer" class="checkbox-grid"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Informations professionnelles</div>
+                    <div class="form-group"><label class="form-label">Date d'embauche</label><input type="date" id="dateEmbauche" class="form-input"></div>
+                </div>
+
+                <!-- Champs pour vacataire -->
+                <div id="permanentFields" style="display: none;">
+                    <div class="form-section">
+                        <div class="form-section-title">🔄 Enseignant à remplacer</div>
+                        <div class="form-group">
+                            <label class="form-label">Sélectionnez l'enseignant que ce vacataire va remplacer</label>
+                            <div id="enseignantsRemplacablesSelector" class="enseignants-selector">
+                                <div class="alert alert-info">Choisissez d'abord les spécialités ci-dessus pour voir les enseignants disponibles</div>
+                            </div>
+                            <input type="hidden" id="enseignantRemplaceId">
+                            <p style="font-size: 0.8rem; color: #5a9d91; margin-top: 0.5rem;">
+                                💡 Le vacataire ne peut remplacer que des enseignants ayant les mêmes spécialités
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Options</div>
+                    <div class="checkbox-item" style="background:transparent; padding-left:0;">
+                        <input type="checkbox" id="envoyerEmailInvitation" checked><label for="envoyerEmailInvitation">📧 Envoyer les identifiants par email</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%; margin-top:1.5rem; padding:1rem; justify-content:center;"><span id="submitIcon">💾</span><span id="submitText">Enregistrer</span></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Emploi du temps -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="scheduleModalTitle">Emploi du temps</h2>
+                <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
+            </div>
+            <div id="scheduleContent"><div class="loading">Chargement...</div></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = null;
+        let allUtilisateurs = [];
+        let matieres = [];
+        let classes = [];
+        let currentFilter = 'tous';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            if (!token) { alert('Session expirée'); setTimeout(() => window.location.href = 'saghiry-auth.html', 2000); return; }
+            loadEnseignants();
+            loadMatieres();
+            loadClasses();
+        });
+
+        async function loadEnseignants() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/intervenants`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (response.ok) {
+                    const data = await response.json();
+                    allUtilisateurs = Array.isArray(data) ? data.map(i => ({
+                        id: i.Id || i.id, 
+                        role: i.Type || i.type || i.Role || 'enseignant', 
+                        nom: i.Nom || i.nom, 
+                        prenom: i.Prenom || i.prenom,
+                        email: i.Email || i.email, 
+                        telephone: i.Telephone || i.telephone, 
+                        specialites: i.Specialites || i.specialites || [],
+                        dateDebutRemplacement: i.DateDebutRemplacement || i.dateDebutRemplacement,
+                        dateFinRemplacement: i.DateFinRemplacement || i.dateFinRemplacement,
+                        cin: i.CIN || i.cin
+                    })) : [];
+                }
+                updateStats();
+                applyFilter();
+            } catch (e) { console.error(e); }
+        }
+
+        function updateStats() {
+            const total = allUtilisateurs.length;
+            const enseignants = allUtilisateurs.filter(u => u.role === 'enseignant').length;
+            const vacataires = allUtilisateurs.filter(u => u.role === 'permanent').length;
+            const enRemplacement = allUtilisateurs.filter(u => u.role === 'permanent' && u.dateDebutRemplacement && new Date(u.dateDebutRemplacement) <= new Date() && (!u.dateFinRemplacement || new Date(u.dateFinRemplacement) >= new Date())).length;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statEnseignants').textContent = enseignants;
+            document.getElementById('statPermanents').textContent = vacataires;
+            document.getElementById('statEnRemplacement').textContent = enRemplacement;
+        }
+
+        function applyFilter() {
+            let filtered = allUtilisateurs;
+            if (currentFilter === 'enseignant') filtered = allUtilisateurs.filter(u => u.role === 'enseignant');
+            else if (currentFilter === 'vacataire') filtered = allUtilisateurs.filter(u => u.role === 'permanent');
+            else if (currentFilter === 'en-remplacement') filtered = allUtilisateurs.filter(u => u.role === 'permanent' && u.dateDebutRemplacement && new Date(u.dateDebutRemplacement) <= new Date() && (!u.dateFinRemplacement || new Date(u.dateFinRemplacement) >= new Date()));
+            displayEnseignants(filtered);
+        }
+
+        function filterByType(type) { 
+            currentFilter = type; 
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
+            event.target.classList.add('active'); 
+            applyFilter(); 
+        }
+
+        function displayEnseignants(users) {
+            const container = document.getElementById('enseignantsContainer');
+            if (!users || users.length === 0) { container.innerHTML = '<div style="text-align:center; padding:3rem;">📭 Aucun utilisateur</div>'; return; }
+            let html = '';
+            users.forEach(u => {
+                const isVacataire = u.role === 'permanent';
+                const estEnRemplacement = isVacataire && u.dateDebutRemplacement && new Date(u.dateDebutRemplacement) <= new Date() && (!u.dateFinRemplacement || new Date(u.dateFinRemplacement) >= new Date());
+                const specialites = Array.isArray(u.specialites) ? u.specialites : [];
+                html += `<div class="enseignant-card ${isVacataire ? 'vacataire' : ''} ${estEnRemplacement ? 'en-remplacement' : ''}">
+                    <div class="enseignant-header">
+                        <div class="enseignant-nom">${u.prenom} ${u.nom}<span class="enseignant-cin">CIN: ${u.cin || 'Non renseigné'}</span></div>
+                        <span class="enseignant-badge ${isVacataire ? 'vacataire' : ''} ${estEnRemplacement ? 'remplacement-actif' : ''}">${isVacataire ? (estEnRemplacement ? '🔄 En remplacement' : '🔄 Vacataire') : '👨‍🏫 Enseignant'}</span>
+                    </div>
+                    <div class="enseignant-details">
+                        <div class="detail-row"><span class="detail-label">📧 Email:</span><span class="detail-value">${u.email || ''}</span></div>
+                        <div class="detail-row"><span class="detail-label">📞 Tél:</span><span class="detail-value">${u.telephone || 'Non renseigné'}</span></div>
+                        ${specialites.length ? `<div class="specialites-list">${specialites.map(s => `<span class="specialite-tag">${s}</span>`).join('')}</div>` : ''}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon btn-edit" onclick="editEnseignant('${u.id}')" title="Modifier">✏️</button>
+                        <button class="btn-icon btn-delete" onclick="deleteEnseignant('${u.id}')" title="Désactiver">🗑️</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        async function loadMatieres() {
+            try {
+                console.log('📚 Chargement des matières...');
+                const response = await fetch(`${API_BASE}/AffectationMatiere/reference`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    console.warn('⚠️ Fallback vers /Matiere/public');
+                    const fallbackResponse = await fetch(`${API_BASE}/Matiere/public`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (!fallbackResponse.ok) throw new Error('Impossible de charger les matières');
+                    const fallbackData = await fallbackResponse.json();
+                    matieres = Array.isArray(fallbackData) ? fallbackData.map(m => ({
+                        id: m.id || m._id || '',
+                        nomMatiere: m.nomMatiere || m.NomMatiere || 'Matière'
+                    })) : [];
+                } else {
+                    const data = await response.json();
+                    matieres = Array.isArray(data) ? data : [];
+                }
+                
+                console.log(`✅ ${matieres.length} matières chargées`);
+                updateSpecialitesCheckboxes();
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement matières:', error);
+                matieres = [
+                    { id: '1', nomMatiere: 'Langue arabe' }, { id: '2', nomMatiere: 'Langue française' },
+                    { id: '3', nomMatiere: 'Langue anglaise' }, { id: '4', nomMatiere: 'Mathématiques' },
+                    { id: '5', nomMatiere: 'Éveil scientifique' }, { id: '6', nomMatiere: 'Éducation islamique' },
+                    { id: '7', nomMatiere: 'Éducation technologique' }, { id: '8', nomMatiere: 'Éducation musicale' },
+                    { id: '9', nomMatiere: 'Éducation artistique' }, { id: '10', nomMatiere: 'Éducation physique' },
+                    { id: '11', nomMatiere: 'Histoire' }, { id: '12', nomMatiere: 'Géographie' },
+                    { id: '13', nomMatiere: 'Éducation civique' }
+                ];
+                updateSpecialitesCheckboxes();
+            }
+        }
+
+        async function loadClasses() {
+            try {
+                console.log('📚 Chargement des classes...');
+                const response = await fetch(`${API_BASE}/Classe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                classes = Array.isArray(data) ? data.map(c => ({
+                    id: c.Id || c.id || c._id || '',
+                    nomClasse: c.NomClasse || c.nomClasse || '',
+                    niveau: c.Niveau || c.niveau || ''
+                })) : [];
+                
+                console.log(`✅ ${classes.length} classes chargées`);
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement classes:', error);
+                classes = [];
+            }
+        }
+
+        function updateSpecialitesCheckboxes() {
+            const container = document.getElementById('specialitesContainer');
+            if (!container) return;
+            
+            if (!matieres || matieres.length === 0) {
+                container.innerHTML = '<div class="alert alert-warning">Aucune matière disponible</div>';
+                return;
+            }
+            
+            container.innerHTML = matieres.map(m => {
+                const nom = m.nomMatiere || m.NomMatiere || 'Matière';
+                const id = m.id || m._id || Math.random().toString();
+                return `<div class="checkbox-item">
+                    <input type="checkbox" id="spec_${id}" value="${nom}" onchange="updateEnseignantsRemplacablesList()">
+                    <label for="spec_${id}">${nom}</label>
+                </div>`;
+            }).join('');
+        }
+
+        function updateEnseignantsRemplacablesList() {
+            const selectedSpecialites = Array.from(document.querySelectorAll('#specialitesContainer input:checked')).map(cb => cb.value);
+            const container = document.getElementById('enseignantsRemplacablesSelector');
+            
+            if (selectedSpecialites.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Choisissez d\'abord les spécialités ci-dessus pour voir les enseignants disponibles</div>';
+                return;
+            }
+
+            const enseignantsRemplacables = allUtilisateurs.filter(u => 
+                u.role === 'enseignant' && 
+                u.specialites && 
+                u.specialites.some(s => selectedSpecialites.includes(s))
+            );
+
+            if (enseignantsRemplacables.length === 0) {
+                container.innerHTML = '<div class="alert alert-warning">Aucun enseignant ne possède ces spécialités</div>';
+                return;
+            }
+
+            container.innerHTML = enseignantsRemplacables.map(e => `
+                <div class="enseignant-select-card" onclick="selectEnseignantARemplacer('${e.id}', '${e.prenom} ${e.nom}', this)">
+                    <div class="enseignant-select-card-title">${e.prenom} ${e.nom}</div>
+                    <div class="enseignant-select-card-subtitle">📧 ${e.email}</div>
+                    <div class="enseignant-specialites">
+                        ${e.specialites.filter(s => selectedSpecialites.includes(s)).map(s => `<span class="enseignant-specialite-badge">${s}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectEnseignantARemplacer(id, nom, element) {
+            document.querySelectorAll('#enseignantsRemplacablesSelector .enseignant-select-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            document.getElementById('enseignantRemplaceId').value = id;
+        }
+
+        function viewSchedule(userId, prenom, nom) {
+            document.getElementById('scheduleModalTitle').textContent = `Emploi du temps - ${prenom} ${nom}`;
+            document.getElementById('scheduleModal').classList.add('active');
+            document.getElementById('scheduleContent').innerHTML = '<div class="loading">Chargement...</div>';
+        }
+
+        function closeScheduleModal() { document.getElementById('scheduleModal').classList.remove('active'); }
+
+        function openCreateModal() {
+            document.getElementById('enseignantForm').reset();
+            document.getElementById('enseignantId').value = '';
+            document.getElementById('enseignantRemplaceId').value = '';
+            document.getElementById('dateEmbauche').value = '';
+            selectedEnseignantRemplace = null;
+            document.getElementById('modalTitleText').textContent = 'Nouvel utilisateur';
+            document.getElementById('submitText').textContent = 'Créer';
+            document.getElementById('enseignantModal').classList.add('active');
+            toggleTypeFields();
+        }
+
+        function closeModal() { document.getElementById('enseignantModal').classList.remove('active'); }
+
+        function toggleTypeFields() { 
+            const isVacataire = document.getElementById('role').value === 'permanent';
+            document.getElementById('permanentFields').style.display = isVacataire ? 'block' : 'none';
+        }
+
+        async function editEnseignant(id) {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Erreur chargement');
+                const user = await response.json();
+                
+                document.getElementById('enseignantId').value = user.id || user.Id || user._id || id;
+                document.getElementById('cin').value = user.CIN || user.cin || '';
+                document.getElementById('nom').value = user.nom || user.Nom || '';
+                document.getElementById('prenom').value = user.prenom || user.Prenom || '';
+                document.getElementById('email').value = user.email || user.Email || '';
+                document.getElementById('telephone').value = user.telephone || user.Telephone || '';
+                document.getElementById('role').value = user.role || user.Role || 'enseignant';
+                document.getElementById('dateEmbauche').value = user.dateEmbauche ? new Date(user.dateEmbauche).toISOString().split('T')[0] : '';
+                
+                const userSpecialites = user.specialites || user.Specialites || [];
+                setTimeout(() => {
+                    document.querySelectorAll('#specialitesContainer input').forEach(cb => {
+                        cb.checked = userSpecialites.includes(cb.value);
+                    });
+                    updateEnseignantsRemplacablesList();
+                    if (user.enseignantRemplaceId) {
+                        document.getElementById('enseignantRemplaceId').value = user.enseignantRemplaceId;
+                    }
+                }, 200);
+                
+                document.getElementById('modalTitleText').textContent = 'Modifier utilisateur';
+                document.getElementById('submitText').textContent = 'Mettre à jour';
+                toggleTypeFields();
+                document.getElementById('enseignantModal').classList.add('active');
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                alert('Erreur lors du chargement');
+            }
+        }
+
+        async function saveEnseignant(e) {
+            e.preventDefault();
+            const id = document.getElementById('enseignantId').value;
+            const isEdit = !!id;
+            const specialites = Array.from(document.querySelectorAll('#specialitesContainer input:checked')).map(cb => cb.value);
+            const enseignantRemplaceId = document.getElementById('enseignantRemplaceId').value;
+            
+            const data = {
+                cin: document.getElementById('cin').value,
+                nom: document.getElementById('nom').value,
+                prenom: document.getElementById('prenom').value,
+                email: document.getElementById('email').value,
+                telephone: document.getElementById('telephone').value,
+                role: document.getElementById('role').value,
+                specialites: specialites,
+                statut: true
+            };
+            
+            const dateEmbauche = document.getElementById('dateEmbauche').value;
+            if (dateEmbauche) {
+                data.dateEmbauche = new Date(dateEmbauche).toISOString();
+            }
+            
+            if (data.role === 'permanent' && enseignantRemplaceId) {
+                data.enseignantRemplaceId = enseignantRemplaceId;
+            }
+            
+            try {
+                const url = isEdit ? `${API_BASE}/admin/AdminUtilisateurs/${id}` : `${API_BASE}/utilisateurs`;
+                const method = isEdit ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    console.error('Erreur API:', errorData);
+                    throw new Error('Erreur: ' + (errorData || response.statusText));
+                }
+                alert(isEdit ? '✅ Modifié avec succès' : '✅ Créé avec succès');
+                closeModal();
+                loadEnseignants();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        async function deleteEnseignant(id) {
+            if (!confirm('⚠️ Êtes-vous sûr de vouloir désactiver cet utilisateur ?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Erreur suppression');
+                alert('✅ Utilisateur désactivé avec succès');
+                loadEnseignants();
+            } catch (error) {
+                alert('❌ Erreur lors de la désactivation');
+            }
+        }
+    </script>
+</body>
+</html>

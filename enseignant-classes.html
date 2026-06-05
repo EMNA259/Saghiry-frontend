@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes Classes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid #ff9466;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: #5a9d91;
+            font-size: 0.95rem;
+        }
+
+        .stats-badge {
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .remplacement-badge {
+            background: #ff9466;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .remplacement-partiel-badge {
+            background: #f59e0b;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .classes-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .classe-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e0e9e7;
+            cursor: pointer;
+        }
+
+        .classe-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+        }
+
+        .classe-header {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            padding: 1.2rem 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .classe-info {
+            flex: 1;
+        }
+
+        .classe-nom {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .classe-niveau {
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+
+        .classe-stats {
+            background: rgba(255,255,255,0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .classe-footer {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e0e9e7;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .btn-details {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-details:hover {
+            background: #3d8a7f;
+            transform: scale(1.02);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            border: 2px dashed #e0e9e7;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 0.8rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e3b36;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .info-banner {
+            background: #e8f4f1;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #4ca896;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .classe-header { flex-direction: column; text-align: center; gap: 0.5rem; }
+            .classe-footer { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h1>
+        📚 Mes Classes
+        <span class="stats-badge" id="classesCount">0 classe(s)</span>
+        <span id="remplacementBadge" style="display: none;"></span>
+    </h1>
+    <p>Cliquez sur une classe pour gérer les présences des élèves par séance.</p>
+</div>
+
+<div id="infoBanner" style="display: none;" class="info-banner"></div>
+
+<div id="classesContainer">
+    <div class="loading">Chargement de vos classes...</div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:5267';
+    let token = null;
+    let enseignantId = null;
+    let userRole = null;
+    let mesClasses = [];
+    let remplacementComplet = true;
+    let mesSpecialites = [];
+    let enseignantOriginalId = null;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        await recupererTokenEtUtilisateur();
+        await chargerInfosUtilisateur();
+        await chargerClasses();
+    });
+    
+    async function recupererTokenEtUtilisateur() {
+        try {
+            token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            let userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            
+            if (token && userStr) {
+                const user = JSON.parse(userStr);
+                enseignantId = user.id || user._id;
+                userRole = (user.role || user.Role || '').toLowerCase();
+            } else {
+                enseignantId = "69a89476ce07827d1c732ec7";
+                userRole = "enseignant";
+            }
+            console.log('📋 Rôle utilisateur détecté:', userRole);
+        } catch (e) {
+            console.error('Erreur récupération token:', e);
+            enseignantId = "69a89476ce07827d1c732ec7";
+            userRole = "enseignant";
+        }
+    }
+    
+// Dans enseignant-classes.html, dans chargerInfosUtilisateur()
+async function chargerInfosUtilisateur() {
+    try {
+        const response = await fetch(`${API_BASE}/api/utilisateurs/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            mesSpecialites = data.specialites || [];
+            remplacementComplet = data.remplacementComplet !== false;
+            
+            // ✅ Récupérer l'ID de l'enseignant original pour les vacataires
+            if (userRole === 'permanent' || userRole === 'vacataire') {
+                if (data.enseignantRemplaceId) {
+                    enseignantOriginalId = data.enseignantRemplaceId;
+                    console.log('✅ ID enseignant original récupéré:', enseignantOriginalId);
+                } else {
+                    // Si l'API ne retourne pas l'ID, essayer de le récupérer depuis l'emploi du temps
+                    await recupererEnseignantOriginalDepuisEmploi();
+                }
+            }
+        }
+    } catch (error) {
+        console.warn("Impossible de récupérer les infos utilisateur:", error);
+    }
+}
+
+// ✅ Fonction pour récupérer l'ID de l'enseignant original depuis l'emploi du temps
+async function recupererEnseignantOriginalDepuisEmploi() {
+    try {
+        const response = await fetch(`${API_BASE}/api/EmploiDuTemps/permanent/${enseignantId}?anneeScolaire=2025-2026`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.Success && result.Data && result.Data.emploi && result.Data.emploi.enseignantRemplaceId) {
+                enseignantOriginalId = result.Data.emploi.enseignantRemplaceId;
+                console.log('✅ ID enseignant original récupéré depuis emploi du temps:', enseignantOriginalId);
+            }
+        }
+    } catch (error) {
+        console.warn("Impossible de récupérer l'ID original depuis l'emploi:", error);
+    }
+}
+    
+    // ✅ FONCTION POUR GÉNÉRER UN ID TEMPORAIRE POUR UNE CLASSE SANS ID
+    function generateTempClassId(classeNom, niveau) {
+        // Utiliser le nom et le niveau pour créer un ID unique mais stable
+        return `TEMP_${classeNom}_${niveau}`.replace(/[^a-zA-Z0-9_]/g, '_');
+    }
+    
+    // ✅ FONCTION POUR VÉRIFIER SI L'ID EST UN OBJECTID MONGODB VALIDE
+    function isValidObjectId(id) {
+        if (!id || typeof id !== 'string') return false;
+        // Un ObjectId MongoDB est une chaîne de 24 caractères hexadécimaux
+        return /^[0-9a-fA-F]{24}$/.test(id);
+    }
+    
+    async function chargerClasses() {
+        const container = document.getElementById('classesContainer');
+        container.innerHTML = '<div class="loading">Chargement de vos classes...</div>';
+        
+        try {
+            let classesMap = new Map();
+            
+            if (userRole === 'permanent' || userRole === 'vacataire') {
+                console.log('📚 Vacataire - Chargement des classes');
+                const response = await fetch(`${API_BASE}/api/EmploiDuTemps/permanent/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('📦 Réponse API permanent:', result);
+                    
+                    if (result.Success && result.Data && result.Data.emploi && result.Data.emploi.emploiParJour) {
+                        const emploiParJour = result.Data.emploi.emploiParJour;
+                        console.log('📊 emploiParJour:', emploiParJour);
+                        
+                        for (const [jour, seances] of Object.entries(emploiParJour)) {
+                            if (Array.isArray(seances) && seances.length > 0) {
+                                console.log(`📅 ${jour}: ${seances.length} séances`);
+                                for (const seance of seances) {
+                                    console.log(`   - ${seance.matiereNom} | ${seance.classeNom}`);
+                                    
+                                    // Utiliser l'ID de la classe si disponible, sinon générer un ID temporaire
+                                    let classeId = seance.classeId;
+                                    const classeNom = seance.classeNom;
+                                    const niveau = seance.niveau;
+                                    const matiereNom = seance.matiereNom;
+                                    
+                                    // Si pas d'ID valide, générer un ID temporaire
+                                    if (!classeId || !isValidObjectId(classeId)) {
+                                        classeId = generateTempClassId(classeNom, niveau);
+                                        console.log(`⚠️ ID de classe manquant ou invalide, utilisation de l'ID temporaire: ${classeId}`);
+                                    }
+                                    
+                                    // Clé unique pour le regroupement
+                                    const classeKey = classeId;
+                                    
+                                    // 🔥 FILTRE POUR REMPLACEMENT PARTIEL
+                                    const estRemplacementPartiel = !remplacementComplet && mesSpecialites.length > 0;
+                                    
+                                    if (estRemplacementPartiel && matiereNom) {
+                                        const matiereCorrespond = mesSpecialites.some(specialite => 
+                                            matiereNom.toLowerCase().includes(specialite.toLowerCase()) ||
+                                            specialite.toLowerCase().includes(matiereNom.toLowerCase())
+                                        );
+                                        
+                                        if (!matiereCorrespond) {
+                                            console.log(`⏭️ Séance filtrée: ${classeNom} - ${matiereNom} (non dans spécialités)`);
+                                            continue;
+                                        }
+                                    }
+                                    
+                                    if (!classesMap.has(classeKey)) {
+                                        classesMap.set(classeKey, {
+                                            id: classeId,
+                                            nom: classeNom,
+                                            niveau: niveau,
+                                            matieres: new Set(),
+                                            seances: []
+                                        });
+                                    }
+                                    
+                                    const classe = classesMap.get(classeKey);
+                                    if (matiereNom) {
+                                        classe.matieres.add(matiereNom);
+                                    }
+                                    
+                                    classe.seances.push({
+                                        id: seance.id || `${classeKey}_${jour}_${seance.heureDebut}`,
+                                        matiere: matiereNom,
+                                        jour: jour,
+                                        heureDebut: seance.heureDebut,
+                                        heureFin: seance.heureFin,
+                                        dureeMinutes: seance.dureeHeures ? seance.dureeHeures * 60 : 60,
+                                        salle: seance.salle
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                console.log('📚 Enseignant - Chargement des classes');
+                const response = await fetch(`${API_BASE}/api/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    let creneaux = [];
+                    
+                    if (result.success && result.data && result.data.Creneaux) {
+                        creneaux = result.data.Creneaux;
+                    } else if (result.data && result.data.Creneaux) {
+                        creneaux = result.data.Creneaux;
+                    } else if (result.Creneaux) {
+                        creneaux = result.Creneaux;
+                    }
+                    
+                    for (const creneau of creneaux) {
+                        const classeId = creneau.ClasseId;
+                        if (!classeId || !isValidObjectId(classeId)) {
+                            console.log(`⚠️ ID de classe invalide: ${classeId}, ignoré`);
+                            continue;
+                        }
+                        
+                        if (!classesMap.has(classeId)) {
+                            classesMap.set(classeId, {
+                                id: classeId,
+                                nom: creneau.ClasseNom || 'Classe',
+                                niveau: creneau.Niveau || 'Non défini',
+                                matieres: new Set(),
+                                seances: []
+                            });
+                        }
+                        
+                        const classe = classesMap.get(classeId);
+                        if (creneau.MatiereNom) {
+                            classe.matieres.add(creneau.MatiereNom);
+                        }
+                        
+                        classe.seances.push({
+                            id: creneau.Id,
+                            matiere: creneau.MatiereNom,
+                            jour: creneau.Jour,
+                            heureDebut: creneau.HeureDebut,
+                            heureFin: creneau.HeureFin,
+                            dureeMinutes: creneau.DureeMinutes || 60,
+                            salle: creneau.Salle
+                        });
+                    }
+                }
+            }
+            
+            mesClasses = Array.from(classesMap.values()).map(c => ({
+                id: c.id,
+                nomClasse: c.nom,
+                niveau: c.niveau,
+                matieres: Array.from(c.matieres),
+                seances: c.seances,
+                totalHeures: c.seances.reduce((sum, s) => sum + (s.dureeMinutes / 60), 0)
+            }));
+            
+            document.getElementById('classesCount').textContent = `${mesClasses.length} classe${mesClasses.length > 1 ? 's' : ''}`;
+            afficherClasses();
+            
+            console.log(`✅ ${mesClasses.length} classes chargées avec succès`);
+            
+        } catch (error) {
+            console.error("Erreur:", error);
+            container.innerHTML = `<div class="empty-state">
+                <div style="font-size: 3rem;">⚠️</div>
+                <h3>Erreur de chargement</h3>
+                <p>${error.message}</p>
+                <button onclick="chargerClasses()" style="margin-top:1rem; padding:0.5rem 1rem; background:#4ca896; color:white; border:none; border-radius:40px; cursor:pointer;">🔄 Réessayer</button>
+            </div>`;
+        }
+    }
+    
+    // ✅ Fonction pour formater le nom de la classe: niveau + " A " + nom
+    function formatClasseName(classe) {
+        const niveau = classe.niveau || '';
+        const nom = classe.nomClasse || '';
+        
+        // Extraire le numéro de la classe du nom (ex: "3" de "6ème A 3")
+        let classeNumber = '';
+        if (nom) {
+            // Chercher un nombre à la fin du nom
+            const match = nom.match(/\d+$/);
+            if (match) {
+                classeNumber = match[0];
+            } else {
+                // Si pas de nombre, utiliser le nom complet
+                classeNumber = nom;
+            }
+        }
+        
+        // Formater: niveau + " A " + numéro
+        if (niveau && classeNumber) {
+            return `${niveau} A ${classeNumber}`;
+        } else if (niveau) {
+            return niveau;
+        } else if (classeNumber) {
+            return classeNumber;
+        }
+        return nom || 'Classe';
+    }
+    
+    function afficherClasses() {
+        const container = document.getElementById('classesContainer');
+        
+        if (mesClasses.length === 0) {
+            let message = '';
+            if ((userRole === 'permanent' || userRole === 'vacataire') && !remplacementComplet && mesSpecialites.length > 0) {
+                message = `<p>Aucune classe ne correspond à vos spécialités (${mesSpecialites.join(', ')}).</p>`;
+            }
+            container.innerHTML = `<div class="empty-state">
+                <div style="font-size: 4rem;">🏫</div>
+                <h3>Aucune classe assignée</h3>
+                ${message}
+            </div>`;
+            return;
+        }
+        
+        let html = `<div class="classes-grid">`;
+        
+        for (const classe of mesClasses) {
+            // Ajouter un indicateur si c'est un ID temporaire
+            const isTempId = !isValidObjectId(classe.id);
+            const tempWarning = isTempId ? `<span style="background:#ff9466; color:white; padding:0.2rem 0.5rem; border-radius:20px; font-size:0.7rem; margin-left:0.5rem;">⚠️ Données temporaires</span>` : '';
+            
+            // Utiliser la nouvelle fonction de formatage
+            const displayName = formatClasseName(classe);
+            
+            html += `
+                <div class="classe-card" onclick="ouvrirClasse('${classe.id}')">
+                    <div class="classe-header">
+                        <div class="classe-info">
+                            <div class="classe-nom">${escapeHtml(displayName)}${tempWarning}</div>
+                            <div class="classe-niveau">${escapeHtml(classe.niveau)}</div>
+                        </div>
+                        <div class="classe-stats">
+                            📖 ${classe.matieres.length} matière(s) | ⏱️ ${classe.totalHeures.toFixed(1)}h/semaine
+                        </div>
+                    </div>
+                    <div class="classe-footer">
+                        <span>🎓 ${classe.seances.length} séance(s)</span>
+                        <button class="btn-details" onclick="event.stopPropagation(); ouvrirClasse('${classe.id}')">📋 Gérer les présences →</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+    
+// Dans enseignant-classes.html, dans la fonction ouvrirClasse(), ajoutez :
+function ouvrirClasse(classeId) {
+    const classe = mesClasses.find(c => c.id === classeId);
+    if (classe) {
+        // Stocker les informations
+        localStorage.setItem('classeSelectionnee', JSON.stringify(classe));
+        localStorage.setItem('enseignantId', enseignantId);
+        localStorage.setItem('token', token);
+        localStorage.setItem('userRole', userRole);
+        localStorage.setItem('remplacementComplet', remplacementComplet);
+        localStorage.setItem('mesSpecialites', JSON.stringify(mesSpecialites));
+        
+        // ✅ AJOUTER CETTE LIGNE POUR STOCKER L'ID DE L'ENSEIGNANT ORIGINAL
+        if (enseignantOriginalId) {
+            localStorage.setItem('enseignantRemplaceId', enseignantOriginalId);
+        } else {
+            // Si pas d'original, stocker l'ID du vacataire lui-même
+            localStorage.setItem('enseignantRemplaceId', enseignantId);
+        }
+        
+        window.location.href = 'gestion-presences-classe.html';
+    }
+}
+    
+    function afficherToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.style.backgroundColor = type === 'error' ? '#dc2626' : '#1e3b36';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+</script>
+</body>
+</html>

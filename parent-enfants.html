@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes Enfants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            color: #1e3b36;
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title h1 span {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            font-size: 1rem;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            margin-left: 0.5rem;
+        }
+
+        .btn-back {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateX(-3px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            background: #4ca896;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .search-box:focus-within {
+            border-color: #4ca896;
+            box-shadow: 0 4px 20px rgba(76, 168, 150, 0.2);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            background: transparent;
+        }
+
+        .search-button {
+            background: #4ca896;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-button:hover {
+            background: #3d8a7f;
+            transform: scale(1.02);
+        }
+
+        .search-info {
+            text-align: center;
+            margin: 0.5rem 0 1rem;
+            font-size: 0.9rem;
+            color: #5a9d91;
+        }
+
+        .clear-search {
+            color: #4ca896;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+            margin-left: 0.5rem;
+        }
+
+        .enfants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .enfant-card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .enfant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4ca896, #ff9466, #4ca896);
+            background-size: 200% 100%;
+            transition: all 0.4s ease;
+        }
+
+        .enfant-card:hover::before {
+            background-position: 100% 0;
+        }
+
+        .enfant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(76, 168, 150, 0.2);
+            border-color: rgba(76, 168, 150, 0.4);
+        }
+
+        .enfant-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .enfant-info-left {
+            flex: 1;
+        }
+
+        .enfant-avatar-large {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.25);
+        }
+
+        .enfant-nom {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3b36 0%, #2d6b63 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+        }
+
+        .enfant-classe {
+            display: inline-block;
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
+        .enfant-statut-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .enfant-statut-badge.inactif {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .enfant-stats-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 0.8rem 0;
+            border-top: 2px dashed #e0e9e7;
+            border-bottom: 2px dashed #e0e9e7;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-icon {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #5a9d91;
+            font-weight: 500;
+        }
+
+        .enfant-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .enfant-view-link {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+        }
+
+        .enfant-view-link:hover {
+            transform: translateX(3px);
+            background: linear-gradient(135deg, #3d8a7f, #2d6b63);
+        }
+
+        .enfant-details-page {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #5a9d91;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .breadcrumb span {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb span:hover {
+            color: #4ca896;
+            text-decoration: underline;
+        }
+
+        .enfant-header-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .enfant-title {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .enfant-avatar-detail {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 8px 16px rgba(76, 168, 150, 0.3);
+        }
+
+        .enfant-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3b36;
+            line-height: 1.2;
+        }
+
+        .enfant-classe-year {
+            background: #e0f2f1;
+            color: #2d6b63;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-stat-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid #e0e9e7;
+            transition: all 0.3s ease;
+        }
+
+        .quick-stat-card:hover {
+            border-color: #4ca896;
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .quick-stat-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .quick-stat-content h4 {
+            color: #5a9d91;
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin-bottom: 0.2rem;
+        }
+
+        .quick-stat-content .stat-number {
+            color: #1e3b36;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .details-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e9e7;
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .details-nav-btn {
+            padding: 0.8rem 2rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: #5a9d91;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .details-nav-btn:hover {
+            color: #4ca896;
+            background: #e0f2f1;
+        }
+
+        .details-nav-btn.active {
+            color: #4ca896;
+            border-bottom: 3px solid #4ca896;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem;
+            border: 1px solid #e0e9e7;
+        }
+
+        .info-card h3 {
+            color: #1e3b36;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #5a9d91;
+        }
+
+        .info-value {
+            color: #1e3b36;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: #e0f2f1;
+            color: #2d6b63;
+            border: 1px solid #4ca896;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #ef4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            border: 2px dashed #e0e9e7;
+            grid-column: 1/-1;
+        }
+
+        .empty-state h3 {
+            color: #1e3b36;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #5a9d91;
+            margin-bottom: 1.5rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .medical-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group select {
+            padding: 0.8rem;
+            border: 1px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e0e9e7;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.3rem 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #e0f2f1;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4ca896;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: normal;
+            color: #1e3b36;
+        }
+
+        .custom-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .custom-input-group input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid #e0e9e7;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .custom-input-group input:focus {
+            outline: none;
+            border-color: #4ca896;
+        }
+
+        .custom-input-group button {
+            padding: 0.6rem 1rem;
+            background: #4ca896;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .custom-input-group button:hover {
+            background: #3d8a7f;
+        }
+
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .selected-tag {
+            background: #4ca896;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .selected-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selected-tag-remove:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e9e7;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .enfants-grid { grid-template-columns: 1fr; }
+            .enfant-name { font-size: 2rem; }
+            .quick-stats { grid-template-columns: repeat(2, 1fr); }
+            .info-grid { grid-template-columns: 1fr; }
+            .checkbox-group { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">
+            <button class="btn-back" id="backButton" style="display: none;" onclick="showListeEnfants()">
+                ← Retour
+            </button>
+            <h1 id="mainTitle">
+                👨‍👩‍👧‍👦 Mes Enfants
+                <span id="totalEnfantsCount">0</span>
+            </h1>
+        </div>
+    </div>
+
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" 
+                   placeholder="Rechercher un enfant par nom, prénom, classe..." 
+                   value="" oninput="debounce(handleSearch, 300)()">
+            <button class="search-button" onclick="handleSearch()">Rechercher</button>
+        </div>
+        <div id="searchInfo" class="search-info" style="display: none;"></div>
+    </div>
+
+    <div id="mainContainer">
+        <div class="loading">Chargement de vos enfants...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        let allEnfants = [];
+        let filteredEnfants = [];
+        let currentView = 'liste';
+        let currentEnfant = null;
+        let currentSearchTerm = '';
+        let currentTab = 'info';
+        let timeoutId = null;
+        let classesCache = new Map();
+        let classesChargees = false;
+        let isEditingMedical = false;
+        let currentMedicalInfo = null;
+        
+        // Listes prédéfinies
+        const commonAllergies = ['Arachides', 'Lactose', 'Gluten', 'Œufs', 'Poissons', 'Fruits à coque', 'Soja', 'Pollen'];
+        const commonConditions = ['Asthme', 'Diabète', 'Épilepsie', 'Cardiopathie', 'Allergie sévère', 'Problèmes respiratoires', 'TDAH', 'Dyslexie'];
+        const commonMedicaments = ['Ventoline', 'Inhalateur', 'Épipen', 'Insuline', 'Antihistaminique', 'Corticostéroïdes'];
+        
+        // Données du formulaire médical
+        let medicalFormData = {
+            groupeSanguin: '',
+            allergies: [],
+            conditionsMedicales: [],
+            medicaments: []
+        };
+
+        function getAuthToken() {
+            try {
+                const locations = [
+                    localStorage.getItem('parentAuthToken'),
+                    localStorage.getItem('authToken'),
+                    sessionStorage.getItem('authToken'),
+                    sessionStorage.getItem('parentAuthToken')
+                ];
+                
+                for (const token of locations) {
+                    if (token && token !== 'undefined' && token !== 'null' && token.length > 10) {
+                        localStorage.setItem('authToken', token);
+                        return token;
+                    }
+                }
+                return null;
+            } catch(e) {
+                console.error('Erreur récupération token:', e);
+                return null;
+            }
+        }
+
+        async function waitForToken(maxAttempts = 20, delayMs = 200) {
+            for (let i = 0; i < maxAttempts; i++) {
+                const token = getAuthToken();
+                if (token) return token;
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+            return null;
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const tokenValue = await waitForToken(30, 200);
+            if (tokenValue) {
+                token = tokenValue;
+                await loadEnfants();
+            } else {
+                document.getElementById('mainContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size:4rem;">🔒</div>
+                        <h3>Session expirée</h3>
+                        <p>Veuillez vous reconnecter.</p>
+                        <button class="btn-primary" onclick="window.location.href='saghiry-auth.html'">Se reconnecter</button>
+                    </div>
+                `;
+            }
+        });
+
+        function debounce(func, delay) {
+            return function() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(func, delay);
+            };
+        }
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return '';
+            return String(unsafe).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        function formatClasseName(classeInfo) {
+            if (!classeInfo) return 'Non assigné';
+            const niveauComplet = classeInfo.niveau || classeInfo.Niveau;
+            const nomClasse = classeInfo.nomClasse || classeInfo.NomClasse;
+            if (niveauComplet && niveauComplet !== 'Non spécifié') {
+                if (nomClasse && nomClasse !== 'Non assigné') return `${niveauComplet} A - ${nomClasse}`;
+                return `${niveauComplet} A`;
+            }
+            if (nomClasse && nomClasse !== 'Non assigné') return `${nomClasse} A`;
+            return 'Non assigné';
+        }
+
+        async function loadAllClassesNames() {
+            if (classesChargees) return;
+            try {
+                const response = await fetch(`${API_BASE}/api/Classe/public`, { 
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    const toutesLesClasses = await response.json();
+                    toutesLesClasses.forEach(classe => {
+                        const classeId = classe.Id || classe.id;
+                        if (classeId) classesCache.set(classeId, classe);
+                    });
+                    classesChargees = true;
+                }
+            } catch(e) {
+                console.warn('❌ Impossible de charger les classes:', e);
+            }
+        }
+
+        function getClasseDisplayName(classeId) {
+            if (!classeId || classeId === 'Non assigné' || classeId === 'null') return 'Non assigné';
+            const classeInfo = classesCache.get(classeId);
+            return classeInfo ? formatClasseName(classeInfo) : 'Non assigné';
+        }
+
+        async function loadEnfants() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = '<div class="loading">Chargement de vos enfants...</div>';
+            
+            if (!token) token = getAuthToken();
+            if (!token) {
+                container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">🔒</div><h3>Session expirée</h3><button class="btn-primary" onclick="window.location.href='saghiry-auth.html'">Se reconnecter</button></div>`;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enfants`, { 
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    credentials: 'include'
+                });
+                
+                if (response.status === 401) {
+                    token = null;
+                    localStorage.removeItem('authToken');
+                    container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">🔒</div><h3>Session expirée</h3><button class="btn-primary" onclick="window.location.href='saghiry-auth.html'">Se reconnecter</button></div>`;
+                    return;
+                }
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const result = await response.json();
+                allEnfants = (result.success && result.data) ? result.data : (Array.isArray(result) ? result : []);
+                
+                document.getElementById('totalEnfantsCount').textContent = allEnfants.length;
+                
+                if (allEnfants.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">👶</div><h3>Aucun enfant inscrit</h3><p>Contacter l'administration.</p></div>`;
+                    return;
+                }
+                
+                await loadAllClassesNames();
+                applyFilters();
+                displayEnfantsList();
+                
+            } catch(e) {
+                container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">❌</div><h3>Erreur</h3><button class="btn-primary" onclick="loadEnfants()">Réessayer</button></div>`;
+            }
+        }
+
+        function applyFilters() {
+            filteredEnfants = [...allEnfants];
+            if (currentSearchTerm && currentSearchTerm.trim()) {
+                const term = currentSearchTerm.toLowerCase().trim();
+                filteredEnfants = filteredEnfants.filter(e => {
+                    const prenom = (e.prenom || e.Prenom || '').toLowerCase();
+                    const nom = (e.nom || e.Nom || '').toLowerCase();
+                    const classeId = (e.classeId || e.ClasseId || '');
+                    const classeNom = getClasseDisplayName(classeId).toLowerCase();
+                    return prenom.includes(term) || nom.includes(term) || classeNom.includes(term);
+                });
+            }
+            const si = document.getElementById('searchInfo');
+            if(si) {
+                if(currentSearchTerm) {
+                    si.style.display = 'block';
+                    si.innerHTML = `${filteredEnfants.length} résultat(s) sur ${allEnfants.length} enfant(s) <span class="clear-search" onclick="clearSearch()">Effacer</span>`;
+                } else {
+                    si.style.display = 'none';
+                }
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentSearchTerm = '';
+            applyFilters();
+            displayEnfantsList();
+        }
+
+        function handleSearch() {
+            currentSearchTerm = document.getElementById('searchInput').value;
+            applyFilters();
+            displayEnfantsList();
+        }
+
+        function displayEnfantsList() {
+            const container = document.getElementById('mainContainer');
+            document.getElementById('backButton').style.display = 'none';
+            document.getElementById('searchContainer').style.display = 'block';
+            document.getElementById('mainTitle').innerHTML = `👨‍👩‍👧‍👦 Mes Enfants <span>${allEnfants.length}</span>`;
+            currentView = 'liste';
+
+            if (!filteredEnfants.length) {
+                container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">🔍</div><h3>Aucun résultat</h3><button class="btn-outline" onclick="clearSearch()">Effacer la recherche</button></div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="enfants-grid">
+                    ${filteredEnfants.map(e => {
+                        const prenom = e.prenom || e.Prenom || '';
+                        const nom = e.nom || e.Nom || '';
+                        const nomComplet = `${prenom} ${nom}`.trim() || 'Élève';
+                        const classeId = e.classeId || e.ClasseId || null;
+                        const classeNom = classeId ? getClasseDisplayName(classeId) : 'Non assigné';
+                        const identifiant = e.identifiantEcole || e.IdentifiantEcole || 'N/A';
+                        const statut = e.statut || e.Statut || 'actif';
+                        const sexe = e.sexe || e.Sexe || '';
+                        const avatar = sexe === 'M' || sexe === 'masculin' ? '👦' : (sexe === 'F' || sexe === 'féminin' ? '👧' : '👶');
+                        const eleveId = e.id || e.Id;
+                        
+                        return `
+                            <div class="enfant-card" onclick="viewEnfantDetails('${eleveId}')">
+                                <div class="enfant-card-header">
+                                    <div class="enfant-info-left">
+                                        <div class="enfant-avatar-large">${avatar}</div>
+                                        <div class="enfant-nom">${escapeHtml(nomComplet)}</div>
+                                        <div class="enfant-classe">📚 ${escapeHtml(classeNom)}</div>
+                                    </div>
+                                    <div class="enfant-actions">
+                                        <span class="enfant-statut-badge ${statut !== 'actif' ? 'inactif' : ''}">
+                                            ${statut === 'actif' ? '✅ Actif' : '⭕ Inactif'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="enfant-stats-container">
+                                    <div class="stat-item">
+                                        <span class="stat-icon">🆔</span>
+                                        <div class="stat-value">${escapeHtml(identifiant)}</div>
+                                        <div class="stat-label">Matricule</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-icon">📖</span>
+                                        <div class="stat-value">${escapeHtml(classeNom)}</div>
+                                        <div class="stat-label">Classe</div>
+                                    </div>
+                                </div>
+                                <div class="enfant-footer">
+                                    <div class="enfant-view-link" onclick="event.stopPropagation(); viewEnfantDetails('${eleveId}')">
+                                        Voir le profil →
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        async function viewEnfantDetails(eleveId) {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = '<div class="loading">Chargement du profil...</div>';
+            document.getElementById('backButton').style.display = 'flex';
+            document.getElementById('searchContainer').style.display = 'none';
+            document.getElementById('mainTitle').innerHTML = '👤 Profil de l\'élève';
+            currentView = 'details';
+            isEditingMedical = false;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/Eleve/parent/${eleveId}`, { 
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Accès refusé');
+                
+                currentEnfant = await response.json();
+                
+                let classeNom = 'Non assigné';
+                const classeId = currentEnfant.classeId || currentEnfant.ClasseId;
+                if (classeId && classeId !== 'Non assigné') {
+                    const classeInfo = classesCache.get(classeId);
+                    if (classeInfo) classeNom = formatClasseName(classeInfo);
+                }
+                
+                await loadMedicalInfo(eleveId);
+                displayEnfantDetails(classeNom);
+                
+            } catch(e) {
+                container.innerHTML = `<div class="empty-state"><div style="font-size:4rem;">❌</div><h3>Erreur</h3><button class="btn-primary" onclick="showListeEnfants()">Retour</button></div>`;
+            }
+        }
+
+        async function loadMedicalInfo(eleveId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/Eleve/${eleveId}/medical`, { 
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    currentMedicalInfo = await response.json();
+                    medicalFormData = {
+                        groupeSanguin: currentMedicalInfo.groupeSanguin || '',
+                        allergies: [...(currentMedicalInfo.allergies || [])],
+                        conditionsMedicales: [...(currentMedicalInfo.conditionsMedicales || [])],
+                        medicaments: [...(currentMedicalInfo.medicaments || [])]
+                    };
+                    console.log('✅ Infos médicales chargées:', medicalFormData);
+                } else {
+                    currentMedicalInfo = null;
+                }
+            } catch(e) {
+                console.error('❌ Erreur chargement médical:', e);
+                currentMedicalInfo = null;
+            }
+        }
+
+        async function updateMedicalInfo(eleveId, medicalData) {
+            try {
+                console.log('📤 Envoi des données médicales:', medicalData);
+                
+                const response = await fetch(`${API_BASE}/api/Eleve/${eleveId}/medical`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(medicalData)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erreur lors de la mise à jour');
+                }
+                
+                const result = await response.json();
+                console.log('✅ Réponse serveur:', result);
+                
+                showAlert('success', result.message || 'Dossier médical mis à jour avec succès');
+                await loadMedicalInfo(eleveId);
+                return true;
+            } catch(e) {
+                console.error('❌ Erreur mise à jour:', e);
+                showAlert('error', e.message);
+                return false;
+            }
+        }
+
+        function showAlert(type, message) {
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `${type === 'success' ? '✅' : '❌'} ${escapeHtml(message)}`;
+            
+            const container = document.getElementById('mainContainer');
+            const detailsPage = container.querySelector('.enfant-details-page');
+            if (detailsPage) {
+                detailsPage.insertBefore(alertDiv, detailsPage.firstChild);
+                setTimeout(() => alertDiv.remove(), 4000);
+            }
+        }
+
+        function displayEnfantDetails(classeNom) {
+            const e = currentEnfant;
+            const prenom = e.prenom || e.Prenom || '';
+            const nom = e.nom || e.Nom || '';
+            const nomComplet = `${prenom} ${nom}`.trim() || 'Élève';
+            const sexe = e.sexe || e.Sexe || '';
+            const avatar = sexe === 'M' || sexe === 'masculin' ? '👦' : (sexe === 'F' || sexe === 'féminin' ? '👧' : '👶');
+            const identifiant = e.identifiantEcole || e.IdentifiantEcole || 'N/A';
+            const statut = e.statut || e.Statut || 'actif';
+            const niveau = e.niveau || e.Niveau || 'Non spécifié';
+            const anneeScolaire = e.anneeScolaire || e.AnneeScolaire || '2025-2026';
+
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = `
+                <div class="enfant-details-page">
+                    <div class="breadcrumb">
+                        <span onclick="showListeEnfants()">Mes enfants</span> / 
+                        <span>${escapeHtml(nomComplet)}</span>
+                    </div>
+                    
+                    <div class="enfant-header-details">
+                        <div class="enfant-title">
+                            <div class="enfant-avatar-detail">${avatar}</div>
+                            <div>
+                                <h1 class="enfant-name">${escapeHtml(nomComplet)}</h1>
+                                <div class="enfant-classe-year">📚 ${escapeHtml(classeNom)}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="enfant-statut-badge ${statut !== 'actif' ? 'inactif' : ''}">
+                                ${statut === 'actif' ? '✅ Actif' : '⭕ Inactif'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="quick-stat-card">
+                            <div class="quick-stat-icon">🆔</div>
+                            <div><h4>Matricule</h4><div class="stat-number">${escapeHtml(identifiant)}</div></div>
+                        </div>
+                        <div class="quick-stat-card">
+                            <div class="quick-stat-icon">📚</div>
+                            <div><h4>Niveau</h4><div class="stat-number">${escapeHtml(niveau)}</div></div>
+                        </div>
+                        <div class="quick-stat-card">
+                            <div class="quick-stat-icon">📅</div>
+                            <div><h4>Année scolaire</h4><div class="stat-number">${escapeHtml(anneeScolaire)}</div></div>
+                        </div>
+                    </div>
+
+                    <div class="details-nav">
+                        <button class="details-nav-btn ${currentTab === 'info' ? 'active' : ''}" onclick="switchTab('info', event)">📋 Informations</button>
+                        <button class="details-nav-btn ${currentTab === 'medical' ? 'active' : ''}" onclick="switchTab('medical', event)">🏥 Médical</button>
+                    </div>
+
+                    <div id="tabContent"></div>
+                </div>
+            `;
+            
+            refreshTabContent();
+        }
+
+        function refreshTabContent() {
+            let content = '';
+            if (currentTab === 'info') content = displayInfoTab();
+            else if (currentTab === 'medical') content = displayMedicalTab();
+            
+            const tabContent = document.getElementById('tabContent');
+            if (tabContent) tabContent.innerHTML = content;
+        }
+
+        function displayInfoTab() {
+            const e = currentEnfant;
+            const prenom = e.prenom || e.Prenom || '';
+            const nom = e.nom || e.Nom || '';
+            const niveau = e.niveau || e.Niveau || 'Non spécifié';
+            const sexe = e.sexe || e.Sexe || '';
+            const anneeScolaire = e.anneeScolaire || e.AnneeScolaire || '2025-2026';
+            const identifiant = e.identifiantEcole || e.IdentifiantEcole || 'N/A';
+            const adresse = e.adresse || e.Adresse || 'Non spécifiée';
+            const ville = e.ville || e.Ville || 'Non spécifiée';
+            const codePostal = e.codePostal || e.CodePostal || '';
+            const telephone = e.telephone || e.Telephone || '';
+            const email = e.emailParent || e.EmailParent || 'Non renseigné';
+            const dateNaissance = e.dateNaissance || e.DateNaissance;
+            const lieuNaissance = e.lieuNaissance || e.LieuNaissance || 'Non spécifié';
+            
+            let dateNaissanceFormatee = 'Non spécifiée';
+            if (dateNaissance) {
+                try {
+                    const d = dateNaissance.$date || dateNaissance;
+                    dateNaissanceFormatee = new Date(d).toLocaleDateString('fr-FR');
+                } catch(e) {}
+            }
+            
+            const classeId = e.classeId || e.ClasseId;
+            let classeNom = 'Non assigné';
+            if (classeId && classeId !== 'Non assigné') {
+                const classeInfo = classesCache.get(classeId);
+                if (classeInfo) classeNom = formatClasseName(classeInfo);
+            }
+
+            return `
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>📋 Identité</h3>
+                        <div class="info-row"><span class="info-label">Nom complet :</span><span class="info-value">${escapeHtml(prenom)} ${escapeHtml(nom)}</span></div>
+                        <div class="info-row"><span class="info-label">Date de naissance :</span><span class="info-value">${escapeHtml(dateNaissanceFormatee)}</span></div>
+                        <div class="info-row"><span class="info-label">Lieu de naissance :</span><span class="info-value">${escapeHtml(lieuNaissance)}</span></div>
+                        <div class="info-row"><span class="info-label">Sexe :</span><span class="info-value">${escapeHtml(sexe === 'M' ? 'Masculin' : (sexe === 'F' ? 'Féminin' : 'Non spécifié'))}</span></div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🏫 Informations scolaires</h3>
+                        <div class="info-row"><span class="info-label">Matricule :</span><span class="info-value">${escapeHtml(identifiant)}</span></div>
+                        <div class="info-row"><span class="info-label">Classe :</span><span class="info-value">${escapeHtml(classeNom)}</span></div>
+                        <div class="info-row"><span class="info-label">Niveau :</span><span class="info-value">${escapeHtml(niveau)}</span></div>
+                        <div class="info-row"><span class="info-label">Année scolaire :</span><span class="info-value">${escapeHtml(anneeScolaire)}</span></div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📍 Coordonnées</h3>
+                        <div class="info-row"><span class="info-label">Adresse :</span><span class="info-value">${escapeHtml(adresse)}</span></div>
+                        <div class="info-row"><span class="info-label">Ville :</span><span class="info-value">${escapeHtml(ville)}</span></div>
+                        ${codePostal ? `<div class="info-row"><span class="info-label">Code postal :</span><span class="info-value">${escapeHtml(codePostal)}</span></div>` : ''}
+                        ${telephone ? `<div class="info-row"><span class="info-label">Téléphone :</span><span class="info-value">${escapeHtml(telephone)}</span></div>` : ''}
+                        <div class="info-row"><span class="info-label">Email parent :</span><span class="info-value">${escapeHtml(email)}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayMedicalTab() {
+            if (isEditingMedical) {
+                return displayMedicalEditForm();
+            }
+            
+            if (!currentMedicalInfo) {
+                return `<div class="empty-state"><div style="font-size:4rem;">🏥</div><h3>Chargement...</h3></div>`;
+            }
+            
+            const medical = currentMedicalInfo;
+            const lastUpdate = medical.derniereMiseAJour ? new Date(medical.derniereMiseAJour).toLocaleDateString('fr-FR') : 'Jamais';
+            
+            return `
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>🩸 Groupe sanguin</h3>
+                        <div class="info-row"><span class="info-value" style="font-size:1.2rem; font-weight:bold;">${escapeHtml(medical.groupeSanguin || 'Non spécifié')}</span></div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>⚠️ Allergies</h3>
+                        ${medical.allergies && medical.allergies.length > 0 ? 
+                            `<ul style="margin: 0.5rem 0 0 1rem; color: #1e3b36;">
+                                ${medical.allergies.map(a => `<li style="margin-bottom: 0.3rem;">• ${escapeHtml(a)}</li>`).join('')}
+                            </ul>` : 
+                            '<p class="info-value">Aucune allergie déclarée</p>'}
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🏥 Conditions médicales</h3>
+                        ${medical.conditionsMedicales && medical.conditionsMedicales.length > 0 ? 
+                            `<ul style="margin: 0.5rem 0 0 1rem; color: #1e3b36;">
+                                ${medical.conditionsMedicales.map(c => `<li style="margin-bottom: 0.3rem;">• ${escapeHtml(c)}</li>`).join('')}
+                            </ul>` : 
+                            '<p class="info-value">Aucune condition médicale déclarée</p>'}
+                    </div>
+
+                    <div class="info-card">
+                        <h3>💊 Traitements en cours</h3>
+                        ${medical.medicaments && medical.medicaments.length > 0 ? 
+                            `<ul style="margin: 0.5rem 0 0 1rem; color: #1e3b36;">
+                                ${medical.medicaments.map(m => `<li style="margin-bottom: 0.3rem;">• ${escapeHtml(m)}</li>`).join('')}
+                            </ul>` : 
+                            '<p class="info-value">Aucun traitement déclaré</p>'}
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn-primary" onclick="startEditMedical()">
+                        ✏️ Modifier le dossier médical
+                    </button>
+                </div>
+                <div class="info-row" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e0e9e7;">
+                    <span class="info-label">Dernière mise à jour :</span>
+                    <span class="info-value">${escapeHtml(lastUpdate)}${medical.miseAJourPar ? ` par ${escapeHtml(medical.miseAJourPar)}` : ''}</span>
+                </div>
+            `;
+        }
+
+        function displayMedicalEditForm() {
+            return `
+                <form id="medicalForm" class="medical-form" onsubmit="event.preventDefault(); saveMedicalInfo();">
+                    <div class="form-group">
+                        <label>🩸 Groupe sanguin</label>
+                        <select id="groupeSanguin">
+                            <option value="">Non spécifié</option>
+                            <option value="A+" ${medicalFormData.groupeSanguin === 'A+' ? 'selected' : ''}>A+</option>
+                            <option value="A-" ${medicalFormData.groupeSanguin === 'A-' ? 'selected' : ''}>A-</option>
+                            <option value="B+" ${medicalFormData.groupeSanguin === 'B+' ? 'selected' : ''}>B+</option>
+                            <option value="B-" ${medicalFormData.groupeSanguin === 'B-' ? 'selected' : ''}>B-</option>
+                            <option value="AB+" ${medicalFormData.groupeSanguin === 'AB+' ? 'selected' : ''}>AB+</option>
+                            <option value="AB-" ${medicalFormData.groupeSanguin === 'AB-' ? 'selected' : ''}>AB-</option>
+                            <option value="O+" ${medicalFormData.groupeSanguin === 'O+' ? 'selected' : ''}>O+</option>
+                            <option value="O-" ${medicalFormData.groupeSanguin === 'O-' ? 'selected' : ''}>O-</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>⚠️ Allergies</label>
+                        <div class="checkbox-group" id="allergiesCheckboxGroup">
+                            ${commonAllergies.map(allergy => `
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="allergy_${allergy.replace(/\s/g, '_')}" 
+                                           value="${escapeHtml(allergy)}"
+                                           ${medicalFormData.allergies.includes(allergy) ? 'checked' : ''}
+                                           onchange="toggleCheckboxItem('allergies', '${escapeHtml(allergy)}', this.checked)">
+                                    <label for="allergy_${allergy.replace(/\s/g, '_')}">${escapeHtml(allergy)}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="custom-input-group">
+                            <input type="text" id="newAllergy" placeholder="Autre allergie..." 
+                                   onkeypress="if(event.key==='Enter'){addCustomItem('allergies', 'newAllergy');event.preventDefault();}">
+                            <button type="button" onclick="addCustomItem('allergies', 'newAllergy')">Ajouter</button>
+                        </div>
+                        <div id="allergiesCustomList" class="selected-items"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🏥 Conditions médicales</label>
+                        <div class="checkbox-group" id="conditionsCheckboxGroup">
+                            ${commonConditions.map(condition => `
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="condition_${condition.replace(/\s/g, '_')}" 
+                                           value="${escapeHtml(condition)}"
+                                           ${medicalFormData.conditionsMedicales.includes(condition) ? 'checked' : ''}
+                                           onchange="toggleCheckboxItem('conditionsMedicales', '${escapeHtml(condition)}', this.checked)">
+                                    <label for="condition_${condition.replace(/\s/g, '_')}">${escapeHtml(condition)}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="custom-input-group">
+                            <input type="text" id="newCondition" placeholder="Autre condition..." 
+                                   onkeypress="if(event.key==='Enter'){addCustomItem('conditionsMedicales', 'newCondition');event.preventDefault();}">
+                            <button type="button" onclick="addCustomItem('conditionsMedicales', 'newCondition')">Ajouter</button>
+                        </div>
+                        <div id="conditionsMedicalesCustomList" class="selected-items"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>💊 Traitements en cours</label>
+                        <div class="checkbox-group" id="medicamentsCheckboxGroup">
+                            ${commonMedicaments.map(med => `
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="med_${med.replace(/\s/g, '_')}" 
+                                           value="${escapeHtml(med)}"
+                                           ${medicalFormData.medicaments.includes(med) ? 'checked' : ''}
+                                           onchange="toggleCheckboxItem('medicaments', '${escapeHtml(med)}', this.checked)">
+                                    <label for="med_${med.replace(/\s/g, '_')}">${escapeHtml(med)}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="custom-input-group">
+                            <input type="text" id="newMedicament" placeholder="Autre traitement..." 
+                                   onkeypress="if(event.key==='Enter'){addCustomItem('medicaments', 'newMedicament');event.preventDefault();}">
+                            <button type="button" onclick="addCustomItem('medicaments', 'newMedicament')">Ajouter</button>
+                        </div>
+                        <div id="medicamentsCustomList" class="selected-items"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-outline" onclick="cancelEditMedical()">Annuler</button>
+                        <button type="submit" class="btn-primary">💾 Enregistrer</button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function toggleCheckboxItem(type, value, isChecked) {
+            if (isChecked) {
+                if (!medicalFormData[type].includes(value)) {
+                    medicalFormData[type].push(value);
+                }
+            } else {
+                medicalFormData[type] = medicalFormData[type].filter(v => v !== value);
+            }
+            refreshCustomLists();
+        }
+
+        function addCustomItem(type, inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const value = input.value.trim();
+            if (!value) return;
+            if (!medicalFormData[type].includes(value)) {
+                medicalFormData[type].push(value);
+                refreshCustomLists();
+            }
+            input.value = '';
+        }
+
+        function removeCustomItem(type, value) {
+            medicalFormData[type] = medicalFormData[type].filter(v => v !== value);
+            // Décocher la checkbox correspondante si elle existe
+            const checkboxId = `${type}_${value.replace(/\s/g, '_')}`;
+            const checkbox = document.getElementById(checkboxId);
+            if (checkbox) checkbox.checked = false;
+            refreshCustomLists();
+        }
+
+        function refreshCustomLists() {
+            // Rafraîchir les listes personnalisées pour chaque type
+            const types = ['allergies', 'conditionsMedicales', 'medicaments'];
+            types.forEach(type => {
+                const customListContainer = document.getElementById(`${type}CustomList`);
+                if (customListContainer) {
+                    const predefinedItems = type === 'allergies' ? commonAllergies : 
+                                           (type === 'conditionsMedicales' ? commonConditions : commonMedicaments);
+                    const customItems = medicalFormData[type].filter(item => !predefinedItems.includes(item));
+                    
+                    customListContainer.innerHTML = customItems.map(item => `
+                        <span class="selected-tag">
+                            ${escapeHtml(item)}
+                            <span class="selected-tag-remove" onclick="removeCustomItem('${type}', '${escapeHtml(item)}')">×</span>
+                        </span>
+                    `).join('');
+                }
+            });
+        }
+
+        function startEditMedical() {
+            medicalFormData = {
+                groupeSanguin: currentMedicalInfo?.groupeSanguin || '',
+                allergies: [...(currentMedicalInfo?.allergies || [])],
+                conditionsMedicales: [...(currentMedicalInfo?.conditionsMedicales || [])],
+                medicaments: [...(currentMedicalInfo?.medicaments || [])]
+            };
+            isEditingMedical = true;
+            refreshTabContent();
+        }
+
+        function cancelEditMedical() {
+            isEditingMedical = false;
+            refreshTabContent();
+        }
+
+        async function saveMedicalInfo() {
+            const groupeSanguinSelect = document.getElementById('groupeSanguin');
+            const groupeSanguin = groupeSanguinSelect ? groupeSanguinSelect.value : medicalFormData.groupeSanguin;
+            
+            const medicalData = {
+                GroupeSanguin: groupeSanguin || null,
+                Allergies: medicalFormData.allergies,
+                ConditionsMedicales: medicalFormData.conditionsMedicales,
+                Medicaments: medicalFormData.medicaments
+            };
+            
+            console.log('📝 Données à sauvegarder:', medicalData);
+            
+            const success = await updateMedicalInfo(currentEnfant.id || currentEnfant.Id, medicalData);
+            
+            if (success) {
+                isEditingMedical = false;
+                refreshTabContent();
+            }
+        }
+
+        function switchTab(tab, event) {
+            currentTab = tab;
+            isEditingMedical = false;
+            
+            document.querySelectorAll('.details-nav-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            
+            refreshTabContent();
+        }
+
+        function showListeEnfants() {
+            currentView = 'liste';
+            isEditingMedical = false;
+            displayEnfantsList();
+        }
+
+        // Exposer les fonctions globalement
+        window.showListeEnfants = showListeEnfants;
+        window.viewEnfantDetails = viewEnfantDetails;
+        window.switchTab = switchTab;
+        window.handleSearch = handleSearch;
+        window.clearSearch = clearSearch;
+        window.loadEnfants = loadEnfants;
+        window.startEditMedical = startEditMedical;
+        window.cancelEditMedical = cancelEditMedical;
+        window.toggleCheckboxItem = toggleCheckboxItem;
+        window.addCustomItem = addCustomItem;
+        window.removeCustomItem = removeCustomItem;
+        window.saveMedicalInfo = saveMedicalInfo;
+    </script>
+</body>
+</html>

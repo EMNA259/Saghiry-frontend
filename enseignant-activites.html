@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des activités</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            padding: 24px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #4ca896;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #3d8a7f;
+            transform: translateX(-4px);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .page-title-icon {
+            font-size: 2rem;
+        }
+
+        .page-subtitle {
+            color: #5a9d91;
+            margin-bottom: 28px;
+            font-size: 0.95rem;
+        }
+
+        .remplacement-badge {
+            background: #ff9466;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .info-banner {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            border-radius: 20px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .info-banner-content h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .info-banner-content h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .info-banner-content p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        .info-banner-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 12px 24px;
+            border-radius: 40px;
+            text-align: center;
+        }
+
+        .info-banner-badge .label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .info-banner-badge .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e9e7;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .form-section {
+            padding: 28px;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3d5a54;
+            margin-bottom: 8px;
+        }
+
+        .form-group label .required {
+            color: #ff9466;
+            margin-left: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e9e7;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .form-control:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .file-upload {
+            border: 2px dashed #e0e9e7;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+        }
+
+        .file-upload.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-upload:hover:not(.disabled) {
+            border-color: #4ca896;
+            background: #f0f9f7;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .file-upload-text {
+            color: #5a9d91;
+            font-size: 0.85rem;
+        }
+
+        .file-name {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: #e0e9e7;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #1e3b36;
+            display: inline-block;
+        }
+
+        .activites-list {
+            margin-top: 20px;
+        }
+
+        .activite-item {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e9e7;
+            transition: all 0.2s ease;
+        }
+
+        .activite-item:hover {
+            border-color: #4ca896;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .activite-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .activite-titre {
+            font-weight: 700;
+            color: #1e3b36;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activite-type {
+            background: #4ca896;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .activite-type.devoir {
+            background: #ff9466;
+        }
+
+        .activite-type.projet {
+            background: #4ca896;
+        }
+
+        .activite-type.examen {
+            background: #1e3b36;
+        }
+
+        .activite-type.exercice {
+            background: #5a9d91;
+        }
+
+        .activite-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+            color: #5a9d91;
+        }
+
+        .activite-details span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .activite-description {
+            color: #3d5a54;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .activite-stats {
+            display: flex;
+            gap: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e0e9e7;
+            font-size: 0.75rem;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            border: 1px solid #e0e9e7;
+            color: #3d5a54;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            border-color: #4ca896;
+            background: #f0f9f7;
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #4ca896;
+            border-color: #4ca896;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #3d8a7f;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #fff;
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #fff0f0;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            border: 1px solid #e0e9e7;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e3b36;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            color: #5a9d91;
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast-message {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e3b36;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-message.success {
+            background: #4ca896;
+        }
+
+        .toast-message.error {
+            background: #ff6b6b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 28px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-header h3 {
+            color: #1e3b36;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #5a9d91;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        /* Conversation styles améliorés */
+        .conversation-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 20px;
+        }
+
+        .conversation-message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .conversation-message.parent {
+            justify-content: flex-end;
+        }
+
+        .conversation-message.enseignant {
+            justify-content: flex-start;
+        }
+
+        .message-card {
+            max-width: 70%;
+            border-radius: 20px;
+            padding: 12px 16px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .conversation-message.parent .message-card {
+            background: #4ca896;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .conversation-message.enseignant .message-card {
+            background: white;
+            color: #1e3b36;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e0e9e7;
+        }
+
+        .message-sender {
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .conversation-message.parent .message-sender {
+            justify-content: flex-end;
+        }
+
+        .sender-name {
+            font-weight: 600;
+        }
+
+        .sender-badge {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.6rem;
+        }
+
+        .conversation-message.parent .sender-badge {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .message-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-break: break-word;
+            margin-bottom: 6px;
+        }
+
+        .message-time {
+            font-size: 0.6rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .message-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .message-actions button {
+            background: none;
+            border: none;
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 16px;
+            transition: all 0.2s;
+        }
+
+        .message-actions .reply-btn {
+            color: #4ca896;
+            background: #e0f2f1;
+        }
+
+        .message-actions .reply-btn:hover {
+            background: #4ca896;
+            color: white;
+        }
+
+        .message-actions .edit-btn {
+            color: #ff9466;
+            background: #fff3e0;
+        }
+
+        .message-actions .delete-btn {
+            color: #ff6b6b;
+            background: #ffebee;
+        }
+
+        .reply-area {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #e0e9e7;
+            display: none;
+        }
+
+        .reply-area.active {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .reply-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e0e9e7;
+            border-radius: 20px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        .reply-input:focus {
+            outline: none;
+            border-color: #4ca896;
+        }
+
+        .reply-preview {
+            font-size: 0.7rem;
+            color: #4ca896;
+            margin-bottom: 8px;
+            padding: 4px 12px;
+            background: #e0f2f1;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .discussion-closed {
+            text-align: center;
+            padding: 1rem;
+            background: #fff3e0;
+            border-radius: 12px;
+            color: #ff9466;
+        }
+
+        .depots-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .depot-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid #e0e9e7;
+        }
+
+        .depot-eleve {
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 0.5rem;
+        }
+
+        .depot-files {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .depot-file {
+            background: #e0e9e7;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .depot-file a {
+            color: #1e3b36;
+            text-decoration: none;
+        }
+
+        .depot-file a:hover {
+            color: #4ca896;
+            text-decoration: underline;
+        }
+
+        .depot-note {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .depot-note input {
+            width: 70px;
+            padding: 0.3rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-info {
+            background: #e0f2f1;
+            color: #4ca896;
+            border-left: 4px solid #4ca896;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-consultation {
+            background: #e8f4f1;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #95a5a6;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            .form-section {
+                padding: 20px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .message-card {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <a href="enseignant-matieres.html" class="back-link">← Retour à mes matières</a>
+        <div class="page-title">
+            <span class="page-title-icon">📋</span>
+            Gestion des activités
+            <span id="remplacementBadge" style="display: none;" class="remplacement-badge"></span>
+        </div>
+        <div class="page-subtitle">Créez, modifiez et suivez les activités de vos élèves</div>
+    </div>
+
+    <div id="infoConsultation" style="display: none;" class="info-consultation"></div>
+
+    <div class="info-banner">
+        <div class="info-banner-content">
+            <h3>📌 Activité pour</h3>
+            <h2 id="matiereNom">Chargement...</h2>
+            <p>Classe : <span id="classeNomDisplay">-</span> | Niveau : <span id="niveauDisplay">-</span></p>
+        </div>
+        <div class="info-banner-badge">
+            <div class="label">Coefficient par défaut</div>
+            <div class="value" id="coefficient">-</div>
+        </div>
+    </div>
+
+    <div class="form-container" id="createFormContainer">
+        <div class="form-section">
+            <div class="section-title">✏️ Nouvelle activité</div>
+            <div class="form-group">
+                <label>Titre <span class="required">*</span></label>
+                <input type="text" class="form-control" id="titre" placeholder="Ex: Devoir sur les fractions">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Type <span class="required">*</span></label>
+                    <select class="form-control" id="type">
+                        <option value="devoir">📝 Devoir</option>
+                        <option value="projet">🚀 Projet</option>
+                        <option value="examen">📊 Examen</option>
+                        <option value="exercice">✏️ Exercice</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Coefficient <span class="required">*</span></label>
+                    <input type="number" class="form-control" id="coefficientInput" value="1" step="0.5" min="0.5">
+                </div>
+                <div class="form-group">
+                    <label>Date limite <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="dateLimite">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description <span class="required">*</span></label>
+                <textarea class="form-control" id="description" placeholder="Décrivez l'activité..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Fichier joint</label>
+                <div class="file-upload" id="fileUploadDiv" onclick="document.getElementById('fileInput').click()">
+                    <div class="file-upload-icon">📎</div>
+                    <div class="file-upload-text">Cliquez pour joindre un fichier</div>
+                    <input type="file" id="fileInput">
+                </div>
+                <div id="fileNameDisplay" style="display:none;">
+                    <span class="file-name" id="selectedFileName"></span>
+                    <button class="btn-action" style="padding:4px 8px;margin-left:8px;" onclick="supprimerFichier()">✖</button>
+                </div>
+            </div>
+            <div class="form-actions" id="formActions">
+                <button class="btn-action" onclick="resetForm()">Annuler</button>
+                <button class="btn-action btn-primary" id="creerBtn" onclick="creerActivite()">✨ Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="form-section">
+            <div class="section-title">
+                📚 Activités existantes
+                <button class="btn-action" style="margin-left:auto;padding:6px 12px;" onclick="chargerActivites()">🔄 Actualiser</button>
+            </div>
+            <div id="activitesList"><div class="loader"><div class="spinner"></div></div></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="detailModalTitle">Détail de l'activité</h3>
+                <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <div class="loader"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✏️ Modifier l'activité</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Titre</label>
+                    <input type="text" class="form-control" id="editTitre">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select class="form-control" id="editType">
+                            <option value="devoir">Devoir</option>
+                            <option value="projet">Projet</option>
+                            <option value="examen">Examen</option>
+                            <option value="exercice">Exercice</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Coefficient</label>
+                        <input type="number" class="form-control" id="editCoefficient" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Date limite</label>
+                        <input type="date" class="form-control" id="editDateLimite">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" id="editDescription" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select class="form-control" id="editStatut">
+                        <option value="assigné">Assigné</option>
+                        <option value="en cours">En cours</option>
+                        <option value="terminé">Terminé</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action" onclick="closeEditModal()">Annuler</button>
+                <button class="btn-action btn-primary" onclick="updateActivite()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        const params = new URLSearchParams(window.location.search);
+        const matiereId = params.get('matiereId');
+        const matiereNom = decodeURIComponent(params.get('matiereNom') || '');
+        const classeId = params.get('classeId');
+        const classeNom = decodeURIComponent(params.get('classeNom') || '');
+        const niveau = decodeURIComponent(params.get('niveau') || '');
+        const coef = params.get('coefficient') || 1;
+        let selectedFile = null;
+        let userRole = null;
+        let remplacementComplet = true;
+        let isReadOnly = false;
+        let currentDetailActivite = null;
+        let currentDetailActiviteId = null;
+
+        // ✅ Fonction pour formater le nom de la classe: niveau + " A " + nom
+        function formatClasseName(classeNom, niveau) {
+            if (!classeNom && !niveau) return 'Classe';
+            
+            // Extraire le numéro de la classe du nom
+            let classeNumber = '';
+            if (classeNom) {
+                const match = classeNom.match(/\d+$/);
+                if (match) {
+                    classeNumber = match[0];
+                } else if (/^\d+$/.test(classeNom)) {
+                    classeNumber = classeNom;
+                } else {
+                    classeNumber = classeNom;
+                }
+            }
+            
+            // Formater: niveau + " A " + numéro
+            if (niveau && niveau !== 'Non défini' && niveau !== '' && classeNumber) {
+                return `${niveau} A ${classeNumber}`;
+            } else if (niveau && niveau !== 'Non défini' && niveau !== '') {
+                return niveau;
+            } else if (classeNumber) {
+                return classeNumber;
+            }
+            return classeNom || 'Classe';
+        }
+
+        function getToken() { return localStorage.getItem('authToken') || sessionStorage.getItem('authToken'); }
+        function getUser() {
+            try {
+                const u = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                return u ? JSON.parse(u) : null;
+            } catch(e) { return null; }
+        }
+        function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        
+        function showToast(msg, type='success') {
+            const t=document.createElement('div');
+            t.className=`toast-message ${type}`;
+            t.textContent=msg;
+            document.body.appendChild(t);
+            setTimeout(()=>t.remove(),3000);
+        }
+
+        function formatDate(d) { return d ? new Date(d).toLocaleDateString('fr-FR') : 'Non définie'; }
+        function formatDateTime(d) { return d ? new Date(d).toLocaleString('fr-FR') : 'Non définie'; }
+        function formatDateInput(d) { return d ? new Date(d).toISOString().split('T')[0] : ''; }
+
+        function getTypeIcon(t) {
+            switch(t) {
+                case 'devoir': return '📝';
+                case 'projet': return '🚀';
+                case 'examen': return '📊';
+                default: return '📋';
+            }
+        }
+
+        function getTypeClass(t) {
+            switch(t) {
+                case 'devoir': return 'devoir';
+                case 'projet': return 'projet';
+                case 'examen': return 'examen';
+                default: return 'devoir';
+            }
+        }
+
+        function getStatutBadge(statut, dateLimite) {
+            const now = new Date();
+            const limite = new Date(dateLimite);
+            if(statut === 'terminé') return '<span style="color:#4ca896;">✅ Terminé</span>';
+            if(limite < now) return '<span style="color:#ff6b6b;">⏰ Date dépassée</span>';
+            if(statut === 'en cours') return '<span style="color:#ff9466;">🔄 En cours</span>';
+            return '<span style="color:#5a9d91;">⚪ Assigné</span>';
+        }
+
+        function extractId(obj) {
+            if (!obj) return null;
+            if (typeof obj === 'string') return obj;
+            if (obj.$oid) return obj.$oid;
+            if (obj._id) return extractId(obj._id);
+            if (obj.Id) return obj.Id;
+            return null;
+        }
+
+        async function chargerInfosUtilisateur() {
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/utilisateurs/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    userRole = (data.role || data.Role || '').toLowerCase();
+                    remplacementComplet = data.remplacementComplet !== false;
+                    isReadOnly = (userRole === 'permanent' || userRole === 'vacataire') && !remplacementComplet;
+                    
+                    const badge = document.getElementById('remplacementBadge');
+                    const createFormContainer = document.getElementById('createFormContainer');
+                    const infoConsultation = document.getElementById('infoConsultation');
+                    
+                    if (isReadOnly) {
+                        badge.style.display = 'inline-block';
+                        badge.textContent = '📖 Mode consultation';
+                        badge.style.background = '#95a5a6';
+                        if (createFormContainer) createFormContainer.style.display = 'none';
+                        infoConsultation.style.display = 'flex';
+                        infoConsultation.innerHTML = `<i>📖</i><div><strong>Mode consultation seule</strong><br>Vous pouvez consulter les activités mais pas en créer/modifier.</div>`;
+                    } else if (userRole === 'permanent' || userRole === 'vacataire') {
+                        badge.style.display = 'inline-block';
+                        badge.textContent = '✏️ Mode édition (remplacement complet)';
+                        badge.style.background = '#4ca896';
+                    }
+                }
+            } catch (error) {
+                console.warn("Impossible de récupérer les infos utilisateur:", error);
+            }
+        }
+
+        function resetForm() {
+            if (isReadOnly) return;
+            document.getElementById('titre').value='';
+            document.getElementById('type').value='devoir';
+            document.getElementById('coefficientInput').value=coef;
+            document.getElementById('description').value='';
+            document.getElementById('dateLimite').value='';
+            supprimerFichier();
+        }
+
+        function supprimerFichier() {
+            document.getElementById('fileInput').value='';
+            document.getElementById('fileNameDisplay').style.display='none';
+            selectedFile=null;
+        }
+
+        async function chargerActivites() {
+            const container = document.getElementById('activitesList');
+            container.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+            
+            try {
+                const token = getToken();
+                if(!matiereId || !classeId) {
+                    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Paramètres manquants</div></div>`;
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/Activite`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const result = await response.json();
+                let activites = [];
+                if(result.Data && Array.isArray(result.Data)) activites = result.Data;
+                else if(result.data && Array.isArray(result.data)) activites = result.data;
+                else if(Array.isArray(result)) activites = result;
+                
+                const filtrees = activites.filter(a => {
+                    const aMatiereId = extractId(a.MatiereId || a.matiereId || a.Matiere || a.matiere);
+                    const aClasseId = extractId(a.ClasseId || a.classeId || a.Classe || a.classe);
+                    return aMatiereId === matiereId && aClasseId === classeId;
+                });
+                
+                if(filtrees.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">Aucune activité</div></div>`;
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="activites-list">
+                        ${filtrees.map(a => {
+                            const id = a.Id || a.id || a._id;
+                            const titre = a.Titre || a.titre || '';
+                            const type = a.Type || a.type || 'devoir';
+                            const description = a.Description || a.description || '';
+                            const dateLimite = a.DateLimite || a.dateLimite;
+                            const coefficient = a.Coefficient || a.coefficient || 1;
+                            const statut = a.Statut || a.statut || 'assigné';
+                            const fichierJoint = a.FichierJoint || a.fichierJoint;
+                            const soumissions = a.Soumissions || a.soumissions || [];
+                            const discussionCount = (a.Discussion || a.discussion)?.length || 0;
+                            const depotsCount = (a.DepotsTravail || a.depotsTravail)?.length || 0;
+                            
+                            return `
+                            <div class="activite-item">
+                                <div class="activite-header">
+                                    <div class="activite-titre">${getTypeIcon(type)} ${escapeHtml(titre)}</div>
+                                    <span class="activite-type ${getTypeClass(type)}">${type?.toUpperCase() || 'ACTIVITÉ'}</span>
+                                </div>
+                                <div class="activite-details">
+                                    <span>📅 Date limite: ${formatDate(dateLimite)}</span>
+                                    <span>⚖️ Coefficient: ${coefficient}</span>
+                                    <span>📊 ${getStatutBadge(statut, dateLimite)}</span>
+                                </div>
+                                <div class="activite-description">${escapeHtml(description?.substring(0, 200) || 'Aucune description')}${description?.length > 200 ? '...' : ''}</div>
+                                <div class="activite-stats">
+                                    <span>📎 ${fichierJoint ? 'Fichier joint' : 'Sans fichier'}</span>
+                                    <span>👥 Soumissions: ${soumissions?.length || 0}</span>
+                                    <span>💬 Messages: ${discussionCount}</span>
+                                    <span>📦 Dépôts: ${depotsCount}</span>
+                                </div>
+                                <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                                    <button class="btn-action" style="padding:6px 12px; background:#4ca896; color:white;" onclick="voirDetailActivite('${id}')">💬 Voir messages (${discussionCount}) & dépôts (${depotsCount})</button>
+                                    ${!isReadOnly ? `
+                                        <button class="btn-action" style="padding:6px 12px;" onclick="modifierActivite('${id}')">✏️ Modifier</button>
+                                        <button class="btn-action btn-danger" style="padding:6px 12px;" onclick="supprimerActivite('${id}')">🗑️ Supprimer</button>
+                                    ` : '<span style="color:#95a5a6;">🔒 Consultation seule</span>'}
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                `;
+            } catch(error) {
+                console.error(error);
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur</div><button class="btn-action btn-primary" onclick="chargerActivites()">Réessayer</button></div>`;
+            }
+        }
+
+        function telechargerFichier(nomFichier) {
+            const contenu = `Contenu du fichier: ${nomFichier}\n\nCeci est une simulation de téléchargement.\nDans l'application réelle, le fichier serait récupéré depuis le serveur.`;
+            const blob = new Blob([contenu], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomFichier;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Téléchargement de ${nomFichier} démarré`, 'success');
+        }
+
+        async function voirDetailActivite(activiteId) {
+            const modal = document.getElementById('detailModal');
+            const modalBody = document.getElementById('detailModalBody');
+            modalBody.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+            modal.classList.add('active');
+            currentDetailActiviteId = activiteId;
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                const activite = result.Data || result.data || result;
+                currentDetailActivite = activite;
+                
+                const titre = activite.Titre || activite.titre || 'Sans titre';
+                const type = activite.Type || activite.type || 'devoir';
+                const description = activite.Description || activite.description || '';
+                const dateLimite = activite.DateLimite || activite.dateLimite;
+                const statut = activite.Statut || activite.statut || 'assigné';
+                const coefficient = activite.Coefficient || activite.coefficient || 1;
+                const fichierJoint = activite.FichierJoint || activite.fichierJoint;
+                
+                let discussion = activite.Discussion || activite.discussion || [];
+                const depots = activite.DepotsTravail || activite.depotsTravail || [];
+                const dateDepassee = dateLimite ? new Date(dateLimite) < new Date() : false;
+                
+                document.getElementById('detailModalTitle').innerHTML = `${getTypeIcon(type)} ${escapeHtml(titre)}`;
+                
+                modalBody.innerHTML = `
+                    <div class="activite-info">
+                        <div style="margin-bottom:1rem;">
+                            <span class="type-badge ${type}">${type.toUpperCase()}</span>
+                            <span class="statut-badge" style="margin-left:0.5rem;">${statut}</span>
+                            <span style="margin-left:0.5rem;">📅 Limite: ${formatDate(dateLimite)}</span>
+                            <span style="margin-left:0.5rem;">⚖️ Coef: ${coefficient}</span>
+                        </div>
+                        ${description ? `<div class="activite-description">📝 ${escapeHtml(description)}</div>` : ''}
+                        ${fichierJoint ? `<div class="alert alert-info">📎 Fichier joint: ${escapeHtml(fichierJoint)}</div>` : ''}
+                    </div>
+                    
+                    <div class="depot-section">
+                        <div class="section-title">📦 Travaux déposés par les élèves (${depots.length})</div>
+                        <div id="depotsList" class="depots-list"></div>
+                    </div>
+                    
+                    <div class="depot-section">
+                        <div class="section-title">💬 Conversation avec les parents (${discussion.length} message(s))</div>
+                        <div id="conversationContainer" class="conversation-container"></div>
+                        ${!dateDepassee ? `
+                            <div style="margin-top: 20px;">
+                                <div class="reply-preview">📝 Nouveau message</div>
+                                <div class="message-input-area">
+                                    <textarea id="generalMessageInput" class="message-input" rows="2" placeholder="Écrivez votre message..."></textarea>
+                                    <button class="btn-primary" onclick="repondreMessageGeneral()" style="align-self:flex-end;">✉️ Envoyer</button>
+                                </div>
+                            </div>
+                        ` : '<div class="discussion-closed">🔒 Discussion fermée (date limite dépassée)</div>'}
+                    </div>
+                `;
+                
+                // Afficher les dépôts
+                const depotsContainer = document.getElementById('depotsList');
+                if (depots.length === 0) {
+                    depotsContainer.innerHTML = '<div style="text-align:center;color:#5a9d91;padding:1rem;">📭 Aucun travail déposé pour le moment</div>';
+                } else {
+                    depotsContainer.innerHTML = depots.map(depot => {
+                        const eleveNom = depot.eleveNom || depot.EleveNom || 'Élève';
+                        const fichiers = depot.fichiers || depot.Fichiers || [];
+                        const commentaire = depot.commentaire || depot.Commentaire || '';
+                        const dateDepot = depot.dateDepot || depot.DateDepot;
+                        const note = depot.note || depot.Note;
+                        const eleveId = depot.eleveId || depot.EleveId;
+                        
+                        return `
+                            <div class="depot-item">
+                                <div class="depot-eleve">👨‍🎓 ${escapeHtml(eleveNom)}</div>
+                                <div class="depot-files">
+                                    ${fichiers.length > 0 
+                                        ? fichiers.map(f => `<span class="depot-file">📄 <a href="#" onclick="telechargerFichier('${escapeHtml(f)}'); return false;">${escapeHtml(f)}</a></span>`).join('') 
+                                        : '<span class="depot-file">Aucun fichier</span>'}
+                                </div>
+                                ${commentaire ? `<div><strong>Commentaire:</strong> ${escapeHtml(commentaire)}</div>` : ''}
+                                <div><strong>Déposé le:</strong> ${formatDateTime(dateDepot)}</div>
+                                <div class="depot-note">
+                                    <strong>⭐ Note:</strong>
+                                    <input type="number" id="note_${eleveId}" value="${note || ''}" step="0.5" min="0" max="20" style="width:70px;">
+                                    <button class="btn-action" style="padding:4px 12px;" onclick="noterDepot('${activiteId}', '${eleveId}')">Enregistrer</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // Afficher la conversation
+                const conversationContainer = document.getElementById('conversationContainer');
+                if (discussion.length === 0) {
+                    conversationContainer.innerHTML = '<div style="text-align:center;color:#5a9d91;padding:2rem;">💬 Aucun message pour le moment</div>';
+                } else {
+                    conversationContainer.innerHTML = discussion.map(msg => {
+                        const auteurRole = msg.auteurRole || msg.AuteurRole || 'inconnu';
+                        const auteurNom = msg.auteurNom || msg.AuteurNom || 'Anonyme';
+                        const messageTexte = msg.message || msg.Message || '';
+                        const dateMessage = msg.dateMessage || msg.DateMessage;
+                        const messageId = msg.id || msg.Id;
+                        const isOwnMessage = auteurRole === 'enseignant';
+                        
+                        const roleLabel = auteurRole === 'parent' ? 'Parent' : 'Enseignant';
+                        const roleIcon = auteurRole === 'parent' ? '👨‍👩‍👧' : '👨‍🏫';
+                        
+                        return `
+                            <div class="conversation-message ${auteurRole === 'parent' ? 'parent' : 'enseignant'}">
+                                <div class="message-card">
+                                    <div class="message-sender">
+                                        <span class="sender-name">${escapeHtml(auteurNom)}</span>
+                                        <span class="sender-badge">${roleIcon} ${roleLabel}</span>
+                                    </div>
+                                    <div class="message-content">${escapeHtml(messageTexte)}</div>
+                                    <div class="message-time">${formatDateTime(dateMessage)}</div>
+                                    ${!dateDepassee ? `
+                                        <div class="message-actions">
+                                            ${auteurRole === 'parent' ? `<button class="reply-btn" onclick="repondreAParent('${activiteId}', '${escapeHtml(auteurNom).replace(/'/g, "\\'")}', '${messageId}')">💬 Répondre</button>` : ''}
+                                            ${isOwnMessage ? `<button class="edit-btn" onclick="modifierMessageEnseignant('${activiteId}', '${messageId}', '${escapeHtml(messageTexte).replace(/'/g, "\\'")}')">✏️ Modifier</button>` : ''}
+                                            ${isOwnMessage ? `<button class="delete-btn" onclick="supprimerMessageEnseignant('${activiteId}', '${messageId}')">🗑️ Supprimer</button>` : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    conversationContainer.scrollTop = conversationContainer.scrollHeight;
+                }
+            } catch(e) {
+                console.error('Erreur dans voirDetailActivite:', e);
+                modalBody.innerHTML = `<div class="alert alert-warning">Erreur: ${e.message}</div>`;
+            }
+        }
+        
+        async function repondreAParent(activiteId, parentName, messageId) {
+            const replyMessage = prompt(`Répondre à ${parentName}:`, "");
+            if (!replyMessage) return;
+            
+            try {
+                const token = getToken();
+                const user = getUser();
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/discussion`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        auteurId: user?.id || 'enseignant',
+                        auteurNom: `${user?.prenom || ''} ${user?.nom || ''}`.trim() || 'Enseignant',
+                        auteurRole: 'enseignant',
+                        message: replyMessage
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast(`Message envoyé à ${parentName} !`, 'success');
+                    await voirDetailActivite(activiteId);
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau: ' + e.message, 'error');
+            }
+        }
+        
+        async function repondreMessageGeneral() {
+            const messageInput = document.getElementById('generalMessageInput');
+            const message = messageInput.value.trim();
+            if (!message) {
+                showToast('Veuillez écrire un message', 'error');
+                return;
+            }
+            
+            const btn = document.querySelector('#generalMessageInput + .btn-primary');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ Envoi...';
+            
+            try {
+                const token = getToken();
+                const user = getUser();
+                const response = await fetch(`${API_BASE}/Activite/${currentDetailActiviteId}/discussion`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        auteurId: user?.id || 'enseignant',
+                        auteurNom: `${user?.prenom || ''} ${user?.nom || ''}`.trim() || 'Enseignant',
+                        auteurRole: 'enseignant',
+                        message: message
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('Message envoyé !', 'success');
+                    messageInput.value = '';
+                    await voirDetailActivite(currentDetailActiviteId);
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+        
+        async function noterDepot(activiteId, eleveId) {
+            const noteInput = document.getElementById(`note_${eleveId}`);
+            const note = parseFloat(noteInput.value);
+            if (isNaN(note)) {
+                showToast('Veuillez entrer une note valide', 'error');
+                return;
+            }
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/depot/eleve/${eleveId}/note`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(note)
+                });
+                
+                if (response.ok) {
+                    showToast('Note enregistrée !', 'success');
+                    await voirDetailActivite(activiteId);
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+        
+        async function modifierMessageEnseignant(activiteId, messageId, oldMessage) {
+            const nouveauMessage = prompt("Modifier votre message:", oldMessage);
+            if (!nouveauMessage || nouveauMessage === oldMessage) return;
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/discussion/${messageId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: nouveauMessage })
+                });
+                
+                if (response.ok) {
+                    showToast('Message modifié !', 'success');
+                    await voirDetailActivite(activiteId);
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+        
+        async function supprimerMessageEnseignant(activiteId, messageId) {
+            if (!confirm('Supprimer ce message ?')) return;
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/discussion/${messageId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    showToast('Message supprimé !', 'success');
+                    await voirDetailActivite(activiteId);
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+        
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+            currentDetailActivite = null;
+            currentDetailActiviteId = null;
+        }
+
+        async function creerActivite() {
+            if (isReadOnly) {
+                showToast("Mode consultation seule - vous ne pouvez pas créer d'activité", "error");
+                return;
+            }
+            
+            const titre = document.getElementById('titre').value.trim();
+            const type = document.getElementById('type').value;
+            const coeff = parseFloat(document.getElementById('coefficientInput').value);
+            const description = document.getElementById('description').value.trim();
+            const dateLimite = document.getElementById('dateLimite').value;
+            
+            if(!titre) { showToast('Titre requis', 'error'); return; }
+            if(!description) { showToast('Description requise', 'error'); return; }
+            if(!dateLimite) { showToast('Date limite requise', 'error'); return; }
+            
+            const user = getUser();
+            const token = getToken();
+            if(!user?.id) { showToast('Non authentifié', 'error'); return; }
+            
+            const btn = document.getElementById('creerBtn');
+            const original = btn.textContent;
+            btn.textContent = '⏳ Création...';
+            btn.disabled = true;
+            
+            const data = {
+                Titre: titre,
+                Description: description,
+                DateLimite: new Date(dateLimite).toISOString(),
+                DateAssignation: new Date().toISOString(),
+                Statut: "assigné",
+                Coefficient: coeff,
+                Type: type,
+                FichierJoint: selectedFile ? selectedFile.name : null,
+                MatiereId: matiereId,
+                ClasseId: classeId,
+                EnseignantId: user.id,
+                Soumissions: [],
+                Discussion: [],
+                DepotsTravail: []
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/Activite`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if(response.ok) {
+                    showToast('✅ Activité créée!', 'success');
+                    resetForm();
+                    await chargerActivites();
+                } else {
+                    const err = await response.text();
+                    showToast('Erreur: ' + err, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            } finally {
+                btn.textContent = original;
+                btn.disabled = false;
+            }
+        }
+
+        async function modifierActivite(id) {
+            if (isReadOnly) {
+                showToast("Mode consultation seule - vous ne pouvez pas modifier d'activité", "error");
+                return;
+            }
+            
+            const token = getToken();
+            try {
+                const response = await fetch(`${API_BASE}/Activite/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                const a = result.Data || result.data || result;
+                
+                document.getElementById('editId').value = id;
+                document.getElementById('editTitre').value = a.Titre || a.titre || '';
+                document.getElementById('editType').value = a.Type || a.type || 'devoir';
+                document.getElementById('editCoefficient').value = a.Coefficient || a.coefficient || 1;
+                document.getElementById('editDateLimite').value = formatDateInput(a.DateLimite || a.dateLimite);
+                document.getElementById('editDescription').value = a.Description || a.description || '';
+                document.getElementById('editStatut').value = a.Statut || a.statut || 'assigné';
+                
+                document.getElementById('editModal').classList.add('active');
+            } catch(e) {
+                showToast('Erreur chargement', 'error');
+            }
+        }
+
+        async function updateActivite() {
+            if (isReadOnly) {
+                showToast("Mode consultation seule - vous ne pouvez pas modifier d'activité", "error");
+                closeEditModal();
+                return;
+            }
+            
+            const id = document.getElementById('editId').value;
+            const token = getToken();
+            
+            const data = {
+                Titre: document.getElementById('editTitre').value,
+                Type: document.getElementById('editType').value,
+                Coefficient: parseFloat(document.getElementById('editCoefficient').value),
+                DateLimite: new Date(document.getElementById('editDateLimite').value).toISOString(),
+                Description: document.getElementById('editDescription').value,
+                Statut: document.getElementById('editStatut').value,
+                UpdatedAt: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/Activite/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if(response.ok) {
+                    showToast('✅ Modifié!', 'success');
+                    closeEditModal();
+                    await chargerActivites();
+                } else {
+                    showToast('Erreur modification', 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        async function supprimerActivite(id) {
+            if (isReadOnly) {
+                showToast("Mode consultation seule - vous ne pouvez pas supprimer d'activité", "error");
+                return;
+            }
+            
+            if(!confirm('Supprimer cette activité ?')) return;
+            const token = getToken();
+            try {
+                const response = await fetch(`${API_BASE}/Activite/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(response.ok) {
+                    showToast('✅ Supprimé!', 'success');
+                    await chargerActivites();
+                } else {
+                    showToast('Erreur suppression', 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+        async function init() {
+            await chargerInfosUtilisateur();
+            
+            if(!matiereId || !classeId) {
+                showToast('Paramètres manquants', 'error');
+                setTimeout(()=> window.location.href='enseignant-matieres.html', 2000);
+                return;
+            }
+            
+            // ✅ Formater le nom de la classe pour l'affichage
+            const formattedClasseName = formatClasseName(classeNom, niveau);
+            
+            document.getElementById('matiereNom').textContent = matiereNom;
+            document.getElementById('classeNomDisplay').textContent = formattedClasseName;
+            document.getElementById('niveauDisplay').textContent = niveau;
+            document.getElementById('coefficient').textContent = coef;
+            document.getElementById('coefficientInput').value = coef;
+            
+            const today = new Date();
+            const nextWeek = new Date(today);
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            document.getElementById('dateLimite').min = today.toISOString().split('T')[0];
+            document.getElementById('dateLimite').value = nextWeek.toISOString().split('T')[0];
+            
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                if(e.target.files?.[0]) {
+                    selectedFile = e.target.files[0];
+                    document.getElementById('selectedFileName').textContent = selectedFile.name;
+                    document.getElementById('fileNameDisplay').style.display = 'block';
+                }
+            });
+            
+            if (isReadOnly) {
+                const fileUploadDiv = document.getElementById('fileUploadDiv');
+                if (fileUploadDiv) fileUploadDiv.classList.add('disabled');
+                const inputs = document.querySelectorAll('#createFormContainer input, #createFormContainer select, #createFormContainer textarea');
+                inputs.forEach(input => input.disabled = true);
+                const buttons = document.querySelectorAll('#formActions button');
+                buttons.forEach(btn => btn.disabled = true);
+            }
+            
+            chargerActivites();
+        }
+        
+        document.addEventListener('DOMContentLoaded', init);
+        
+        window.creerActivite = creerActivite;
+        window.resetForm = resetForm;
+        window.supprimerFichier = supprimerFichier;
+        window.modifierActivite = modifierActivite;
+        window.updateActivite = updateActivite;
+        window.supprimerActivite = supprimerActivite;
+        window.chargerActivites = chargerActivites;
+        window.closeEditModal = closeEditModal;
+        window.voirDetailActivite = voirDetailActivite;
+        window.closeDetailModal = closeDetailModal;
+        window.repondreAParent = repondreAParent;
+        window.repondreMessageGeneral = repondreMessageGeneral;
+        window.noterDepot = noterDepot;
+        window.modifierMessageEnseignant = modifierMessageEnseignant;
+        window.supprimerMessageEnseignant = supprimerMessageEnseignant;
+        window.telechargerFichier = telechargerFichier;
+    </script>
+</body>
+</html>

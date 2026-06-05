@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Saisie des notes</title>
+    <style>
+        /* ============ VARIABLES SAGHIRY ============ */
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            border-radius: 24px;
+            padding: 2rem 2.5rem;
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title-icon {
+            font-size: 2.2rem;
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .info-card h3 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .info-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .remplacement-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .stats-badge {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(255, 148, 102, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 148, 102, 0.3);
+        }
+
+        .stats-badge .number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stats-badge .label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .info-message {
+            background: #e3f2fd;
+            padding: 0.75rem 1rem;
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: #1976d2;
+            border-left: 3px solid #2196f3;
+            transition: all 0.3s ease;
+        }
+
+        .notes-table-container {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background: var(--gray-bg);
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--gray-border);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--gray-border);
+            vertical-align: middle;
+            transition: all 0.2s ease;
+        }
+
+        tr:hover td {
+            background: rgba(76, 168, 150, 0.03);
+        }
+
+        .eleve-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .eleve-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(76, 168, 150, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        tr:hover .eleve-avatar {
+            transform: scale(1.05);
+        }
+
+        .eleve-nom {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .eleve-prenom {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 0.15rem;
+        }
+
+        .notes-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .note-field {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            background: var(--gray-bg);
+            padding: 0.6rem 0.8rem;
+            border-radius: 12px;
+            transition: all 0.2s;
+            border: 1px solid var(--gray-border);
+            position: relative;
+        }
+
+        .note-field:hover {
+            background: white;
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .note-field.test-note {
+            background: #fff8e7;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        .note-field.modified {
+            background: #fff3e0;
+            border-left: 3px solid var(--accent-orange);
+            animation: pulse 0.5s ease;
+        }
+
+        .note-field.readonly {
+            background: #f0f0f0;
+            opacity: 0.8;
+            border-left: 3px solid #95a5a6;
+        }
+
+        .note-field.readonly input,
+        .note-field.readonly select,
+        .note-field.readonly button {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0%, 100% { background: #fff3e0; }
+            50% { background: #ffe4b5; }
+        }
+
+        .note-input {
+            width: 80px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-border);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .note-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+            transform: scale(1.02);
+        }
+
+        .coeff-input {
+            width: 70px;
+            padding: 0.5rem 0.6rem;
+            border: 1px solid var(--gray-border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+            background: white;
+        }
+
+        .coeff-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+        }
+
+        .type-select {
+            padding: 0.5rem 0.6rem;
+            border: 1px solid var(--gray-border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-select:hover {
+            border-color: var(--primary-green);
+            background: rgba(76, 168, 150, 0.05);
+        }
+
+        .moyenne-cell {
+            background: linear-gradient(135deg, rgba(76, 168, 150, 0.03) 0%, rgba(255, 148, 102, 0.03) 100%);
+            text-align: center;
+            position: relative;
+        }
+
+        .moyenne-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-orange);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .moyenne-value:hover {
+            transform: scale(1.1);
+            color: var(--primary-green);
+        }
+
+        .moyenne-detail {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+        }
+
+        .btn-add-note {
+            background: none;
+            border: none;
+            color: var(--primary-green);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .btn-add-note:hover {
+            background: rgba(76, 168, 150, 0.1);
+            transform: translateX(4px);
+        }
+
+        .btn-remove-note {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .btn-remove-note:hover {
+            background: rgba(239, 68, 68, 0.1);
+            transform: scale(1.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.75rem;
+            justify-content: flex-end;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 6px 14px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-light);
+            border: 1px solid var(--gray-border);
+            padding: 0.75rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+            background: rgba(76, 168, 150, 0.05);
+            transform: translateX(-2px);
+        }
+
+        .btn-save-eleve {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(76, 168, 150, 0.2);
+        }
+
+        .btn-save-eleve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-save-eleve:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.25rem;
+            animation: slideIn 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 5rem 1.25rem;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .empty-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-text {
+            color: var(--text-light);
+        }
+
+        .note-status {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            margin-left: 0.3rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .status-saved {
+            background: var(--primary-green);
+            color: white;
+            box-shadow: 0 2px 4px rgba(76, 168, 150, 0.3);
+        }
+
+        .status-new {
+            background: var(--accent-orange);
+            color: white;
+            box-shadow: 0 2px 4px rgba(255, 148, 102, 0.3);
+        }
+
+        .status-modified {
+            background: #fbbf24;
+            color: #78350f;
+        }
+
+        .status-history {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .info-banner {
+            background: #e8f4f1;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #4ca896;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .page-header {
+                padding: 1.25rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            th, td {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="breadcrumb">
+        <a onclick="retourMatieres()">📚 Mes matières</a>
+        <span>›</span>
+        <span id="breadcrumbMatiere">Chargement...</span>
+        <span>›</span>
+        <span id="breadcrumbClasse">Chargement...</span>
+    </div>
+
+    <div class="page-header">
+        <div class="page-title">
+            <span class="page-title-icon">📝</span>
+            Saisie des notes
+            <span id="remplacementBadge" style="display: none;" class="remplacement-badge"></span>
+        </div>
+        <div class="page-subtitle" id="pageSubtitle">
+            Chargement des informations...
+        </div>
+    </div>
+
+    <div id="alertMessage"></div>
+
+    <div id="infoBanner" style="display: none;" class="info-banner"></div>
+
+    <div class="info-card">
+        <div>
+            <h3 id="infoMatiere">Matière</h3>
+            <p id="infoClasse">Classe</p>
+        </div>
+        <div class="stats-badge">
+            <div class="number" id="statsEleves">0</div>
+            <div class="label">Élèves</div>
+        </div>
+    </div>
+
+    <div class="info-message">
+        📌 <strong>Information :</strong> Les notes de type "Test évaluation" sont des évaluations formatives et ne sont pas incluses dans la moyenne générale.
+    </div>
+
+    <div class="notes-table-container" id="notesContainer">
+        <div class="loader">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div class="action-buttons" id="actionButtons">
+        <button class="btn-secondary" onclick="annulerSaisie()">Annuler</button>
+        <button class="btn-primary" id="saveAllBtn" onclick="sauvegarderToutesNotes()">💾 Sauvegarder toutes les notes</button>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        
+        let matiereId = null;
+        let matiereNom = null;
+        let classeId = null;
+        let classeNom = null;
+        let niveau = null;
+        
+        let eleves = [];
+        let notesExistantes = {};
+        let userRole = null;
+        let remplacementComplet = true;
+        let isReadOnly = false; // Mode lecture seule pour les vacataires qui ne remplacent pas complètement
+        
+        const typesNotes = {
+            'devoir': { icon: '📝', label: 'Devoir', inclureDansMoyenne: true, bgClass: '' },
+            'production_ecrite': { icon: '✍️', label: 'Production écrite', inclureDansMoyenne: true, bgClass: '' },
+            'orale': { icon: '🎤', label: 'Orale', inclureDansMoyenne: true, bgClass: '' },
+            'test_evaluation': { icon: '📋', label: 'Test évaluation', inclureDansMoyenne: false, bgClass: 'test-note' }
+        };
+        
+        // ✅ Fonction pour formater le nom de la classe: niveau + " A " + nom
+        function formatClasseName(classeNom, niveau) {
+            if (!classeNom && !niveau) return 'Classe';
+            
+            // Extraire le numéro de la classe du nom (ex: "5" de "5" ou "5" de "5 1ère année")
+            let classeNumber = '';
+            if (classeNom) {
+                // Chercher un nombre dans le nom
+                const match = classeNom.match(/\d+$/);
+                if (match) {
+                    classeNumber = match[0];
+                } else if (/^\d+$/.test(classeNom)) {
+                    classeNumber = classeNom;
+                } else {
+                    classeNumber = classeNom;
+                }
+            }
+            
+            // Formater: niveau + " A " + numéro
+            if (niveau && niveau !== 'Non défini' && niveau !== '' && classeNumber) {
+                return `${niveau} A ${classeNumber}`;
+            } else if (niveau && niveau !== 'Non défini' && niveau !== '') {
+                return niveau;
+            } else if (classeNumber) {
+                return classeNumber;
+            }
+            return classeNom || 'Classe';
+        }
+        
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            matiereId = params.get('matiereId');
+            matiereNom = decodeURIComponent(params.get('matiereNom') || '');
+            classeId = params.get('classeId');
+            classeNom = decodeURIComponent(params.get('classeNom') || '');
+            niveau = decodeURIComponent(params.get('niveau') || '');
+        }
+        
+        function showMessage(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            const className = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-error' : 'alert-info';
+            alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
+            setTimeout(() => { alertDiv.innerHTML = ''; }, 5000);
+        }
+        
+        function retourMatieres() {
+            window.location.href = 'enseignant-matieres.html';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function getInitiales(prenom, nom) {
+            if (prenom && nom) return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
+            if (prenom) return prenom.charAt(0).toUpperCase();
+            if (nom) return nom.charAt(0).toUpperCase();
+            return '?';
+        }
+        
+        function getCurrentEnseignantId() {
+            try {
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) return JSON.parse(userStr).id;
+            } catch (e) {}
+            return null;
+        }
+        
+        function isValidMongoId(id) {
+            return id && typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
+        }
+        
+        function extractId(obj) {
+            if (!obj) return null;
+            if (typeof obj === 'string') return obj;
+            if (obj.$oid) return obj.$oid;
+            if (obj._id) return extractId(obj._id);
+            if (obj.Id) return obj.Id;
+            return null;
+        }
+        
+        function normaliserNote(note) {
+            return {
+                id: note.id || note._id || note.Id || '',
+                valeur: note.valeur || note.Valeur || 0,
+                coefficient: note.coefficient || note.Coefficient || 1,
+                type: note.type || note.Type || 'devoir',
+                eleve: extractId(note.eleve || note.Eleve || note.eleveId || note.EleveId) || '',
+                matiereId: extractId(note.matiereId || note.MatiereId || note.matiere || note.Matiere) || '',
+                enseignant: extractId(note.enseignant || note.Enseignant) || '',
+                date: note.date || note.Date || new Date().toISOString()
+            };
+        }
+        
+        function calculerMoyenneEnTempsReel(eleveId) {
+            const notesDiv = document.getElementById(`notes-${eleveId}`);
+            if (!notesDiv) return 0;
+            
+            const noteFields = notesDiv.querySelectorAll('.note-field:not(.readonly)');
+            let sommePonderees = 0, sommeCoeffs = 0, testsCount = 0;
+            
+            noteFields.forEach(field => {
+                const noteInput = field.querySelector('.note-input');
+                const coeffInput = field.querySelector('.coeff-input');
+                const typeSelect = field.querySelector('.type-select');
+                
+                const note = parseFloat(noteInput?.value);
+                const coeff = parseFloat(coeffInput?.value);
+                const type = typeSelect?.value || 'devoir';
+                const config = typesNotes[type] || typesNotes['devoir'];
+                
+                if (!isNaN(note) && !isNaN(coeff) && note >= 0 && note <= 20 && coeff > 0) {
+                    if (config.inclureDansMoyenne) {
+                        sommePonderees += note * coeff;
+                        sommeCoeffs += coeff;
+                    } else {
+                        testsCount++;
+                    }
+                }
+            });
+            
+            const moyenne = sommeCoeffs > 0 ? sommePonderees / sommeCoeffs : 0;
+            
+            const moyenneSpan = document.getElementById(`moyenne-${eleveId}`);
+            if (moyenneSpan) {
+                moyenneSpan.textContent = moyenne.toFixed(2);
+            }
+            
+            const detailSpan = document.getElementById(`moyenne-detail-${eleveId}`);
+            if (detailSpan) {
+                detailSpan.textContent = testsCount > 0 ? `📋 ${testsCount} test(s) évaluation (hors moyenne)` : 'Aucun test évaluation';
+            }
+            
+            return moyenne;
+        }
+        
+        function updateMoyenneApresModification(eleveId, field) {
+            if (isReadOnly) return;
+            field.classList.add('modified');
+            const statusSpan = field.querySelector('.note-status');
+            if (statusSpan && statusSpan.classList.contains('status-saved')) {
+                statusSpan.className = 'note-status status-modified';
+                statusSpan.textContent = '✏️';
+            }
+            calculerMoyenneEnTempsReel(eleveId);
+        }
+        
+        async function sauvegarderNote(noteData, noteId) {
+            if (isReadOnly) return { success: false, error: 'Mode lecture seule' };
+            
+            try {
+                const isUpdate = isValidMongoId(noteId);
+                
+                let url = `${API_BASE}/Note`;
+                let method = 'POST';
+                
+                if (isUpdate) {
+                    url = `${API_BASE}/Note/${noteId}`;
+                    method = 'PUT';
+                    console.log(`🔵 MODIFICATION de la note ID: ${noteId}`);
+                } else {
+                    console.log(`🟢 CRÉATION d'une nouvelle note`);
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(noteData)
+                });
+                
+                if (response.ok) {
+                    if (method === 'POST') {
+                        const createdNote = await response.json();
+                        const newId = createdNote.id || createdNote._id;
+                        console.log(`✅ Note CRÉÉE avec ID: ${newId}`);
+                        return { success: true, noteId: newId, action: 'create' };
+                    } else {
+                        console.log(`✅ Note MODIFIÉE ID: ${noteId}`);
+                        return { success: true, noteId: noteId, action: 'update' };
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error(`❌ Erreur ${method}:`, errorText);
+                    return { success: false, error: errorText };
+                }
+            } catch (error) {
+                console.error('❌ Erreur sauvegarde:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        async function sauvegarderNotesEleve(eleveId) {
+            if (isReadOnly) {
+                showMessage("Mode consultation seule - vous ne pouvez pas modifier les notes", "error");
+                return;
+            }
+            
+            const notesDiv = document.getElementById(`notes-${eleveId}`);
+            const noteFields = notesDiv.querySelectorAll('.note-field:not(.readonly)');
+            let updateCount = 0, createCount = 0, errorCount = 0;
+            
+            console.log(`\n📝 === SAUVEGARDE ÉLÈVE ${eleveId} ===`);
+            
+            for (const field of noteFields) {
+                const noteInput = field.querySelector('.note-input');
+                const coeffInput = field.querySelector('.coeff-input');
+                const typeSelect = field.querySelector('.type-select');
+                let noteId = field.dataset.noteId;
+                
+                const valeur = parseFloat(noteInput?.value);
+                const coefficient = parseFloat(coeffInput?.value);
+                const type = typeSelect?.value || 'devoir';
+                
+                if (isNaN(valeur) || valeur < 0 || valeur > 20 || isNaN(coefficient) || coefficient <= 0) {
+                    continue;
+                }
+                
+                const hasValidId = isValidMongoId(noteId);
+                
+                if (!hasValidId) {
+                    noteId = null;
+                    console.log(`  ➕ NOUVELLE note - Valeur: ${valeur}, Coef: ${coefficient}`);
+                } else {
+                    console.log(`  🔄 MODIFICATION note ID: ${noteId} - Nouvelle valeur: ${valeur}`);
+                }
+                
+                const result = await sauvegarderNote({
+                    valeur: valeur,
+                    coefficient: coefficient,
+                    type: type,
+                    eleve: eleveId,
+                    matiereId: matiereId,
+                    enseignant: getCurrentEnseignantId(),
+                    date: new Date().toISOString(),
+                    commentaire: ''
+                }, noteId);
+                
+                if (result.success) {
+                    if (result.action === 'update') {
+                        updateCount++;
+                    } else {
+                        createCount++;
+                    }
+                    
+                    field.classList.remove('modified');
+                    
+                    if (result.noteId && !hasValidId) {
+                        field.dataset.noteId = result.noteId;
+                        console.log(`    ✓ ID enregistré: ${result.noteId}`);
+                    }
+                    
+                    const statusSpan = field.querySelector('.note-status');
+                    if (statusSpan) {
+                        statusSpan.className = 'note-status status-saved';
+                        statusSpan.textContent = '✓';
+                    }
+                } else {
+                    errorCount++;
+                    console.error(`    ❌ Erreur: ${result.error}`);
+                }
+            }
+            
+            if (updateCount > 0 || createCount > 0) {
+                let message = '';
+                if (updateCount > 0) message += `${updateCount} note(s) modifiée(s)`;
+                if (createCount > 0) {
+                    if (message) message += ' et ';
+                    message += `${createCount} nouvelle(s) note(s)`;
+                }
+                if (errorCount > 0) message += ` (${errorCount} erreur(s))`;
+                message += ' sauvegardée(s)';
+                showMessage(message, 'success');
+                
+                await chargerNotesExistantes();
+                calculerMoyenneEnTempsReel(eleveId);
+            } else if (errorCount > 0) {
+                showMessage(`Erreur lors de la sauvegarde (${errorCount} erreur(s))`, 'error');
+            }
+        }
+        
+        async function sauvegarderToutesNotes() {
+            if (isReadOnly) {
+                showMessage("Mode consultation seule - vous ne pouvez pas modifier les notes", "error");
+                return;
+            }
+            
+            const rows = document.querySelectorAll('tbody tr');
+            let totalUpdates = 0, totalCreates = 0, totalError = 0;
+            
+            showMessage('Sauvegarde en cours...', 'info');
+            console.log('\n📦 === SAUVEGARDE DE TOUTES LES NOTES ===');
+            
+            for (const row of rows) {
+                const eleveId = row.dataset.eleveId;
+                if (!eleveId) continue;
+                
+                const notesDiv = document.getElementById(`notes-${eleveId}`);
+                if (!notesDiv) continue;
+                
+                const noteFields = notesDiv.querySelectorAll('.note-field:not(.readonly)');
+                
+                for (const field of noteFields) {
+                    const noteInput = field.querySelector('.note-input');
+                    const coeffInput = field.querySelector('.coeff-input');
+                    const typeSelect = field.querySelector('.type-select');
+                    let noteId = field.dataset.noteId;
+                    
+                    const valeur = parseFloat(noteInput?.value);
+                    const coefficient = parseFloat(coeffInput?.value);
+                    const type = typeSelect?.value || 'devoir';
+                    
+                    if (isNaN(valeur) || valeur < 0 || valeur > 20 || isNaN(coefficient) || coefficient <= 0) {
+                        continue;
+                    }
+                    
+                    const hasValidId = isValidMongoId(noteId);
+                    
+                    if (!hasValidId) {
+                        noteId = null;
+                    }
+                    
+                    const result = await sauvegarderNote({
+                        valeur: valeur,
+                        coefficient: coefficient,
+                        type: type,
+                        eleve: eleveId,
+                        matiereId: matiereId,
+                        enseignant: getCurrentEnseignantId(),
+                        date: new Date().toISOString(),
+                        commentaire: ''
+                    }, noteId);
+                    
+                    if (result.success) {
+                        if (result.action === 'update') {
+                            totalUpdates++;
+                        } else {
+                            totalCreates++;
+                        }
+                        
+                        field.classList.remove('modified');
+                        
+                        if (result.noteId && !hasValidId) {
+                            field.dataset.noteId = result.noteId;
+                        }
+                        
+                        const statusSpan = field.querySelector('.note-status');
+                        if (statusSpan) {
+                            statusSpan.className = 'note-status status-saved';
+                            statusSpan.textContent = '✓';
+                        }
+                    } else {
+                        totalError++;
+                    }
+                }
+                
+                calculerMoyenneEnTempsReel(eleveId);
+            }
+            
+            if (totalUpdates > 0 || totalCreates > 0) {
+                let message = '';
+                if (totalUpdates > 0) message += `${totalUpdates} note(s) modifiée(s)`;
+                if (totalCreates > 0) {
+                    if (message) message += ' et ';
+                    message += `${totalCreates} nouvelle(s) note(s)`;
+                }
+                if (totalError > 0) message += ` (${totalError} erreur(s))`;
+                message += ' sauvegardée(s)';
+                showMessage(message, 'success');
+                await chargerNotesExistantes();
+            } else if (totalError > 0) {
+                showMessage(`Aucune note sauvegardée (${totalError} erreur(s))`, 'error');
+            }
+        }
+        
+        function ajouterChampNote(eleveId) {
+            if (isReadOnly) return;
+            
+            const notesDiv = document.getElementById(`notes-${eleveId}`);
+            const fieldsCount = notesDiv.querySelectorAll('.note-field').length;
+            
+            const newField = document.createElement('div');
+            newField.className = 'note-field';
+            newField.setAttribute('data-index', fieldsCount);
+            newField.setAttribute('data-note-id', '');
+            newField.innerHTML = `
+                <input type="number" step="0.25" min="0" max="20" class="note-input" placeholder="Note" value="" oninput="updateMoyenneApresModification('${eleveId}', this.closest('.note-field'))">
+                <input type="number" step="0.5" min="0.5" max="5" class="coeff-input" placeholder="Coef" value="1" oninput="updateMoyenneApresModification('${eleveId}', this.closest('.note-field'))">
+                <select class="type-select" onchange="handleNoteChange('${eleveId}', this)">
+                    <option value="devoir">📝 Devoir</option>
+                    <option value="production_ecrite">✍️ Production écrite</option>
+                    <option value="orale">🎤 Orale</option>
+                    <option value="test_evaluation">📋 Test évaluation (hors moyenne)</option>
+                </select>
+                <button class="btn-remove-note" onclick="supprimerChampNote('${eleveId}', ${fieldsCount})">✖</button>
+                <span class="note-status status-new">🆕</span>
+            `;
+            
+            const addButton = notesDiv.querySelector('.btn-add-note');
+            notesDiv.insertBefore(newField, addButton);
+            
+            const typeSelect = newField.querySelector('.type-select');
+            typeSelect.addEventListener('change', () => {
+                const field = typeSelect.closest('.note-field');
+                const type = typeSelect.value;
+                const config = typesNotes[type] || typesNotes['devoir'];
+                field.classList.remove('test-note');
+                if (config.bgClass) field.classList.add(config.bgClass);
+                updateMoyenneApresModification(eleveId, field);
+            });
+            
+            calculerMoyenneEnTempsReel(eleveId);
+        }
+        
+        function supprimerChampNote(eleveId, index) {
+            if (isReadOnly) return;
+            
+            const notesDiv = document.getElementById(`notes-${eleveId}`);
+            const fields = notesDiv.querySelectorAll('.note-field');
+            if (fields[index]) {
+                fields[index].remove();
+                calculerMoyenneEnTempsReel(eleveId);
+            }
+        }
+        
+        async function supprimerNote(eleveId, noteId) {
+            if (isReadOnly) {
+                showMessage("Mode consultation seule - vous ne pouvez pas supprimer des notes", "error");
+                return;
+            }
+            
+            if (!isValidMongoId(noteId)) {
+                const notesDiv = document.getElementById(`notes-${eleveId}`);
+                const noteFields = notesDiv.querySelectorAll('.note-field');
+                if (noteFields.length > 0) {
+                    noteFields[noteFields.length - 1].remove();
+                    calculerMoyenneEnTempsReel(eleveId);
+                    showMessage('Note supprimée localement', 'info');
+                }
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/Note/${noteId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    showMessage('Note supprimée avec succès', 'success');
+                    await chargerNotesExistantes();
+                    afficherTableauNotes();
+                } else {
+                    showMessage('Erreur lors de la suppression', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur suppression note:', error);
+                showMessage('Erreur réseau', 'error');
+            }
+        }
+        
+        function handleNoteChange(eleveId, element) {
+            if (isReadOnly) return;
+            
+            const field = element.closest('.note-field');
+            updateMoyenneApresModification(eleveId, field);
+            
+            const type = element.value;
+            const config = typesNotes[type] || typesNotes['devoir'];
+            field.classList.remove('test-note');
+            if (config.bgClass) field.classList.add(config.bgClass);
+        }
+        
+        function annulerSaisie() {
+            retourMatieres();
+        }
+        
+        async function chargerInfosUtilisateur() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    userRole = (data.role || data.Role || '').toLowerCase();
+                    remplacementComplet = data.remplacementComplet !== false;
+                    
+                    // Mode lecture seule pour les vacataires en remplacement partiel
+                    isReadOnly = (userRole === 'permanent' || userRole === 'vacataire') && !remplacementComplet;
+                    
+                    const badge = document.getElementById('remplacementBadge');
+                    const infoBanner = document.getElementById('infoBanner');
+                    const saveAllBtn = document.getElementById('saveAllBtn');
+                    
+                    if (isReadOnly) {
+                        badge.style.display = 'inline-block';
+                        badge.textContent = '📖 Mode consultation';
+                        badge.style.background = '#95a5a6';
+                        
+                        infoBanner.style.display = 'flex';
+                        infoBanner.innerHTML = `
+                            <i>📖</i>
+                            <div>
+                                <strong>Mode consultation seule</strong><br>
+                                En tant que vacataire en remplacement partiel, vous pouvez consulter l'historique des notes<br>
+                                mais vous ne pouvez pas les modifier. Seul l'enseignant titulaire peut saisir/modifier les notes.
+                            </div>
+                        `;
+                        
+                        if (saveAllBtn) {
+                            saveAllBtn.disabled = true;
+                            saveAllBtn.title = "Mode consultation - modification non autorisée";
+                        }
+                    } else if (userRole === 'permanent' || userRole === 'vacataire') {
+                        badge.style.display = 'inline-block';
+                        badge.textContent = '✏️ Mode édition (remplacement complet)';
+                        badge.style.background = '#4ca896';
+                    }
+                }
+            } catch (error) {
+                console.warn("Impossible de récupérer les infos utilisateur:", error);
+            }
+        }
+        
+        function afficherTableauNotes() {
+            if (!eleves.length) {
+                document.getElementById('notesContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👨‍🎓</div>
+                        <div class="empty-title">Aucun élève</div>
+                        <div class="empty-text">Cette classe ne contient pas encore d'élèves.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Formatage du nom de la classe pour l'affichage
+            const formattedClasseName = formatClasseName(classeNom, niveau);
+            
+            let html = `<table>
+                <thead>
+                    <tr>
+                        <th>👨‍🎓 Élève</th>
+                        <th>📝 Notes</th>
+                        <th>📊 Moyenne</th>
+                        <th>⚡ Action</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
+            for (const eleve of eleves) {
+                const eleveId = extractId(eleve.Id || eleve.id || eleve._id);
+                if (!eleveId) continue;
+                
+                const nomComplet = `${eleve.Prenom || eleve.prenom || ''} ${eleve.Nom || eleve.nom || ''}`.trim() || 'Élève';
+                const initiales = getInitiales(eleve.Prenom || eleve.prenom, eleve.Nom || eleve.nom);
+                const notesEleve = notesExistantes[eleveId] || [];
+                const moyenne = calculerMoyenneEleve(notesEleve);
+                const identifiantAffiche = eleve.IdentifiantEcole || (eleveId.length > 8 ? eleveId.substring(0, 8) : eleveId);
+                
+                html += `<tr data-eleve-id="${eleveId}">
+                    <td>
+                        <div class="eleve-info">
+                            <div class="eleve-avatar">${initiales}</div>
+                            <div>
+                                <div class="eleve-nom">${escapeHtml(nomComplet)}</div>
+                                <div class="eleve-prenom">${escapeHtml(identifiantAffiche)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <td class="notes-cell">
+                        <div class="notes-input" id="notes-${eleveId}">`;
+                
+                if (notesEleve.length === 0) {
+                    if (isReadOnly) {
+                        html += `<div class="note-field readonly">
+                            <span style="color: #95a5a6;">Aucune note enregistrée</span>
+                        </div>`;
+                    } else {
+                        html += `<div class="note-field" data-note-id="">
+                            <input type="number" step="0.25" min="0" max="20" class="note-input" placeholder="Note" value="" oninput="updateMoyenneApresModification('${eleveId}', this.closest('.note-field'))">
+                            <input type="number" step="0.5" min="0.5" max="5" class="coeff-input" placeholder="Coef" value="1" oninput="updateMoyenneApresModification('${eleveId}', this.closest('.note-field'))">
+                            <select class="type-select" onchange="handleNoteChange('${eleveId}', this)">
+                                <option value="devoir">📝 Devoir</option>
+                                <option value="production_ecrite">✍️ Production écrite</option>
+                                <option value="orale">🎤 Orale</option>
+                                <option value="test_evaluation">📋 Test évaluation (hors moyenne)</option>
+                            </select>
+                            <button class="btn-remove-note" onclick="supprimerChampNote('${eleveId}', 0)" style="display:none;">✖</button>
+                            <span class="note-status status-new">🆕</span>
+                        </div>`;
+                    }
+                } else {
+                    notesEleve.forEach((note, idx) => {
+                        const normalizedNote = normaliserNote(note);
+                        const noteId = normalizedNote.id;
+                        const valeurNote = normalizedNote.valeur;
+                        const coeffNote = normalizedNote.coefficient;
+                        const typeNote = normalizedNote.type;
+                        const config = typesNotes[typeNote] || typesNotes['devoir'];
+                        const hasValidId = isValidMongoId(noteId);
+                        
+                        if (isReadOnly) {
+                            html += `<div class="note-field readonly">
+                                <span class="note-value">${valeurNote}/20</span>
+                                <span class="coeff-value">Coef: ${coeffNote}</span>
+                                <span class="type-value">${config.label}</span>
+                                <span class="note-status status-history">📜</span>
+                            </div>`;
+                        } else {
+                            html += `<div class="note-field ${config.bgClass || ''}" data-note-id="${noteId}">
+                                <input type="number" step="0.25" min="0" max="20" class="note-input" placeholder="Note" value="${valeurNote}" oninput="updateMoyenneApresModification('${eleveId}', this.closest('.note-field'))">
+                                <input type="number" step="0.5" min="0.5" max="5" class="coeff-input" placeholder="Coef" value="${coeffNote}" oninput="updateMoyenneApresModification('${eleveId}', this.closest('.note-field'))">
+                                <select class="type-select" onchange="handleNoteChange('${eleveId}', this)">
+                                    <option value="devoir" ${typeNote === 'devoir' ? 'selected' : ''}>📝 Devoir</option>
+                                    <option value="production_ecrite" ${typeNote === 'production_ecrite' ? 'selected' : ''}>✍️ Production écrite</option>
+                                    <option value="orale" ${typeNote === 'orale' ? 'selected' : ''}>🎤 Orale</option>
+                                    <option value="test_evaluation" ${typeNote === 'test_evaluation' ? 'selected' : ''}>📋 Test évaluation (hors moyenne)</option>
+                                </select>
+                                <button class="btn-remove-note" onclick="supprimerNote('${eleveId}', '${noteId}')">✖</button>
+                                <span class="note-status ${hasValidId ? 'status-saved' : 'status-new'}">${hasValidId ? '✓' : '🆕'}</span>
+                            </div>`;
+                        }
+                    });
+                }
+                
+                if (!isReadOnly) {
+                    html += `<button class="btn-add-note" onclick="ajouterChampNote('${eleveId}')">➕ Ajouter une note</button>`;
+                }
+                html += `</div></td>
+                    <td class="moyenne-cell">
+                        <div>
+                            <span class="moyenne-value" id="moyenne-${eleveId}">${moyenne.toFixed(2)}</span>
+                            <span style="font-size: 0.9rem; color: var(--text-light);">/20</span>
+                        </div>
+                        <div class="moyenne-detail" id="moyenne-detail-${eleveId}"></div>
+                    </td>
+                    <td>`;
+                
+                if (!isReadOnly) {
+                    html += `<button class="btn-save-eleve" onclick="sauvegarderNotesEleve('${eleveId}')">💾 Sauvegarder</button>`;
+                } else {
+                    html += `<span style="color: #95a5a6;">🔒 Consultation seule</span>`;
+                }
+                
+                html += `</td>
+                </tr>`;
+            }
+            
+            html += `</tbody>
+            </table>`;
+            document.getElementById('notesContainer').innerHTML = html;
+            
+            // Mettre à jour l'affichage du nom de la classe formaté dans la breadcrumb et l'info-card
+            document.getElementById('breadcrumbClasse').textContent = formattedClasseName;
+            document.getElementById('infoClasse').innerHTML = `Classe: <strong>${escapeHtml(formattedClasseName)}</strong>${niveau ? ` (${niveau})` : ''}`;
+            document.getElementById('pageSubtitle').textContent = `Saisie des notes pour ${matiereNom || 'la matière'} - ${formattedClasseName}`;
+            
+            eleves.forEach(eleve => {
+                const eleveId = extractId(eleve.Id || eleve.id || eleve._id);
+                if (eleveId) {
+                    calculerMoyenneEnTempsReel(eleveId);
+                }
+            });
+        }
+        
+        function calculerMoyenneEleve(notes) {
+            if (!notes || notes.length === 0) return 0;
+            let sommePonderees = 0, sommeCoeffs = 0;
+            notes.forEach(note => {
+                const normalizedNote = normaliserNote(note);
+                const typeNote = normalizedNote.type;
+                const config = typesNotes[typeNote] || typesNotes['devoir'];
+                if (config.inclureDansMoyenne) {
+                    const coeff = normalizedNote.coefficient;
+                    const valeur = normalizedNote.valeur;
+                    sommePonderees += valeur * coeff;
+                    sommeCoeffs += coeff;
+                }
+            });
+            return sommeCoeffs > 0 ? sommePonderees / sommeCoeffs : 0;
+        }
+        
+        async function chargerNotesExistantes() {
+            try {
+                const response = await fetch(`${API_BASE}/Note/matiere/${matiereId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    let notes = await response.json();
+                    if (!Array.isArray(notes)) {
+                        if (notes.Data && Array.isArray(notes.Data)) notes = notes.Data;
+                        else if (notes.data && Array.isArray(notes.data)) notes = notes.data;
+                        else notes = [];
+                    }
+                    notesExistantes = {};
+                    
+                    console.log('\n📋 === NOTES CHARGÉES ===');
+                    
+                    notes.forEach(note => {
+                        const eleveId = extractId(note.eleve || note.Eleve || note.eleveId || note.EleveId);
+                        if (!eleveId) return;
+                        
+                        if (!notesExistantes[eleveId]) {
+                            notesExistantes[eleveId] = [];
+                        }
+                        notesExistantes[eleveId].push(note);
+                    });
+                }
+            } catch (error) {
+                console.warn('Erreur chargement notes:', error);
+            }
+        }
+        
+        async function chargerEleves() {
+            try {
+                const response = await fetch(`${API_BASE}/Eleve/par-classe/${classeId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+                let data = await response.json();
+                
+                if (data.Data && Array.isArray(data.Data)) eleves = data.Data;
+                else if (data.data && Array.isArray(data.data)) eleves = data.data;
+                else if (Array.isArray(data)) eleves = data;
+                else eleves = [];
+                
+                document.getElementById('statsEleves').textContent = eleves.length;
+                await chargerNotesExistantes();
+                afficherTableauNotes();
+            } catch (error) {
+                document.getElementById('notesContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Erreur de chargement</div>
+                        <div class="empty-text">${error.message}</div>
+                        <button class="btn-primary" onclick="chargerEleves()" style="margin-top:16px;">Réessayer</button>
+                    </div>`;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            getUrlParams();
+            if (!matiereId || !classeId) {
+                showMessage('Paramètres manquants', 'error');
+                setTimeout(() => retourMatieres(), 2000);
+                return;
+            }
+            
+            await chargerInfosUtilisateur();
+            
+            document.getElementById('breadcrumbMatiere').textContent = matiereNom || 'Matière';
+            document.getElementById('infoMatiere').textContent = matiereNom || 'Matière';
+            
+            chargerEleves();
+        });
+        
+        window.retourMatieres = retourMatieres;
+        window.ajouterChampNote = ajouterChampNote;
+        window.supprimerChampNote = supprimerChampNote;
+        window.supprimerNote = supprimerNote;
+        window.sauvegarderNotesEleve = sauvegarderNotesEleve;
+        window.sauvegarderToutesNotes = sauvegarderToutesNotes;
+        window.annulerSaisie = annulerSaisie;
+        window.updateMoyenneApresModification = updateMoyenneApresModification;
+        window.handleNoteChange = handleNoteChange;
+        window.calculerMoyenneEnTempsReel = calculerMoyenneEnTempsReel;
+    </script>
+</body>
+</html>

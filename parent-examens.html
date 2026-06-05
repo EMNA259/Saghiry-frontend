@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Examens de mes enfants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .enfants-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 1rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .enfant-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            background: #f8fafc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .enfant-tab:hover {
+            background: #e0f2f1;
+            transform: translateY(-2px);
+        }
+
+        .enfant-tab.active {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            border-color: #4ca896;
+            box-shadow: 0 4px 15px rgba(76, 168, 150, 0.3);
+        }
+
+        .enfant-tab.active .enfant-tab-name {
+            color: white;
+        }
+
+        .enfant-tab.active .enfant-tab-class {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .enfant-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #4ca896, #2d6b63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .enfant-tab-info {
+            text-align: left;
+        }
+
+        .enfant-tab-name {
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .enfant-tab-class {
+            font-size: 0.7rem;
+            background: #e0e9e7;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e9e7;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #4ca896;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3b36;
+        }
+
+        .stat-label {
+            color: #5a9d91;
+            font-size: 0.85rem;
+        }
+
+        .examens-container {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .examens-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .examens-table th,
+        .examens-table td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .examens-table th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #1e3b36;
+            font-size: 0.85rem;
+        }
+
+        .examens-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .room-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .duration-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .duration-2h {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .duration-1h {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-planifie {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-termine {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-en-cours {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            border: 2px dashed #e0e9e7;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #5a9d91;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #b45309;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        .btn-export-pdf {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-export-pdf:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Cacher l'affichage de la classe */
+        .hide-class {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .examens-table th, .examens-table td { padding: 0.5rem; font-size: 0.75rem; }
+            .enfant-tab { padding: 0.5rem 1rem; }
+            .enfant-avatar { width: 35px; height: 35px; font-size: 0.9rem; }
+            .header-actions { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContainer">
+        <div class="loading">Chargement des examens...</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        let enfants = [];
+        let currentEnfantId = null;
+        let examensData = {};
+        let sallesMap = new Map();
+
+        // Configuration : mettre à false pour cacher complètement la classe
+        const AFFICHER_CLASSE = true;  // Mettre à false pour supprimer l'affichage de la classe
+        const UTILISER_NIVEAU = true;   // Mettre à true pour utiliser le niveau au lieu de l'ID
+
+        // Fonction pour vérifier si une chaîne est un ID MongoDB
+        function isMongoId(str) {
+            return typeof str === 'string' && /^[a-f0-9]{24}$/i.test(str);
+        }
+
+        // Fonction pour formater le nom de la classe
+        function formatClassName(enfant) {
+            if (!AFFICHER_CLASSE) {
+                return ''; // Ne rien afficher
+            }
+            
+            // Essayer d'utiliser le niveau d'abord
+            if (UTILISER_NIVEAU && enfant.niveau) {
+                return enfant.niveau;
+            }
+            
+            // Sinon essayer classeNom
+            if (enfant.classeNom && !isMongoId(enfant.classeNom)) {
+                return enfant.classeNom;
+            }
+            
+            // Sinon essayer classeId si ce n'est pas un ID
+            if (enfant.classeId && !isMongoId(enfant.classeId)) {
+                return enfant.classeId;
+            }
+            
+            // Dernier recours : ne rien afficher
+            return '';
+        }
+
+        // Fonction pour nettoyer le nom des enfants
+        function cleanChildName(prenom, nom) {
+            let cleanPrenom = prenom || '';
+            let cleanNom = nom || '';
+            
+            // Si c'est un objet, essayer d'extraire la valeur
+            if (typeof cleanPrenom === 'object') {
+                cleanPrenom = cleanPrenom.nom || cleanPrenom.prenom || cleanPrenom.value || '';
+            }
+            if (typeof cleanNom === 'object') {
+                cleanNom = cleanNom.nom || cleanNom.prenom || cleanNom.value || '';
+            }
+            
+            let fullName = `${cleanPrenom} ${cleanNom}`.trim();
+            
+            // Supprimer TOUS les IDs MongoDB (24 caractères hexadécimaux)
+            fullName = fullName.replace(/[a-f0-9]{24}/gi, '');
+            
+            // Supprimer spécifiquement les IDs connus
+            fullName = fullName.replace(/6995fdbdaf7c09c380f1e289/gi, '');
+            fullName = fullName.replace(/699aebde9977fd14213a85a7/gi, '');
+            
+            // Supprimer tout autre pattern d'ID possible
+            fullName = fullName.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+            fullName = fullName.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '');
+            
+            // Nettoyer les espaces multiples
+            fullName = fullName.replace(/\s+/g, ' ').trim();
+            
+            // Mettre en forme: première lettre de chaque mot en majuscule
+            if (fullName && fullName.length > 0 && fullName !== ' ') {
+                fullName = fullName.split(' ').map(word => {
+                    if (word.length === 0) return '';
+                    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                }).join(' ');
+            }
+            
+            // Si le nom est vide, retourner "Mon enfant"
+            if (!fullName || fullName.length === 0 || fullName === ' ') {
+                return "Mon enfant";
+            }
+            
+            return fullName;
+        }
+
+        function getAuthToken() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    return window.parent.ParentSpace.getToken();
+                }
+                if (window.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    return window.ParentSpace.getToken();
+                }
+            } catch(e) { console.warn('Cannot access ParentSpace:', e); }
+            
+            return localStorage.getItem('authToken') || 
+                   localStorage.getItem('parentAuthToken') || 
+                   sessionStorage.getItem('authToken');
+        }
+
+        function getCurrentUser() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getCurrentUser === 'function') {
+                    return window.parent.ParentSpace.getCurrentUser();
+                }
+                if (window.ParentSpace && typeof window.parent.ParentSpace.getCurrentUser === 'function') {
+                    return window.ParentSpace.getCurrentUser();
+                }
+            } catch(e) { console.warn('Cannot access ParentSpace:', e); }
+            
+            try {
+                const userStr = localStorage.getItem('currentUser') || localStorage.getItem('parentUser');
+                if (userStr) return JSON.parse(userStr);
+            } catch(e) {}
+            return null;
+        }
+
+        function requestTokenFromParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'REQUEST_TOKEN' }, '*');
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'SET_TOKEN') {
+                token = event.data.token;
+                console.log('✅ Token reçu du parent');
+                chargerEnfants();
+            }
+        });
+
+        function formatDate(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                let dateStr = dateValue;
+                if (typeof dateValue === 'object' && dateValue.$date) {
+                    dateStr = dateValue.$date;
+                }
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Date inconnue';
+                return date.toLocaleDateString('fr-FR', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        function formatDateSimple(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                let dateStr = dateValue;
+                if (typeof dateValue === 'object' && dateValue.$date) {
+                    dateStr = dateValue.$date;
+                }
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Date inconnue';
+                return date.toLocaleDateString('fr-FR');
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        async function chargerEnfants() {
+            if (!token) {
+                token = getAuthToken();
+                if (!token) {
+                    requestTokenFromParent();
+                    setTimeout(() => {
+                        if (!token) chargerEnfants();
+                    }, 500);
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/parent/enfants`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        requestTokenFromParent();
+                        setTimeout(() => chargerEnfants(), 1000);
+                        return;
+                    }
+                    throw new Error(`Erreur ${response.status}`);
+                }
+
+                const data = await response.json();
+                enfants = data.data || [];
+                console.log(`📊 ${enfants.length} enfant(s) trouvé(s)`);
+                
+                // Debug: Afficher les données des enfants
+                enfants.forEach(e => {
+                    const clean = cleanChildName(e.prenom, e.nom);
+                    console.log(`Enfant: "${e.prenom} ${e.nom}" -> Nettoyé: "${clean}" | Niveau: "${e.niveau || 'non défini'}"`);
+                });
+
+                if (enfants.length === 0) {
+                    afficherAucunEnfant();
+                    return;
+                }
+
+                await chargerSalles();
+                await chargerExamensTousEnfants();
+                
+                if (enfants.length > 0 && !currentEnfantId) {
+                    currentEnfantId = enfants[0].id;
+                }
+                
+                afficherInterface();
+
+            } catch (error) {
+                console.error('Erreur chargement enfants:', error);
+                afficherErreur('Impossible de charger la liste de vos enfants. Veuillez réessayer.');
+            }
+        }
+
+        async function chargerSalles() {
+            try {
+                console.log('📡 Chargement des salles...');
+                
+                let response = await fetch(`${API_BASE}/api/Salle/public`);
+                if (!response.ok) {
+                    response = await fetch(`${API_BASE}/api/Salle`);
+                }
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📦 Données salles reçues:', data);
+                    
+                    let salles = [];
+                    if (data.Data && Array.isArray(data.Data)) {
+                        salles = data.Data;
+                    } else if (data.data && Array.isArray(data.data)) {
+                        salles = data.data;
+                    } else if (data.$values && Array.isArray(data.$values)) {
+                        salles = data.$values;
+                    } else if (Array.isArray(data)) {
+                        salles = data;
+                    }
+                    
+                    sallesMap.clear();
+                    salles.forEach(s => {
+                        const id = s.id || s._id || s.Id;
+                        const nom = s.nomSalle || s.nom || s.NomSalle || s.Nom;
+                        if (id && nom) {
+                            sallesMap.set(id, nom);
+                            console.log(`  📌 ${nom} -> ${id}`);
+                        }
+                    });
+                    
+                    console.log(`✅ ${sallesMap.size} salles chargées`);
+                } else {
+                    console.error(`❌ Erreur chargement salles: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('❌ Erreur chargement salles:', error);
+            }
+        }
+
+        async function chargerExamensEnfant(eleveId) {
+            try {
+                console.log(`📊 Chargement des examens pour l'élève ${eleveId}`);
+                
+                const eleveResponse = await fetch(`${API_BASE}/api/Eleve/parent/${eleveId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!eleveResponse.ok) {
+                    console.warn(`⚠️ Impossible de récupérer l'élève ${eleveId}`);
+                    examensData[eleveId] = [];
+                    return;
+                }
+                
+                const eleve = await eleveResponse.json();
+                const classeId = eleve.classeId || eleve.ClasseId;
+                
+                if (!classeId) {
+                    console.warn(`⚠️ L'élève ${eleveId} n'a pas de classe`);
+                    examensData[eleveId] = [];
+                    return;
+                }
+                
+                console.log(`✅ Élève: ${eleve.prenom} ${eleve.nom} - Classe: ${classeId}`);
+                
+                const examensResponse = await fetch(`${API_BASE}/api/Examen/public`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!examensResponse.ok) {
+                    examensData[eleveId] = [];
+                    return;
+                }
+                
+                const examensDataRaw = await examensResponse.json();
+                let exams = examensDataRaw.Data || examensDataRaw.data || examensDataRaw || [];
+                if (!Array.isArray(exams)) exams = [];
+                
+                const examsFiltres = exams.filter(exam => {
+                    const examClasseId = exam.ClasseId || exam.classeId;
+                    return examClasseId === classeId;
+                });
+                
+                console.log(`📊 ${examsFiltres.length} examens trouvés`);
+                
+                examensData[eleveId] = examsFiltres.map(exam => {
+                    let dateValue = exam.Date || exam.date;
+                    if (dateValue && typeof dateValue === 'object' && dateValue.$date) {
+                        dateValue = dateValue.$date;
+                    }
+                    
+                    const dateStr = formatDate(dateValue);
+                    const dateSimple = formatDateSimple(dateValue);
+                    
+                    let salleNom = '—';
+                    const salleId = exam.Salle || exam.salle;
+                    if (salleId) {
+                        if (sallesMap.has(salleId)) {
+                            salleNom = sallesMap.get(salleId);
+                        } else {
+                            console.log(`⚠️ Salle non trouvée dans Map: ${salleId}`);
+                            salleNom = salleId.substring(0, 8) + '...';
+                        }
+                    }
+                    
+                    let duree = exam.duree || 60;
+                    const matiereNom = (exam.MatiereNom || exam.matiereNom || '').toLowerCase();
+                    if (matiereNom.includes('arabe') || matiereNom.includes('franc') || 
+                        matiereNom.includes('anglais') || matiereNom.includes('math')) {
+                        duree = 120;
+                    }
+                    
+                    let status = 'planifie';
+                    if (dateValue) {
+                        const dateObj = new Date(dateValue);
+                        if (!isNaN(dateObj.getTime())) {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            if (dateObj < today) status = 'termine';
+                            else if (dateObj.toDateString() === today.toDateString()) status = 'en-cours';
+                        }
+                    }
+                    
+                    return {
+                        matiereNom: exam.MatiereNom || exam.matiereNom || 'Matière',
+                        dateStr: dateStr,
+                        dateSimple: dateSimple,
+                        heureDebut: exam.HeureDebut || exam.heureDebut || '08:00',
+                        heureFin: exam.HeureFin || exam.heureFin || '10:00',
+                        duree: duree,
+                        coefficient: exam.Coefficient || exam.coefficient || 1,
+                        salle: salleNom,
+                        status: status
+                    };
+                });
+                
+                examensData[eleveId].sort((a, b) => (a.dateSimple || '').localeCompare(b.dateSimple || ''));
+                console.log(`✅ ${examensData[eleveId].length} examens pour ${eleve.prenom}`);
+
+            } catch (error) {
+                console.error(`Erreur:`, error);
+                examensData[eleveId] = [];
+            }
+        }
+
+        async function chargerExamensTousEnfants() {
+            for (const enfant of enfants) {
+                await chargerExamensEnfant(enfant.id);
+            }
+        }
+
+        async function exporterPDF() {
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const cleanName = cleanChildName(enfant?.prenom, enfant?.nom);
+            const classeName = formatClassName(enfant);
+            const examens = examensData[currentEnfantId] || [];
+            
+            if (!examens || examens.length === 0) {
+                alert('Aucun examen à exporter');
+                return;
+            }
+            
+            const element = document.getElementById('examensContent');
+            if (!element) return;
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = element.innerHTML;
+            
+            const title = document.createElement('div');
+            title.style.textAlign = 'center';
+            title.style.marginBottom = '20px';
+            title.style.padding = '20px';
+            title.style.background = 'linear-gradient(135deg, #4ca896, #2d6b63)';
+            title.style.color = 'white';
+            title.style.borderRadius = '15px';
+            title.innerHTML = `
+                <h1 style="margin: 0;">📋 Calendrier des Examens</h1>
+                <h2 style="margin: 10px 0 0 0;">${escapeHtml(cleanName)}</h2>
+                ${classeName ? `<p style="margin: 5px 0 0 0;">${escapeHtml(classeName)}</p>` : ''}
+                <p style="margin: 5px 0 0 0; font-size: 12px;">Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}</p>
+            `;
+            
+            const stats = document.createElement('div');
+            stats.style.display = 'grid';
+            stats.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            stats.style.gap = '15px';
+            stats.style.margin = '20px 0';
+            stats.innerHTML = `
+                <div style="background: #f8fafc; border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #e0e9e7;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #1e3b36;">${examens.length}</div>
+                    <div style="color: #5a9d91;">Total examens</div>
+                </div>
+                <div style="background: #f8fafc; border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #e0e9e7;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #1e3b36;">${examens.filter(e => e.status === 'planifie').length}</div>
+                    <div style="color: #5a9d91;">À venir</div>
+                </div>
+                <div style="background: #f8fafc; border-radius: 15px; padding: 15px; text-align: center; border: 1px solid #e0e9e7;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #1e3b36;">${examens.filter(e => e.status === 'termine').length}</div>
+                    <div style="color: #5a9d91;">Terminés</div>
+                </div>
+            `;
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.padding = '20px';
+            wrapper.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+            wrapper.appendChild(title);
+            wrapper.appendChild(stats);
+            wrapper.appendChild(tempDiv);
+            
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `Examens_${cleanName.replace(/\s/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(wrapper).save();
+        }
+
+        function afficherInterface() {
+            const container = document.getElementById('mainContainer');
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const cleanName = enfant ? cleanChildName(enfant.prenom, enfant.nom) : "Mon enfant";
+            
+            // Générer l'affichage des onglets enfants
+            let tabsHtml = '';
+            for (const enfant of enfants) {
+                const cleanNameTab = cleanChildName(enfant.prenom, enfant.nom);
+                const initial = cleanNameTab.charAt(0) || 'E';
+                const classeDisplay = formatClassName(enfant);
+                const classHtml = classeDisplay ? `<div class="enfant-tab-class">${escapeHtml(classeDisplay)}</div>` : '';
+                
+                tabsHtml += `
+                    <div class="enfant-tab ${enfant.id === currentEnfantId ? 'active' : ''}" 
+                         onclick="window.selectEnfant('${enfant.id}')">
+                        <div class="enfant-avatar">
+                            ${escapeHtml(initial)}
+                        </div>
+                        <div class="enfant-tab-info">
+                            <div class="enfant-tab-name">${escapeHtml(cleanNameTab)}</div>
+                            ${classHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div class="enfants-tabs" id="enfantsTabs">
+                    ${tabsHtml}
+                    <button class="enfant-tab" onclick="window.rafraichirExamens()" style="background: transparent; border: 1px solid #4ca896;">
+                        <span>🔄</span>
+                        <span>Rafraîchir</span>
+                    </button>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="btn-export-pdf" onclick="window.exporterPDF()">
+                        📄 Exporter PDF
+                    </button>
+                </div>
+                
+                <div id="examensContent">
+                    <div class="loading">Chargement des examens...</div>
+                </div>
+            `;
+            
+            afficherExamensEnfant();
+        }
+
+        function afficherExamensEnfant() {
+            if (!currentEnfantId) return;
+            
+            const enfant = enfants.find(e => e.id === currentEnfantId);
+            const examens = examensData[currentEnfantId] || [];
+            const cleanChild = enfant ? cleanChildName(enfant.prenom, enfant.nom) : "Mon enfant";
+            
+            const container = document.getElementById('examensContent');
+            if (!container) return;
+            
+            if (examens.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <h3>Aucun examen programmé</h3>
+                        <p style="color: #5a9d91;">Les examens de ${escapeHtml(cleanChild)} apparaîtront ici dès qu'ils seront planifiés.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const totalExamens = examens.length;
+            const examensAVenir = examens.filter(e => e.status === 'planifie').length;
+            const examensTermines = examens.filter(e => e.status === 'termine').length;
+            
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number">${totalExamens}</div><div class="stat-label">Total examens</div></div>
+                    <div class="stat-card"><div class="stat-number">${examensAVenir}</div><div class="stat-label">À venir</div></div>
+                    <div class="stat-card"><div class="stat-number">${examensTermines}</div><div class="stat-label">Terminés</div></div>
+                </div>
+                
+                <div class="examens-container">
+                    <table class="examens-table">
+                        <thead>
+                            <tr>
+                                <th>📅 Date</th>
+                                <th>⏰ Horaire</th>
+                                <th>📚 Matière</th>
+                                <th>🏛️ Salle</th>
+                                <th>⏱️ Durée</th>
+                                <th>📌 Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${examens.map(exam => {
+                                const dureeClass = exam.duree === 120 ? 'duration-2h' : 'duration-1h';
+                                const dureeText = exam.duree === 120 ? '2h' : '1h';
+                                const statusClass = exam.status === 'planifie' ? 'status-planifie' : (exam.status === 'en-cours' ? 'status-en-cours' : 'status-termine');
+                                const statusText = exam.status === 'planifie' ? '📝 Planifié' : (exam.status === 'en-cours' ? '🔄 En cours' : '✅ Terminé');
+                                
+                                return `
+                                    <tr>
+                                        <td><strong>${escapeHtml(exam.dateStr)}</strong></td>
+                                        <td>${escapeHtml(exam.heureDebut)} - ${escapeHtml(exam.heureFin)}</td>
+                                        <td><strong>${escapeHtml(exam.matiereNom)}</strong> <span style="font-size:0.7rem;">(coef ${exam.coefficient})</span></td>
+                                        <td><span class="room-badge">🏛️ ${escapeHtml(exam.salle)}</span></td>
+                                        <td><span class="duration-badge ${dureeClass}">${dureeText}</span></td>
+                                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function selectEnfant(eleveId) {
+            currentEnfantId = eleveId;
+            document.querySelectorAll('.enfant-tab').forEach(tab => tab.classList.remove('active'));
+            const tabs = document.querySelectorAll('.enfant-tab');
+            for (let i = 0; i < enfants.length; i++) {
+                if (enfants[i].id === eleveId && tabs[i]) tabs[i].classList.add('active');
+            }
+            afficherExamensEnfant();
+        }
+
+        async function rafraichirExamens() {
+            await chargerSalles();
+            if (currentEnfantId) {
+                await chargerExamensEnfant(currentEnfantId);
+                afficherExamensEnfant();
+            } else {
+                await chargerExamensTousEnfants();
+                if (enfants.length > 0 && !currentEnfantId) currentEnfantId = enfants[0].id;
+                afficherInterface();
+            }
+        }
+
+        function afficherErreur(message) {
+            document.getElementById('mainContainer').innerHTML = `
+                <div class="alert-warning">⚠️ ${escapeHtml(message)}</div>
+                <button class="enfant-tab" onclick="location.reload()" style="background:#4ca896;color:white;border:none;padding:0.8rem 1.5rem;border-radius:50px;margin-top:1rem;">🔄 Réessayer</button>
+            `;
+        }
+
+        function afficherAucunEnfant() {
+            document.getElementById('mainContainer').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👧🧒</div>
+                    <h3>Aucun enfant associé à votre compte</h3>
+                    <p style="color:#5a9d91;">Contactez l'administration.</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            token = getAuthToken();
+            console.log('📱 Page parent-examens initialisée');
+            if (token) chargerEnfants();
+            else { 
+                requestTokenFromParent(); 
+                setTimeout(() => { 
+                    token = getAuthToken(); 
+                    if (token) chargerEnfants(); 
+                    else afficherErreur('Impossible de récupérer votre session. Veuillez vous reconnecter.'); 
+                }, 1000); 
+            }
+        });
+
+        window.selectEnfant = selectEnfant;
+        window.rafraichirExamens = rafraichirExamens;
+        window.exporterPDF = exporterPDF;
+    </script>
+</body>
+</html>

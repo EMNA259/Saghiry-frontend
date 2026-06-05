@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Administration des Annonces</title>
+    <script src="global-settings.js"></script>
+    <style>
+        /* ====================================================
+           STYLE AMÉLIORÉ - DESIGN MODERNE & HARMONIEUX SAGHIRY
+           ==================================================== */
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* ============ MODE SOMBRE ============ */
+        body.dark-mode {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .page-header,
+        body.dark-mode .stat-card,
+        body.dark-mode .filters-section,
+        body.dark-mode .annonce-card,
+        body.dark-mode .empty-state,
+        body.dark-mode .modal {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .page-title h1 {
+            background: linear-gradient(135deg, #6abfad 0%, #5aa695 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        body.dark-mode .page-title-badge,
+        body.dark-mode .admin-badge {
+            background: linear-gradient(135deg, #2d6b63 0%, #1e4a44 100%);
+        }
+
+        body.dark-mode .stat-info .stat-number {
+            color: #6abfad;
+        }
+
+        body.dark-mode .stat-info h3 {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .filter-input,
+        body.dark-mode .form-control {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .filter-input:focus,
+        body.dark-mode .form-control:focus {
+            border-color: #6abfad;
+        }
+
+        body.dark-mode .filter-group label {
+            color: #6abfad;
+        }
+
+        body.dark-mode .filter-tag {
+            background: rgba(106, 191, 173, 0.1);
+            color: #6abfad;
+            border-color: #6abfad;
+        }
+
+        body.dark-mode .tab {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .tab:hover {
+            color: #6abfad;
+            background: rgba(106, 191, 173, 0.1);
+        }
+
+        body.dark-mode .tab.active {
+            background: linear-gradient(135deg, #2d6b63 0%, #1e4a44 100%);
+            color: white;
+        }
+
+        body.dark-mode .annonce-header {
+            background: #0f0f23;
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .annonce-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .annonce-preview {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .annonce-meta .meta-item {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .annonce-footer {
+            background: #0f0f23;
+            border-top-color: #2d2d44;
+        }
+
+        body.dark-mode .stats-mini {
+            color: #8a9ba8;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: #16213e;
+            border-color: #2d2d44;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .btn-secondary:hover:not(:disabled) {
+            border-color: #6abfad;
+            background: #1a1a2e;
+            color: #6abfad;
+        }
+
+        body.dark-mode .btn-icon {
+            background: #16213e;
+            border-color: #2d2d44;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .btn-icon:hover {
+            background: #6abfad;
+            color: white;
+        }
+
+        body.dark-mode .modal-header {
+            background: #0f0f23;
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .modal-header h2 {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .modal-footer {
+            border-top-color: #2d2d44;
+        }
+
+        body.dark-mode .checkbox-label {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .classes-selector-header {
+            background: #0f0f23;
+        }
+
+        body.dark-mode .suggestion-tag {
+            background: rgba(106, 191, 173, 0.1);
+            color: #6abfad;
+            border-color: #6abfad;
+        }
+
+        body.dark-mode .suggestion-tag:hover {
+            background: #6abfad;
+            color: #16213e;
+        }
+
+        body.dark-mode .page-item {
+            background: #16213e;
+            border-color: #2d2d44;
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .page-item:hover:not(.active) {
+            background: rgba(106, 191, 173, 0.1);
+            border-color: #6abfad;
+        }
+
+        body.dark-mode .page-item.active {
+            background: #6abfad;
+            color: white;
+        }
+
+        body.dark-mode .toast {
+            background: #16213e;
+            color: #e0e0e0;
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-title-badge {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .admin-badge {
+            background: var(--primary-deep);
+            color: white;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 14px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-soft);
+            border: 2px solid var(--gray-border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            border-color: var(--primary-green);
+            background: #f8fdfc;
+            color: var(--primary-dark);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary-green);
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-icon.total { background: #e3f2fd; color: #1976d2; }
+        .stat-icon.actives { background: #e8f5e9; color: #2e7d32; }
+        .stat-icon.urgentes { background: #fff3e0; color: #f57c00; }
+        .stat-icon.archivees { background: #f5f5f5; color: #616161; }
+
+        body.dark-mode .stat-icon.total { background: #1a3a4a; color: #66c0ff; }
+        body.dark-mode .stat-icon.actives { background: #1a3a2a; color: #51cf66; }
+        body.dark-mode .stat-icon.urgentes { background: #3a2a1a; color: #ff9466; }
+        body.dark-mode .stat-icon.archivees { background: #2a2a2a; color: #a0a0a0; }
+
+        .stat-info h3 {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .stat-info .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1;
+        }
+
+        .filters-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            text-transform: uppercase;
+        }
+
+        .filter-input {
+            padding: 0.7rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 14px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: white;
+            width: 100%;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+        }
+
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-border);
+        }
+
+        .filter-tag {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--primary-green);
+        }
+
+        .filter-tag button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .tabs-container {
+            background: white;
+            border-radius: 50px;
+            border: 1px solid var(--gray-border);
+            display: inline-flex;
+            gap: 0.3rem;
+            padding: 0.4rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        body.dark-mode .tabs-container {
+            background: #16213e;
+        }
+
+        .tab {
+            padding: 0.6rem 1.2rem;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 40px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .tab:hover {
+            color: var(--primary-green);
+            background: rgba(76, 168, 150, 0.1);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .tab-badge {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.15rem 0.5rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+        }
+
+        .tab.active .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .annonces-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .annonce-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .annonce-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-md);
+        }
+
+        .annonce-card.urgent {
+            border-left: 5px solid var(--accent-orange);
+        }
+
+        .annonce-header {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafdfc;
+        }
+
+        .annonce-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .type-badge {
+            background: var(--primary-green);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .urgent-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.15rem 0.7rem;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .annonce-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .annonce-body {
+            padding: 1.2rem;
+        }
+
+        .annonce-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+        }
+
+        .annonce-preview {
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .annonce-meta {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            color: var(--text-light);
+        }
+
+        .annonce-footer {
+            padding: 0.8rem 1.2rem;
+            background: #fafdfc;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-mini {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .btn-icon {
+            background: white;
+            border: 1px solid var(--gray-border);
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-icon:hover {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .btn-icon.delete:hover {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .page-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid var(--gray-border);
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .page-item:hover:not(.active) {
+            background: rgba(76, 168, 150, 0.1);
+            border-color: var(--primary-green);
+        }
+
+        .page-item.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: white;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 850px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafdfc;
+            border-radius: 28px 28px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary-deep);
+            font-size: 0.85rem;
+        }
+
+        .form-group label.required::after {
+            content: '*';
+            color: var(--accent-orange);
+            margin-left: 0.2rem;
+        }
+
+        .form-control {
+            padding: 0.7rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 14px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-green);
+        }
+
+        .suggestions-titres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.3rem;
+        }
+
+        .suggestion-tag {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.3rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px solid var(--primary-green);
+        }
+
+        .suggestion-tag:hover {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .classes-selector-section {
+            margin-bottom: 0.8rem;
+            border: 1px solid var(--gray-border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .classes-selector-header {
+            background: #f8fafc;
+            padding: 0.6rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .classes-selector-header .arrow {
+            margin-left: auto;
+        }
+
+        .classes-selector-header.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+
+        .classes-selector-content {
+            padding: 0.8rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .classes-selector-content.collapsed {
+            display: none;
+        }
+
+        .niveau-badge {
+            background: var(--primary-deep);
+            color: white;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.65rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.8rem 1.2rem;
+            border-radius: 14px;
+            background: white;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+            max-width: 350px;
+            border-left: 4px solid;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { border-left-color: var(--primary-green); }
+        .toast.error { border-left-color: #ff6b6b; }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(76, 168, 150, 0.2);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: 28px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full-width { grid-column: span 1; }
+            .annonces-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <h1>📢 Administration des Annonces</h1>
+                <span class="page-title-badge" id="totalAnnonces">0</span>
+                <span class="admin-badge" id="adminBadge">Chargement...</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="exportAnnonces()" id="exportBtn">📥 Exporter</button>
+                <button class="btn-primary" onclick="openCreateModal()" id="createBtn">➕ Nouvelle annonce</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon total">📋</div><div class="stat-info"><h3>Total</h3><div class="stat-number" id="statTotal">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon actives">✅</div><div class="stat-info"><h3>Actives</h3><div class="stat-number" id="statActives">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon urgentes">⚠️</div><div class="stat-info"><h3>Urgentes</h3><div class="stat-number" id="statUrgentes">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon archivees">📦</div><div class="stat-info"><h3>Archivées</h3><div class="stat-number" id="statArchivees">0</div></div></div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="search-box filter-group">
+                    <label>🔍 Recherche</label>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="Titre, contenu...">
+                </div>
+                <div class="filter-group">
+                    <label>🎯 Public cible</label>
+                    <select class="filter-input" id="cibleFilter">
+                        <option value="">Tous</option>
+                        <option value="tous">Tous</option>
+                        <option value="parents">Parents</option>
+                        <option value="enseignants">Enseignants</option>
+                        <option value="administration">Administration</option>
+                        <option value="classes">Classes spécifiques</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>📌 Statut</label>
+                    <select class="filter-input" id="statutFilter">
+                        <option value="">Tous</option>
+                        <option value="publiee">Publiée</option>
+                        <option value="brouillon">Brouillon</option>
+                        <option value="archivee">Archivée</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>📅 Période</label>
+                    <select class="filter-input" id="periodeFilter">
+                        <option value="all">Toutes</option>
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                    </select>
+                </div>
+            </div>
+            <div class="active-filters" id="activeFilters"></div>
+        </div>
+
+        <div class="tabs-container">
+            <button class="tab active" onclick="switchTab('all')">📋 Toutes <span class="tab-badge" id="tabAllCount">0</span></button>
+            <button class="tab" onclick="switchTab('actives')">✅ Actives <span class="tab-badge" id="tabActivesCount">0</span></button>
+            <button class="tab" onclick="switchTab('urgentes')">⚠️ Urgentes <span class="tab-badge" id="tabUrgentesCount">0</span></button>
+            <button class="tab" onclick="switchTab('archivees')">📦 Archivées <span class="tab-badge" id="tabArchiveesCount">0</span></button>
+        </div>
+
+        <div id="annoncesContainer"><div class="loading-spinner"><div class="spinner"></div></div></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- MODAL CRÉATION/MODIFICATION -->
+    <div id="annonceModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Créer une annonce</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="annonceForm">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label class="required">Titre</label>
+                            <input type="text" class="form-control" id="titre" required>
+                            <div class="suggestions-titres">
+                                <span class="suggestion-tag" onclick="setTitre('Réunion parents-professeurs')">👪 Réunion</span>
+                                <span class="suggestion-tag" onclick="setTitre('Conseil de classe')">📋 Conseil</span>
+                                <span class="suggestion-tag" onclick="setTitre('Sortie scolaire')">🚌 Sortie</span>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Motif</label>
+                            <select class="form-control" id="motif">
+                                <option value="">Sélectionner</option>
+                                <option value="reunion">👪 Réunion</option>
+                                <option value="urgence">⚠️ Urgence</option>
+                                <option value="information">ℹ️ Information</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="required">Contenu</label>
+                            <textarea class="form-control" id="contenu" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">Public cible</label>
+                            <select class="form-control" id="publicCible" required onchange="toggleClassesSelector()">
+                                <option value="tous">👥 Tous</option>
+                                <option value="parents">👪 Parents</option>
+                                <option value="enseignants">👨‍🏫 Enseignants</option>
+                                <option value="administration">🏛️ Administration</option>
+                                <option value="classes">🏫 Classes spécifiques</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Expiration</label>
+                            <input type="date" class="form-control" id="dateExpiration">
+                        </div>
+                        <div class="form-group full-width" id="classesSelector" style="display: none;">
+                            <label>Classes concernées</label>
+                            <div id="classesList"></div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label"><input type="checkbox" id="estUrgent"> ⚠️ Urgent</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Statut</label>
+                            <select class="form-control" id="statut">
+                                <option value="publiee">✅ Publier</option>
+                                <option value="brouillon">📝 Brouillon</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+                <button class="btn-primary" onclick="saveAnnonce()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DÉTAIL -->
+    <div id="detailModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Détail</h2>
+                <button class="modal-close" onclick="closeDetailModal()">×</button>
+            </div>
+            <div class="modal-body" id="detailContent"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDetailModal()">Fermer</button>
+                <button class="btn-primary" onclick="editFromDetail()">Modifier</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"><span class="toast-icon" id="toastIcon">✅</span><span class="toast-message" id="toastMessage"></span></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5267/api';
+        
+        let annonces = [];
+        let classes = [];
+        let currentAnnonceId = null;
+        let currentPage = 1;
+        let pageSize = 12;
+        let currentTab = 'all';
+        let isAdmin = true;
+        let currentUserId = null;
+        let currentFilters = { search: '', cible: '', statut: '', periode: 'all' };
+        let collapsedSections = {};
+
+        function getToken() {
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken') || 
+                   localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            toastMessage.textContent = message;
+            toastIcon.textContent = type === 'success' ? '✅' : '❌';
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function setTitre(titre) {
+            document.getElementById('titre').value = titre;
+        }
+
+        async function loadCurrentUser() {
+            try {
+                const token = getToken();
+                if (!token) return;
+                
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    currentUserId = user.id || user._id;
+                    const role = (user.role || '').toLowerCase();
+                    isAdmin = role === 'admin' || role === 'superadmin';
+                    document.getElementById('adminBadge').textContent = user.nom || user.prenom || 'Admin';
+                }
+            } catch (e) {
+                console.error('Erreur chargement user:', e);
+            }
+        }
+
+        async function loadClasses() {
+            try {
+                const token = getToken();
+                if (!token) return;
+                
+                const response = await fetch(`${API_BASE_URL}/Classe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    classes = data.data || data;
+                    if (!Array.isArray(classes)) classes = [];
+                    console.log(`${classes.length} classes chargées`);
+                    renderClassesSelector();
+                }
+            } catch (error) {
+                console.warn('Erreur classes:', error);
+                classes = [];
+            }
+        }
+
+        async function loadAnnonces() {
+            try {
+                const token = getToken();
+                if (!token) {
+                    document.getElementById('annoncesContainer').innerHTML = '<div class="empty-state"><div class="empty-icon">🔒</div><h2>Non authentifié</h2></div>';
+                    return;
+                }
+                
+                console.log('Chargement des annonces...');
+                const response = await fetch(`${API_BASE_URL}/Annonce`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error(`Erreur ${response.status}`);
+                
+                const data = await response.json();
+                console.log('Réponse API:', data);
+                
+                // CORRECTION CLAV : Extraction correcte des données
+                if (data && data.data && Array.isArray(data.data)) {
+                    annonces = data.data;
+                } else if (data && data.Data && Array.isArray(data.Data)) {
+                    annonces = data.Data;
+                } else if (Array.isArray(data)) {
+                    annonces = data;
+                } else if (data && typeof data === 'object') {
+                    // Chercher un tableau dans l'objet
+                    for (let key in data) {
+                        if (Array.isArray(data[key])) {
+                            annonces = data[key];
+                            break;
+                        }
+                    }
+                }
+                
+                console.log(`${annonces.length} annonces extraites`);
+                
+                if (annonces.length > 0) {
+                    console.log('Première annonce:', annonces[0]);
+                }
+                
+                updateStats();
+                updateTabsCounts();
+                filterAnnonces();
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                annonces = [];
+                filterAnnonces();
+                showToast('Erreur de chargement', 'error');
+            }
+        }
+
+        function updateStats() {
+            const total = annonces.length;
+            const actives = annonces.filter(a => a.statut === 'publiee').length;
+            const urgentes = annonces.filter(a => a.estUrgent === true).length;
+            const archivees = annonces.filter(a => a.statut === 'archivee').length;
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statActives').textContent = actives;
+            document.getElementById('statUrgentes').textContent = urgentes;
+            document.getElementById('statArchivees').textContent = archivees;
+            document.getElementById('totalAnnonces').textContent = total;
+        }
+
+        function updateTabsCounts() {
+            document.getElementById('tabAllCount').textContent = annonces.length;
+            document.getElementById('tabActivesCount').textContent = annonces.filter(a => a.statut === 'publiee').length;
+            document.getElementById('tabUrgentesCount').textContent = annonces.filter(a => a.estUrgent === true).length;
+            document.getElementById('tabArchiveesCount').textContent = annonces.filter(a => a.statut === 'archivee').length;
+        }
+
+        function filterAnnonces() {
+            let filtered = [...annonces];
+            
+            if (currentFilters.search) {
+                const search = currentFilters.search.toLowerCase();
+                filtered = filtered.filter(a => 
+                    (a.titre || '').toLowerCase().includes(search) || 
+                    (a.contenu || '').toLowerCase().includes(search)
+                );
+            }
+            
+            if (currentFilters.cible) {
+                filtered = filtered.filter(a => a.publicCible === currentFilters.cible);
+            }
+            
+            if (currentFilters.statut) {
+                filtered = filtered.filter(a => a.statut === currentFilters.statut);
+            }
+            
+            if (currentFilters.periode && currentFilters.periode !== 'all') {
+                const now = new Date();
+                filtered = filtered.filter(a => {
+                    if (!a.datePublication) return false;
+                    const date = new Date(a.datePublication);
+                    if (currentFilters.periode === 'today') return date.toDateString() === now.toDateString();
+                    if (currentFilters.periode === 'week') {
+                        const weekAgo = new Date(now);
+                        weekAgo.setDate(weekAgo.getDate() - 7);
+                        return date >= weekAgo;
+                    }
+                    if (currentFilters.periode === 'month') {
+                        const monthAgo = new Date(now);
+                        monthAgo.setMonth(monthAgo.getMonth() - 1);
+                        return date >= monthAgo;
+                    }
+                    return true;
+                });
+            }
+            
+            switch(currentTab) {
+                case 'actives':
+                    filtered = filtered.filter(a => a.statut === 'publiee');
+                    break;
+                case 'urgentes':
+                    filtered = filtered.filter(a => a.estUrgent === true);
+                    break;
+                case 'archivees':
+                    filtered = filtered.filter(a => a.statut === 'archivee');
+                    break;
+            }
+            
+            const start = (currentPage - 1) * pageSize;
+            const paginated = filtered.slice(start, start + pageSize);
+            
+            renderAnnonces(paginated);
+            renderPagination(filtered.length);
+            renderActiveFilters();
+        }
+
+        function renderAnnonces(annoncesToRender) {
+            const container = document.getElementById('annoncesContainer');
+            
+            if (!annoncesToRender || annoncesToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <h2>Aucune annonce</h2>
+                        ${isAdmin ? '<button class="btn-primary" onclick="openCreateModal()" style="margin-top: 1rem;">➕ Créer</button>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="annonces-grid">';
+            for (const a of annoncesToRender) {
+                const id = a.id || a._id;
+                let date = 'Date inconnue';
+                if (a.datePublication) {
+                    try { date = new Date(a.datePublication).toLocaleDateString('fr-FR'); } catch(e) {}
+                }
+                
+                const publicLabel = {
+                    'tous': '👥 Tous',
+                    'parents': '👪 Parents',
+                    'enseignants': '👨‍🏫 Enseignants',
+                    'administration': '🏛️ Administration'
+                }[a.publicCible] || a.publicCible || 'Tous';
+                
+                html += `
+                    <div class="annonce-card ${a.estUrgent ? 'urgent' : ''}" onclick="showDetail('${id}')">
+                        <div class="annonce-header">
+                            <div class="annonce-type">
+                                <span class="type-badge">${publicLabel}</span>
+                                ${a.estUrgent ? '<span class="urgent-badge">⚠️ URGENT</span>' : ''}
+                            </div>
+                            <div class="annonce-date">📅 ${date}</div>
+                        </div>
+                        <div class="annonce-body">
+                            <h3 class="annonce-title">${escapeHtml(a.titre || 'Sans titre')}</h3>
+                            <p class="annonce-preview">${escapeHtml((a.contenu || '').substring(0, 150))}${(a.contenu || '').length > 150 ? '...' : ''}</p>
+                            <div class="annonce-meta">
+                                <span class="meta-item">👤 ${escapeHtml(a.auteurNom || 'Admin')}</span>
+                                ${a.motif ? `<span class="meta-item">📌 ${escapeHtml(a.motif)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="annonce-footer">
+                            <div class="stats-mini">
+                                <span>👁️ ${a.vues || 0}</span>
+                                <span>${a.statut === 'publiee' ? 'Publiée' : a.statut === 'brouillon' ? 'Brouillon' : 'Archivée'}</span>
+                            </div>
+                            ${isAdmin ? `
+                                <div class="action-buttons" onclick="event.stopPropagation()">
+                                    <button class="btn-icon" onclick="editAnnonce('${id}')">✏️</button>
+                                    <button class="btn-icon delete" onclick="deleteAnnonce('${id}')">🗑️</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderPagination(total) {
+            const pages = Math.ceil(total / pageSize);
+            const pagination = document.getElementById('pagination');
+            if (pages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            const maxPages = Math.min(pages, 7);
+            let start = Math.max(1, currentPage - 3);
+            let end = Math.min(pages, start + maxPages - 1);
+            start = Math.max(1, end - maxPages + 1);
+            
+            for (let i = start; i <= end; i++) {
+                html += `<div class="page-item ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</div>`;
+            }
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            filterAnnonces();
+        }
+
+        function renderActiveFilters() {
+            const container = document.getElementById('activeFilters');
+            let filters = [];
+            
+            if (currentFilters.search) filters.push({ type: 'search', label: `Recherche: "${currentFilters.search}"` });
+            if (currentFilters.cible) filters.push({ type: 'cible', label: `Cible: ${currentFilters.cible}` });
+            if (currentFilters.statut) filters.push({ type: 'statut', label: `Statut: ${currentFilters.statut}` });
+            if (currentFilters.periode && currentFilters.periode !== 'all') {
+                const labels = { today: 'Aujourd\'hui', week: 'Cette semaine', month: 'Ce mois' };
+                filters.push({ type: 'periode', label: `Période: ${labels[currentFilters.periode]}` });
+            }
+            
+            if (filters.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '<span style="color: var(--text-light);">Filtres:</span>';
+            for (const f of filters) {
+                html += `<span class="filter-tag">${f.label} <button onclick="clearFilter('${f.type}')">×</button></span>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function clearFilter(type) {
+            if (type === 'search') {
+                currentFilters.search = '';
+                document.getElementById('searchInput').value = '';
+            } else if (type === 'cible') {
+                currentFilters.cible = '';
+                document.getElementById('cibleFilter').value = '';
+            } else if (type === 'statut') {
+                currentFilters.statut = '';
+                document.getElementById('statutFilter').value = '';
+            } else if (type === 'periode') {
+                currentFilters.periode = 'all';
+                document.getElementById('periodeFilter').value = 'all';
+            }
+            filterAnnonces();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            currentPage = 1;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const tabMap = { all: 'tabAll', actives: 'tabActives', urgentes: 'tabUrgentes', archivees: 'tabArchivees' };
+            const el = document.getElementById(tabMap[tab]);
+            if (el) el.classList.add('active');
+            filterAnnonces();
+        }
+
+        async function saveAnnonce() {
+            const titre = document.getElementById('titre').value.trim();
+            const contenu = document.getElementById('contenu').value.trim();
+            
+            if (!titre || !contenu) {
+                showToast('Titre et contenu requis', 'error');
+                return;
+            }
+            
+            const publicCible = document.getElementById('publicCible').value;
+            let classesCibles = null;
+            
+            if (publicCible === 'classes') {
+                classesCibles = getSelectedClasses();
+                if (!classesCibles || classesCibles.length === 0) {
+                    showToast('Sélectionnez au moins une classe', 'error');
+                    return;
+                }
+            }
+            
+            const data = {
+                titre: titre,
+                contenu: contenu,
+                publicCible: publicCible,
+                dateExpiration: document.getElementById('dateExpiration').value || null,
+                estUrgent: document.getElementById('estUrgent').checked,
+                statut: document.getElementById('statut').value,
+                auteurId: currentUserId || 'admin',
+                classesCibles: classesCibles,
+                motif: document.getElementById('motif').value || null,
+                piecesJointes: []
+            };
+            
+            try {
+                const token = getToken();
+                if (!token) throw new Error('Non authentifié');
+                
+                let url = `${API_BASE_URL}/Annonce`;
+                let method = 'POST';
+                
+                if (currentAnnonceId) {
+                    url += `/${currentAnnonceId}`;
+                    method = 'PUT';
+                }
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error || `Erreur ${response.status}`);
+                }
+                
+                showToast(currentAnnonceId ? 'Annonce modifiée' : 'Annonce créée', 'success');
+                closeModal();
+                await loadAnnonces();
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function deleteAnnonce(id) {
+            if (!confirm('Supprimer cette annonce ?')) return;
+            
+            try {
+                const token = getToken();
+                const response = await fetch(`${API_BASE_URL}/Annonce/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) throw new Error('Erreur suppression');
+                
+                showToast('Annonce supprimée', 'success');
+                await loadAnnonces();
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        function openCreateModal() {
+            currentAnnonceId = null;
+            document.getElementById('modalTitle').textContent = 'Nouvelle annonce';
+            document.getElementById('annonceForm').reset();
+            document.getElementById('publicCible').value = 'tous';
+            document.getElementById('classesSelector').style.display = 'none';
+            document.getElementById('annonceModal').style.display = 'flex';
+        }
+
+        function editAnnonce(id) {
+            const annonce = annonces.find(a => (a.id || a._id) === id);
+            if (!annonce) return;
+            
+            currentAnnonceId = id;
+            document.getElementById('modalTitle').textContent = 'Modifier';
+            document.getElementById('titre').value = annonce.titre || '';
+            document.getElementById('contenu').value = annonce.contenu || '';
+            document.getElementById('publicCible').value = annonce.publicCible || 'tous';
+            document.getElementById('motif').value = annonce.motif || '';
+            if (annonce.dateExpiration) {
+                document.getElementById('dateExpiration').value = new Date(annonce.dateExpiration).toISOString().split('T')[0];
+            }
+            document.getElementById('estUrgent').checked = annonce.estUrgent || false;
+            document.getElementById('statut').value = annonce.statut || 'publiee';
+            
+            toggleClassesSelector();
+            if (annonce.classesCibles) {
+                setTimeout(() => selectClasses(annonce.classesCibles), 100);
+            }
+            
+            document.getElementById('annonceModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('annonceModal').style.display = 'none';
+        }
+
+        function showDetail(id) {
+            const annonce = annonces.find(a => (a.id || a._id) === id);
+            if (!annonce) return;
+            
+            let datePub = 'Inconnue', dateExp = 'Pas d\'expiration';
+            try {
+                if (annonce.datePublication) datePub = new Date(annonce.datePublication).toLocaleString('fr-FR');
+                if (annonce.dateExpiration) dateExp = new Date(annonce.dateExpiration).toLocaleDateString('fr-FR');
+            } catch(e) {}
+            
+            const html = `
+                <h3 style="margin-bottom: 1rem;">${escapeHtml(annonce.titre)}</h3>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                    <p><strong>📅 Publication:</strong> ${datePub}</p>
+                    <p><strong>⏰ Expiration:</strong> ${dateExp}</p>
+                    <p><strong>👤 Auteur:</strong> ${escapeHtml(annonce.auteurNom || 'Admin')}</p>
+                    <p><strong>🎯 Public:</strong> ${annonce.publicCible}</p>
+                    ${annonce.estUrgent ? '<p style="color: #ff9466;">⚠️ URGENT</p>' : ''}
+                </div>
+                <div style="white-space: pre-wrap;">${escapeHtml(annonce.contenu)}</div>
+            `;
+            
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('detailModal').style.display = 'flex';
+            currentAnnonceId = id;
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        function editFromDetail() {
+            closeDetailModal();
+            editAnnonce(currentAnnonceId);
+        }
+
+        function exportAnnonces() {
+            const dataStr = JSON.stringify(annonces, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `annonces_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Export réussi', 'success');
+        }
+
+        function toggleClassesSelector() {
+            const select = document.getElementById('publicCible');
+            document.getElementById('classesSelector').style.display = select.value === 'classes' ? 'block' : 'none';
+        }
+
+        function toggleSection(niveau) {
+            collapsedSections[niveau] = !collapsedSections[niveau];
+            renderClassesSelector();
+        }
+
+        function renderClassesSelector() {
+            const container = document.getElementById('classesList');
+            if (!container) return;
+            
+            if (!classes || classes.length === 0) {
+                container.innerHTML = '<p>Aucune classe</p>';
+                return;
+            }
+            
+            const groups = {};
+            for (const c of classes) {
+                const niveau = c.niveau || c.Niveau || 'Autres';
+                if (!groups[niveau]) groups[niveau] = [];
+                groups[niveau].push(c);
+            }
+            
+            let html = '';
+            for (const [niveau, items] of Object.entries(groups)) {
+                const isOpen = collapsedSections[niveau] !== false;
+                html += `
+                    <div class="classes-selector-section">
+                        <div class="classes-selector-header ${isOpen ? '' : 'collapsed'}" onclick="toggleSection('${niveau.replace(/'/g, "\\'")}')">
+                            <span>📘 ${niveau}</span>
+                            <span class="niveau-badge">${items.length}</span>
+                            <span class="arrow">${isOpen ? '▼' : '▶'}</span>
+                        </div>
+                        <div class="classes-selector-content ${isOpen ? '' : 'collapsed'}">
+                `;
+                for (const c of items) {
+                    const id = c.id || c._id;
+                    const nom = c.nomClasse || c.nom || 'Classe';
+                    html += `<label class="checkbox-label"><input type="checkbox" value="${id}" class="classe-checkbox"> ${escapeHtml(nom)}</label>`;
+                }
+                html += `</div></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function getSelectedClasses() {
+            const checkboxes = document.querySelectorAll('.classe-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function selectClasses(ids) {
+            const checkboxes = document.querySelectorAll('.classe-checkbox');
+            for (const cb of checkboxes) {
+                cb.checked = ids.includes(cb.value);
+            }
+        }
+
+        function setupEventListeners() {
+            let timeout;
+            document.getElementById('searchInput').addEventListener('input', function() {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    currentFilters.search = this.value;
+                    filterAnnonces();
+                }, 500);
+            });
+            
+            document.getElementById('cibleFilter').addEventListener('change', function() {
+                currentFilters.cible = this.value;
+                filterAnnonces();
+            });
+            
+            document.getElementById('statutFilter').addEventListener('change', function() {
+                currentFilters.statut = this.value;
+                filterAnnonces();
+            });
+            
+            document.getElementById('periodeFilter').addEventListener('change', function() {
+                currentFilters.periode = this.value;
+                filterAnnonces();
+            });
+        }
+
+        // INITIALISATION
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Initialisation...');
+            await loadCurrentUser();
+            await loadClasses();
+            await loadAnnonces();
+            setupEventListeners();
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateExpiration').min = today;
+            
+            if (!isAdmin) {
+                document.getElementById('createBtn').disabled = true;
+                document.getElementById('exportBtn').disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes propositions d'emploi du temps</title>
+    <style>
+        /* ============ STYLES INSPIRÉS DE CLASSES.HTML, ADMIN-VŒUX ET ENSEIGNANT-VŒUX ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .propositions-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ============ PAGE HEADER ============ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '📋';
+            font-size: 2rem;
+            -webkit-text-fill-color: initial;
+            color: var(--primary-green);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        /* ============ SYSTEM STATUS ============ */
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+            width: fit-content;
+            border: 1px solid var(--gray-border);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-green);
+        }
+
+        .status-dot.checking {
+            background: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            color: var(--text-soft);
+        }
+
+        /* ============ INFO REPARTITION ============ */
+        .info-repartition {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--accent-orange);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .repartition-title {
+            font-weight: 600;
+            color: var(--accent-orange-dark);
+        }
+
+        .repartition-badge {
+            background: var(--gray-bg);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            border: 1px solid var(--gray-border);
+        }
+
+        .repartition-detail {
+            color: var(--text-soft);
+            font-size: 0.9rem;
+        }
+
+        /* ============ GRILLE PROPOSITIONS ============ */
+        .propositions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .proposition-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .proposition-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-orange);
+        }
+
+        .proposition-card.selected {
+            border-color: var(--primary-green);
+            background: linear-gradient(135deg, #f0fff4, #e6f7f4);
+        }
+
+        .selected-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--primary-green);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 8px rgba(76,168,150,0.3);
+            z-index: 10;
+        }
+
+        .proposition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .proposition-strategie {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .proposition-score {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-dark));
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(255,148,102,0.3);
+        }
+
+        .proposition-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--gray-bg), white);
+            border-radius: 16px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .stat-mini {
+            text-align: center;
+            padding: 0.3rem;
+        }
+
+        .stat-mini-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-orange-dark);
+            line-height: 1.2;
+        }
+
+        .stat-mini-label {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ============ EMPLOI MINI ============ */
+        .emploi-mini {
+            margin: 1rem 0 1.5rem;
+            border: 1px solid var(--gray-border);
+            border-radius: 16px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            font-size: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            background: white;
+        }
+
+        .emploi-mini table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+            min-width: 500px;
+        }
+
+        .emploi-mini th {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            padding: 0.6rem 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .emploi-mini td {
+            padding: 0.4rem 0.2rem;
+            text-align: center;
+            border: 1px solid var(--gray-border);
+            vertical-align: middle;
+        }
+
+        .emploi-mini .heure-cell {
+            background: linear-gradient(135deg, var(--gray-bg), #f0f0f0);
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            font-family: monospace;
+            width: 50px;
+        }
+
+        .emploi-mini .cours-cell {
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .emploi-mini .cours-cell.has-cours {
+            background: linear-gradient(135deg, #fff3e0, #ffe4d6);
+            border-left: 4px solid var(--accent-orange);
+            font-weight: 500;
+            box-shadow: inset 0 0 0 1px rgba(255,148,102,0.2);
+        }
+
+        .emploi-mini .cours-cell .matiere {
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+            font-size: 0.75rem;
+            line-height: 1.2;
+            margin-bottom: 0.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+        }
+
+        .emploi-mini .cours-cell .classe-niveau {
+            font-size: 0.65rem;
+            color: var(--text-soft);
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .emploi-mini .cours-cell .classe-niveau span {
+            background: rgba(255,148,102,0.1);
+            padding: 0.1rem 0.3rem;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .emploi-mini .cours-cell .suite-indicator {
+            font-style: italic;
+            font-size: 0.6rem;
+            color: #666;
+            margin-top: 0.1rem;
+        }
+
+        .emploi-mini .cours-cell:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 2;
+            position: relative;
+        }
+
+        /* ============ POINTS FORTS/FAIBLES ============ */
+        .points-forts {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #e6f7f4, #d4f0eb);
+            border-radius: 12px;
+            color: #2d6b63;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .points-faibles {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #fff3e0, #ffe9d4);
+            border-radius: 12px;
+            color: #b45309;
+            font-size: 0.9rem;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .points-forts strong, .points-faibles strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .points-forts ul, .points-faibles ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .points-forts li, .points-faibles li {
+            margin-bottom: 0.3rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .points-forts li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2d6b63;
+        }
+
+        .points-faibles li:before {
+            content: "!";
+            position: absolute;
+            left: 0;
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        /* ============ BOUTONS ============ */
+        .btn-select {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(76,168,150,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-select:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76,168,150,0.4);
+        }
+
+        .btn-remove {
+            width: 100%;
+            padding: 0.8rem;
+            background: white;
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+        }
+
+        .btn-remove:hover {
+            background: #fff5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,107,107,0.2);
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76,168,150,0.4);
+        }
+
+        .btn-force {
+            background: linear-gradient(135deg, #ff6b6b, #dc3545);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-force:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220,53,69,0.4);
+        }
+
+        .btn-diagnostic {
+            background: linear-gradient(135deg, #339af0, #1e7fd9);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-diagnostic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(51,154,240,0.4);
+        }
+
+        .btn-refresh {
+            background: white;
+            color: var(--text-soft);
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-refresh:hover {
+            background: var(--gray-bg);
+            transform: translateY(-2px);
+        }
+
+        .btn-voeux {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-orange-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-voeux:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,148,102,0.4);
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76,168,150,0.3);
+        }
+
+        /* ============ SELECTION COUNTER ============ */
+        .selection-counter {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--accent-orange);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .counter-text {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .counter-number {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* ============ STATUS BADGE ============ */
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-badge.validé {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status-badge.en-attente {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeeba;
+        }
+
+        .status-badge.non-soumis {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        /* ============ MESSAGE EMPLOI EXISTANT ============ */
+        .emploi-existant-message {
+            background: linear-gradient(135deg, #e6f7f4, #d4f0eb);
+            border-radius: 24px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid var(--primary-green);
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .emploi-existant-message .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .emploi-existant-message h2 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .emploi-existant-message p {
+            color: var(--text-soft);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .btn-emploi {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 1rem 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-emploi:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(76,168,150,0.4);
+        }
+
+        /* ============ MODALS ============ */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* ============ ALERTES ============ */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        /* ============ LOADING & NO DATA ============ */
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        .loading:after {
+            content: "...";
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 4rem;
+            background: white;
+            border-radius: 24px;
+            color: var(--text-light);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-border);
+        }
+
+        .no-data h3 {
+            color: var(--text-dark);
+            margin: 1rem 0;
+            font-size: 1.5rem;
+        }
+
+        .no-data .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1200px) {
+            .propositions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .propositions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .info-repartition {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .proposition-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ============ SCROLLBAR ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="propositions-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Mes propositions d'emploi du temps</h1>
+                <p class="page-subtitle" id="pageSubtitle">Vos propositions d'emploi du temps personnalisées</p>
+            </div>
+        </div>
+
+        <div class="system-status" id="systemStatus">
+            <div class="status-dot" id="statusDot"></div>
+            <div class="status-text" id="statusText">Système prêt</div>
+        </div>
+
+        <div id="infoRepartition" class="info-repartition" style="display: none;">
+            <div>
+                <span class="repartition-title">📊 Répartition des cours</span>
+                <span class="repartition-badge" id="totalHeuresVues">0h</span>
+            </div>
+            <div class="repartition-detail" id="repartitionDetail">
+                Chargement...
+            </div>
+        </div>
+
+        <div id="alertMessage"></div>
+        <div id="loadingIndicator" class="loading" style="display: none;">Chargement</div>
+
+        <div id="selectionCounter" class="selection-counter" style="display: none;">
+            <div class="counter-text">
+                <span>📋 Propositions sélectionnées :</span>
+                <span class="counter-number" id="selectedPropositionsCount">0</span>
+            </div>
+            <button class="btn-send" onclick="envoyerToutesSelections()" id="envoyerToutBtn">
+                Envoyer à l'administration
+            </button>
+        </div>
+
+        <!-- Zone pour afficher les propositions -->
+        <div id="propositionsGrid" class="propositions-grid"></div>
+
+        <!-- Zone pour afficher le message si aucun contenu -->
+        <div id="infoMessage" style="display: none;" class="no-data">
+            <div style="font-size: 4rem; margin-bottom: 1rem;" id="infoIcon">⏳</div>
+            <div id="statusBadge" class="status-badge"></div>
+            <h3 id="infoTitle">Information</h3>
+            <p id="infoMessageText" style="margin-top: 1rem; margin-bottom: 2rem;"></p>
+            <div class="action-buttons" id="actionButtons"></div>
+        </div>
+
+        <!-- Zone pour afficher le message "emploi du temps déjà existant" -->
+        <div id="emploiExistantMessage" style="display: none;" class="emploi-existant-message">
+            <div class="icon">📅✅</div>
+            <h2>Votre emploi du temps est disponible !</h2>
+            <p>Vous avez déjà un emploi du temps généré pour cette année scolaire.<br>Veuillez consulter votre emploi du temps final.</p>
+            <button class="btn-emploi" onclick="voirEmploiDuTemps()">
+                📅 Voir mon emploi du temps
+            </button>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Confirmer votre choix</h3>
+            <p id="modalMessage" style="margin-bottom: 1rem;">Voulez-vous sélectionner cette proposition ?</p>
+            <p style="margin-bottom: 1.5rem; color: var(--text-light); background: var(--gray-bg); padding: 1rem; border-radius: 12px;">
+                Vous pouvez sélectionner plusieurs propositions. Elles seront envoyées à l'administration.
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-refresh" onclick="closeModal()">Annuler</button>
+                <button class="btn-generate" id="confirmSelectBtn">Sélectionner</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmMultipleModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Confirmer l'envoi</h3>
+            <p id="multipleModalMessage" style="margin-bottom: 1rem;">Vous allez envoyer <span id="multipleCount">0</span> propositions à l'administration.</p>
+            <p style="margin-bottom: 1.5rem; color: var(--text-light); background: var(--gray-bg); padding: 1rem; border-radius: 12px;">
+                L'administration analysera vos propositions pour l'emploi du temps final.
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-refresh" onclick="closeMultipleModal()">Annuler</button>
+                <button class="btn-generate" id="confirmMultipleBtn">Confirmer l'envoi</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <span style="font-size: 4rem;">✓</span>
+            </div>
+            <h3 style="margin-bottom: 1rem; text-align: center;">Propositions envoyées</h3>
+            <p id="successMessage" style="margin-bottom: 1.5rem; text-align: center; color: var(--text-soft);">
+                Vos propositions ont été transmises à l'administration.
+            </p>
+            <button class="btn-generate" onclick="closeSuccessModal()" style="width: 100%;">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== CONFIGURATION ==========
+        const API_BASE = 'http://localhost:5267/api';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        
+        let currentEnseignant = null;
+        let currentVoeux = null;
+        let propositions = [];
+        let selectedPropositions = new Set();
+        let classesParNiveau = {};
+        let generationEnCours = false;
+
+        const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+        const heures = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+
+        const volumesHoraires = {
+            '1ère année': {
+                'Langue arabe': 9, 'Mathématiques': 5, 'Éveil scientifique': 1,
+                'Éducation islamique': 1, 'Éducation technologique': 1,
+                'Éducation musicale': 1, 'Éducation artistique': 1, 'Éducation physique': 1
+            },
+            '2ème année': {
+                'Langue arabe': 9, 'Langue française': 2, 'Mathématiques': 5,
+                'Éveil scientifique': 1, 'Éducation islamique': 1, 'Éducation technologique': 1,
+                'Éducation musicale': 1, 'Éducation artistique': 1, 'Éducation physique': 1
+            },
+            '3ème année': {
+                'Langue arabe': 6, 'Langue française': 8, 'Mathématiques': 5,
+                'Éveil scientifique': 1, 'Éducation islamique': 1, 'Éducation technologique': 1,
+                'Éducation musicale': 1, 'Éducation artistique': 1, 'Éducation physique': 1
+            },
+            '4ème année': {
+                'Langue arabe': 6, 'Langue française': 8, 'Langue anglaise': 1,
+                'Mathématiques': 5, 'Éveil scientifique': 1, 'Éducation islamique': 1,
+                'Éducation technologique': 1, 'Éducation musicale': 1,
+                'Éducation artistique': 1, 'Éducation physique': 1
+            },
+            '5ème année': {
+                'Langue arabe': 6, 'Langue française': 8, 'Langue anglaise': 2,
+                'Mathématiques': 5, 'Éveil scientifique': 1, 'Éducation islamique': 1,
+                'Éducation technologique': 1, 'Éducation musicale': 1,
+                'Éducation artistique': 1, 'Éducation physique': 1,
+                'Histoire': 1, 'Géographie': 1, 'Éducation civique': 1
+            },
+            '6ème année': {
+                'Langue arabe': 6, 'Langue française': 8, 'Langue anglaise': 2,
+                'Mathématiques': 5, 'Éveil scientifique': 1, 'Éducation islamique': 1,
+                'Éducation technologique': 1, 'Éducation musicale': 1,
+                'Éducation artistique': 1, 'Éducation physique': 1,
+                'Histoire': 1, 'Géographie': 1, 'Éducation civique': 1
+            }
+        };
+
+        // ========== INITIALISATION ==========
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!token) {
+                window.parent.location.href = 'saghiry-auth.html';
+                return;
+            }
+
+            // ✅ Vérifier si l'enseignant a déjà un emploi du temps généré
+            const aDejaEmploi = await verifierEmploiExistant();
+            if (aDejaEmploi) {
+                // Ne pas rediriger automatiquement, afficher un message
+                afficherMessageEmploiExistant();
+                return;
+            }
+
+            loadSelectedPropositions();
+            showLoading(true);
+            await checkSystemStatus();
+            await loadEnseignantInfos();
+            await loadVoeux();
+            await loadClasses();
+            await verifierEtChargerPropositions();
+            showLoading(false);
+        });
+
+        // Afficher le message quand l'emploi du temps existe déjà
+        function afficherMessageEmploiExistant() {
+            document.getElementById('propositionsGrid').style.display = 'none';
+            document.getElementById('selectionCounter').style.display = 'none';
+            document.getElementById('infoRepartition').style.display = 'none';
+            document.getElementById('infoMessage').style.display = 'none';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('emploiExistantMessage').style.display = 'block';
+        }
+
+        // Redirection vers l'emploi du temps
+        function voirEmploiDuTemps() {
+            window.location.href = 'enseignant-emploi.html';
+        }
+
+        async function verifierEmploiExistant() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                if (!enseignantId) return false;
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data && data.data.Creneaux && data.data.Creneaux.length > 0) {
+                        console.log('✅ Emploi du temps déjà existant');
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.log('Erreur vérification emploi:', error);
+                return false;
+            }
+        }
+
+        function loadSelectedPropositions() {
+            try {
+                const saved = localStorage.getItem('selectedPropositions');
+                if (saved) {
+                    const ids = JSON.parse(saved);
+                    selectedPropositions = new Set(ids);
+                    console.log('📦 Sélections chargées:', selectedPropositions.size, 'propositions');
+                }
+            } catch (e) {
+                console.error('Erreur chargement sélections:', e);
+            }
+        }
+
+        function saveSelectedPropositions() {
+            try {
+                const ids = Array.from(selectedPropositions);
+                localStorage.setItem('selectedPropositions', JSON.stringify(ids));
+                console.log('💾 Sélections sauvegardées:', ids.length, 'propositions');
+            } catch (e) {
+                console.error('Erreur sauvegarde sélections:', e);
+            }
+        }
+
+        async function checkSystemStatus() {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            
+            dot.className = 'status-dot checking';
+            text.innerHTML = 'Vérification...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/test-flask`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    dot.className = 'status-dot';
+                    text.innerHTML = 'Système prêt';
+                } else {
+                    dot.className = 'status-dot';
+                    text.innerHTML = 'Mode dégradé';
+                }
+            } catch (error) {
+                dot.className = 'status-dot disconnected';
+                text.innerHTML = 'Mode hors-ligne';
+            }
+        }
+
+        async function verifierFlask() {
+            try {
+                console.log('🔍 Vérification connexion Flask...');
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/test-flask`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Flask connecté:', data);
+                    return true;
+                } else {
+                    console.error('❌ Flask non connecté:', response.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Erreur vérification Flask:', error);
+                return false;
+            }
+        }
+
+        async function diagnosticPropositions() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                if (!enseignantId) {
+                    console.error('❌ Enseignant ID non trouvé');
+                    showMessage('❌ Enseignant non identifié', 'error');
+                    return;
+                }
+                
+                console.log('🔍 Diagnostic pour enseignant:', enseignantId);
+                showMessage('🔍 Diagnostic en cours...', 'info');
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/diagnostic/propositions/${enseignantId}`, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Diagnostic réussi:', data);
+                    if (data.data && data.data.count > 0) {
+                        showMessage(`✅ ${data.data.count} propositions trouvées en base`, 'success');
+                        alert(`✅ ${data.data.count} propositions trouvées !`);
+                    } else {
+                        showMessage('❌ Aucune proposition en base', 'error');
+                        alert('❌ Aucune proposition trouvée');
+                    }
+                } else {
+                    showMessage(`❌ Erreur ${response.status}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ Erreur réseau:', error);
+                showMessage('❌ Erreur de connexion', 'error');
+            }
+        }
+
+        async function loadClasses() {
+            try {
+                console.log('📡 Chargement des classes...');
+                
+                let response = await fetch(`${API_BASE}/Classe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    console.log('⚠️ Erreur chargement classes:', response.status);
+                    classesParNiveau = {};
+                    return;
+                }
+                
+                let data = await response.json();
+                console.log('📥 Données brutes classes:', data);
+                
+                let classes = [];
+                if (Array.isArray(data)) {
+                    classes = data;
+                } else if (data.data && Array.isArray(data.data)) {
+                    classes = data.data;
+                } else if (data.Data && Array.isArray(data.Data)) {
+                    classes = data.Data;
+                } else if (data.value && Array.isArray(data.value)) {
+                    classes = data.value;
+                }
+                
+                console.log(`📊 ${classes.length} classes reçues`);
+                
+                classesParNiveau = {};
+                classes.forEach(c => {
+                    const niveau = c.niveau || c.Niveau || 'Inconnu';
+                    let nomClasse = c.nomClasse || c.NomClasse || c.nom || c.Nom || '';
+                    const id = c._id?.$oid || c._id || c.id || c.Id || `classe-${Date.now()}-${Math.random()}`;
+                    
+                    let numero = nomClasse;
+                    if (!nomClasse.includes('ère') && !nomClasse.includes('ème')) {
+                        if (niveau.includes('1ère') || niveau.includes('1ere')) {
+                            nomClasse = `1ère ${numero}`;
+                        } else if (niveau.includes('2ème') || niveau.includes('2eme')) {
+                            nomClasse = `2ème ${numero}`;
+                        } else if (niveau.includes('3ème') || niveau.includes('3eme')) {
+                            nomClasse = `3ème ${numero}`;
+                        } else if (niveau.includes('4ème') || niveau.includes('4eme')) {
+                            nomClasse = `4ème ${numero}`;
+                        } else if (niveau.includes('5ème') || niveau.includes('5eme')) {
+                            nomClasse = `5ème ${numero}`;
+                        } else if (niveau.includes('6ème') || niveau.includes('6eme')) {
+                            nomClasse = `6ème ${numero}`;
+                        }
+                    }
+                    
+                    if (!classesParNiveau[niveau]) {
+                        classesParNiveau[niveau] = [];
+                    }
+                    
+                    classesParNiveau[niveau].push({
+                        id: id,
+                        nomClasse: nomClasse,
+                        niveau: niveau
+                    });
+                });
+                
+                console.log('📚 Classes par niveau:', classesParNiveau);
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement classes:', error);
+                classesParNiveau = {};
+            }
+        }
+
+        function getCurrentEnseignantId() {
+            try {
+                if (window.parent && window.parent.ENSEIGNANT_CONFIG) {
+                    return window.parent.ENSEIGNANT_CONFIG.user?.id;
+                }
+            } catch (e) {}
+            
+            const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    return user.id;
+                } catch (e) {}
+            }
+            
+            return null;
+        }
+
+        async function loadEnseignantInfos() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                if (!enseignantId) return;
+                
+                const response = await fetch(`${API_BASE}/utilisateurs/${enseignantId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    currentEnseignant = await response.json();
+                }
+            } catch (error) {}
+        }
+
+        async function loadVoeux() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                if (!enseignantId) return;
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/voeux/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.data) currentVoeux = data.data;
+                    else if (data.Data) currentVoeux = data.Data;
+                    
+                    if (currentVoeux && currentVoeux.niveauxPrefere) {
+                        setTimeout(() => {
+                            afficherRepartitionClasses(currentVoeux.niveauxPrefere);
+                        }, 500);
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement vœux:', error);
+            }
+        }
+
+        function afficherRepartitionClasses(niveaux) {
+            const infoDiv = document.getElementById('infoRepartition');
+            const detailDiv = document.getElementById('repartitionDetail');
+            const totalSpan = document.getElementById('totalHeuresVues');
+            
+            if (!niveaux || niveaux.length === 0) {
+                infoDiv.style.display = 'none';
+                return;
+            }
+            
+            let totalHeures = 0;
+            let details = [];
+            
+            niveaux.forEach(niveau => {
+                const classes = classesParNiveau[niveau] || [];
+                const nbClasses = classes.length;
+                
+                if (nbClasses > 0) {
+                    let heuresParClasse = 2;
+                    if (niveau.includes('1')) heuresParClasse = 9;
+                    else if (niveau.includes('2')) heuresParClasse = 9;
+                    else if (niveau.includes('3')) heuresParClasse = 8;
+                    else if (niveau.includes('4')) heuresParClasse = 8;
+                    else if (niveau.includes('5')) heuresParClasse = 8;
+                    else if (niveau.includes('6')) heuresParClasse = 8;
+                    
+                    const heuresNiveau = heuresParClasse * nbClasses;
+                    totalHeures += heuresNiveau;
+                    details.push(`${nbClasses} classe(s) en ${niveau} (${heuresNiveau}h)`);
+                }
+            });
+            
+            if (details.length > 0) {
+                detailDiv.innerHTML = details.join(' • ');
+                totalSpan.textContent = totalHeures + 'h';
+                infoDiv.style.display = 'flex';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        async function verifierEtChargerPropositions() {
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                if (!enseignantId) {
+                    showNoPropositions('non_connecte');
+                    return;
+                }
+                
+                console.log('📡 Chargement des propositions pour:', enseignantId);
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}/propositions?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📥 Propositions reçues:', data);
+                    
+                    let propositionsData = null;
+                    
+                    if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+                        propositionsData = data.data;
+                    } else if (data && data.Data && Array.isArray(data.Data) && data.Data.length > 0) {
+                        propositionsData = data.Data;
+                    } else if (Array.isArray(data) && data.length > 0) {
+                        propositionsData = data;
+                    }
+                    
+                    if (propositionsData && propositionsData.length > 0) {
+                        propositions = propositionsData;
+                        console.log('🎯 ' + propositions.length + ' propositions trouvées, affichage...');
+                        afficherPropositions(propositions);
+                        return;
+                    }
+                }
+                
+                console.log('⚠️ Aucune proposition trouvée, vérification des vœux...');
+                
+                const estValide = currentVoeux && (
+                    currentVoeux.estValide === true || 
+                    currentVoeux.EstValide === true ||
+                    (typeof currentVoeux.estValide === 'boolean' && currentVoeux.estValide) ||
+                    (typeof currentVoeux.EstValide === 'boolean' && currentVoeux.EstValide)
+                );
+                
+                const aDesVoeux = currentVoeux !== null && currentVoeux !== undefined;
+                
+                if (aDesVoeux && estValide) {
+                    console.log('✅ Vœux validés détectés, lancement automatique de la génération...');
+                    await genererPropositionsAuto();
+                } else if (aDesVoeux && !estValide) {
+                    showNoPropositions('en_attente');
+                } else {
+                    showNoPropositions('pas_de_voeux');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement propositions:', error);
+                showNoPropositions('erreur');
+            }
+        }
+
+        async function genererPropositionsAuto() {
+            if (generationEnCours) {
+                console.log('⏳ Génération déjà en cours...');
+                return;
+            }
+            
+            generationEnCours = true;
+            showLoading(true);
+            
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                showMessage('🤖 Génération automatique des propositions en cours...', 'info');
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}/generer-propositions?anneeScolaire=2025-2026`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const nbPropositions = data.data?.length || data.Data?.length || 0;
+                    showMessage(`✅ ${nbPropositions} propositions générées automatiquement`, 'success');
+                    
+                    setTimeout(async () => {
+                        await verifierEtChargerPropositions();
+                    }, 1000);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Erreur génération auto:', errorText);
+                    showMessage('⚠️ Erreur lors de la génération automatique', 'error');
+                    showNoPropositions('valide_mais_erreur');
+                }
+            } catch (error) {
+                console.error('❌ Erreur réseau:', error);
+                showMessage('❌ Erreur de connexion', 'error');
+                showNoPropositions('erreur');
+            } finally {
+                generationEnCours = false;
+                showLoading(false);
+            }
+        }
+
+        async function forcerGenerationIA() {
+            if (generationEnCours) {
+                showMessage('⏳ Une génération est déjà en cours...', 'warning');
+                return;
+            }
+            
+            showLoading(true);
+            document.getElementById('infoMessage').style.display = 'none';
+            generationEnCours = true;
+            
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                const flaskOk = await verifierFlask();
+                if (!flaskOk) {
+                    showMessage('⚠️ IA Python non disponible - Utilisation du fallback C#', 'warning');
+                }
+                
+                showMessage('⚡ Lancement de la génération forcée...', 'info');
+                console.log('📤 Envoi requête pour enseignant:', enseignantId);
+                
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}/generer-propositions?anneeScolaire=2025-2026`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const text = await response.text();
+                console.log('📥 Réponse brute:', text);
+
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(text);
+                        const nbPropositions = data.data?.length || data.Data?.length || 0;
+                        showMessage(`✅ ${nbPropositions} propositions générées !`, 'success');
+                        setTimeout(async () => {
+                            await verifierEtChargerPropositions();
+                        }, 1000);
+                    } catch (e) {
+                        showMessage('✅ Génération lancée, rechargement...', 'success');
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                } else {
+                    let errorMessage = '❌ Erreur: ';
+                    try {
+                        const errorData = JSON.parse(text);
+                        errorMessage += errorData.message || errorData.Message || text.substring(0, 200);
+                    } catch (e) {
+                        errorMessage += text.substring(0, 200);
+                    }
+                    showMessage(errorMessage, 'error');
+                    console.error('❌ Erreur détaillée:', text);
+                    showNoPropositions('erreur');
+                }
+            } catch (error) {
+                console.error('❌ Erreur réseau:', error);
+                showMessage('❌ Erreur de connexion: ' + error.message, 'error');
+                showNoPropositions('erreur');
+            } finally {
+                generationEnCours = false;
+                showLoading(false);
+            }
+        }
+
+        function showNoPropositions(raison) {
+            console.log('🎯 showNoPropositions appelé avec raison:', raison);
+            
+            document.getElementById('propositionsGrid').style.display = 'none';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('infoMessage').style.display = 'block';
+            
+            const messageText = document.getElementById('infoMessageText');
+            const infoIcon = document.getElementById('infoIcon');
+            const infoTitle = document.getElementById('infoTitle');
+            const statusBadge = document.getElementById('statusBadge');
+            const actionButtons = document.getElementById('actionButtons');
+            
+            actionButtons.innerHTML = '';
+            
+            const diagnosticBtn = document.createElement('button');
+            diagnosticBtn.className = 'btn-diagnostic';
+            diagnosticBtn.innerHTML = '🔍 Diagnostic';
+            diagnosticBtn.onclick = diagnosticPropositions;
+            
+            const refreshBtn = document.createElement('button');
+            refreshBtn.className = 'btn-refresh';
+            refreshBtn.innerHTML = 'Actualiser';
+            refreshBtn.onclick = () => location.reload();
+            
+            switch(raison) {
+                case 'en_attente':
+                    infoIcon.innerHTML = '⏳';
+                    infoTitle.innerHTML = 'Vœux en attente de validation';
+                    messageText.innerHTML = 'Vos disponibilités ont été soumises et sont en cours de validation par l\'administration. Revenez plus tard pour voir vos propositions.';
+                    statusBadge.className = 'status-badge en-attente';
+                    statusBadge.innerHTML = '⏳ En attente de validation';
+                    actionButtons.appendChild(diagnosticBtn);
+                    actionButtons.appendChild(refreshBtn);
+                    break;
+                    
+                case 'pas_de_voeux':
+                    infoIcon.innerHTML = '📭';
+                    infoTitle.innerHTML = 'Aucun vœux soumis';
+                    messageText.innerHTML = 'Vous n\'avez pas encore soumis vos disponibilités. Veuillez d\'abord renseigner vos vœux.';
+                    statusBadge.className = 'status-badge non-soumis';
+                    statusBadge.innerHTML = '❌ Aucun vœux soumis';
+                    const voeuxBtn = document.createElement('a');
+                    voeuxBtn.href = 'enseignant-voeux.html';
+                    voeuxBtn.className = 'btn-voeux';
+                    voeuxBtn.innerHTML = '📋 Renseigner mes vœux';
+                    actionButtons.appendChild(voeuxBtn);
+                    actionButtons.appendChild(diagnosticBtn);
+                    actionButtons.appendChild(refreshBtn);
+                    break;
+                    
+                case 'valide_mais_erreur':
+                    infoIcon.innerHTML = '⚠️';
+                    infoTitle.innerHTML = 'Erreur de génération';
+                    messageText.innerHTML = 'Vos vœux sont validés mais une erreur est survenue lors de la génération. Vous pouvez forcer la génération manuellement.';
+                    statusBadge.className = 'status-badge validé';
+                    statusBadge.innerHTML = '✓ Vœux validés';
+                    const forceBtn = document.createElement('button');
+                    forceBtn.className = 'btn-force';
+                    forceBtn.innerHTML = '⚡ FORCER LA GÉNÉRATION';
+                    forceBtn.onclick = forcerGenerationIA;
+                    actionButtons.appendChild(forceBtn);
+                    actionButtons.appendChild(diagnosticBtn);
+                    actionButtons.appendChild(refreshBtn);
+                    break;
+                    
+                case 'erreur':
+                    infoIcon.innerHTML = '❌';
+                    infoTitle.innerHTML = 'Erreur de chargement';
+                    messageText.innerHTML = 'Une erreur est survenue lors du chargement des propositions. Veuillez réessayer.';
+                    statusBadge.className = 'status-badge non-soumis';
+                    statusBadge.innerHTML = '❌ Erreur';
+                    actionButtons.appendChild(diagnosticBtn);
+                    actionButtons.appendChild(refreshBtn);
+                    break;
+                    
+                default:
+                    infoIcon.innerHTML = '🔄';
+                    infoTitle.innerHTML = 'Information';
+                    messageText.innerHTML = 'Veuillez réessayer ultérieurement.';
+                    statusBadge.className = 'status-badge en-attente';
+                    statusBadge.innerHTML = '⏳ En attente';
+                    actionButtons.appendChild(diagnosticBtn);
+                    actionButtons.appendChild(refreshBtn);
+            }
+        }
+
+        function afficherPropositions(propositions) {
+            const grid = document.getElementById('propositionsGrid');
+            
+            document.getElementById('infoMessage').style.display = 'none';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            
+            grid.style.display = 'grid';
+            grid.innerHTML = '';
+            
+            propositions.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+
+            let html = '';
+            propositions.forEach((prop, index) => {
+                const strategie = prop.Strategie || '';
+                let strategieText = '';
+                let strategieIcon = '';
+                
+                if (strategie.includes('equilibree') || strategie.includes('equilibre')) {
+                    strategieText = 'Proposition A - Équilibrée';
+                    strategieIcon = '⚖️';
+                } else if (strategie.includes('compact') || strategie.includes('compacte')) {
+                    strategieText = 'Proposition B - Compacte';
+                    strategieIcon = '📅';
+                } else if (strategie.includes('etendue') || strategie.includes('etendu')) {
+                    strategieText = 'Proposition C - Étendue';
+                    strategieIcon = '📆';
+                } else {
+                    const lettres = ['A', 'B', 'C'];
+                    strategieText = `Proposition ${lettres[index % 3]}`;
+                    strategieIcon = index === 0 ? '⚖️' : index === 1 ? '📅' : '📆';
+                }
+                    
+                const isSelected = selectedPropositions.has(prop.Id);
+                const score = prop.Score || 0;
+                const stats = prop.Statistiques || {};
+                
+                const totalHeures = stats.TotalHeures || 0;
+                const joursTravail = stats.JoursTravail || 0;
+                const heuresCreuses = stats.HeuresCreuses || 0;
+                const respectPreferences = Math.round(stats.RespectPreferences || 0);
+                
+                const matieresPresentes = new Set();
+                const classesPresentes = new Set();
+                const repartitionClasses = {};
+                
+                if (prop.EmploiParJour) {
+                    Object.values(prop.EmploiParJour).forEach(creneaux => {
+                        creneaux.forEach(c => {
+                            if (c.MatiereNom) matieresPresentes.add(c.MatiereNom);
+                            if (c.ClasseNom) {
+                                classesPresentes.add(c.ClasseNom);
+                                if (!repartitionClasses[c.Niveau]) {
+                                    repartitionClasses[c.Niveau] = new Set();
+                                }
+                                repartitionClasses[c.Niveau].add(c.ClasseNom);
+                            }
+                        });
+                    });
+                }
+                
+                let repartitionHtml = '';
+                if (Object.keys(repartitionClasses).length > 0) {
+                    repartitionHtml = '<div style="margin: 0.5rem 0; padding: 0.5rem; background: #f0f0f0; border-radius: 8px; font-size: 0.8rem;">';
+                    repartitionHtml += '<strong>📊 Répartition :</strong><br>';
+                    Object.keys(repartitionClasses).forEach(niveau => {
+                        const nbClasses = repartitionClasses[niveau].size;
+                        repartitionHtml += `<span style="display: inline-block; background: var(--accent-orange); color: white; padding: 0.2rem 0.5rem; border-radius: 20px; margin: 0.2rem;">${niveau}: ${nbClasses} classe(s)</span> `;
+                    });
+                    repartitionHtml += '</div>';
+                }
+                
+                const emploiHtml = afficherEmploiMini(prop.EmploiParJour, prop.Strategie);
+                
+                const pointsForts = [];
+                if (totalHeures > 0) pointsForts.push(`${totalHeures}h de cours`);
+                if (matieresPresentes.size > 0) pointsForts.push(Array.from(matieresPresentes).join(', '));
+                if (joursTravail > 0) pointsForts.push(`${joursTravail} jours`);
+                if (classesPresentes.size > 0) pointsForts.push(`${classesPresentes.size} classe(s) différentes`);
+                
+                const pointsFortsHtml = pointsForts.length > 0 
+                    ? `<div class="points-forts"><strong>Résumé</strong><ul>${pointsForts.map(p => `<li>${p}</li>`).join('')}</ul></div>`
+                    : '';
+                
+                const pointsFaibles = [];
+                if (heuresCreuses > 4) pointsFaibles.push(`${heuresCreuses}h de temps mort`);
+                if (prop.EmploiParJour && prop.EmploiParJour.samedi && prop.EmploiParJour.samedi.length > 0) {
+                    pointsFaibles.push('Cours le samedi');
+                }
+                
+                const aDes2h = Object.values(prop.EmploiParJour || {}).some(creneaux => 
+                    creneaux.some(c => c.DureeMinutes === 120)
+                );
+                if (aDes2h) {
+                    pointsForts.push('➕ 2h supplémentaires intégrées');
+                }
+                
+                const pointsFaiblesHtml = pointsFaibles.length > 0 
+                    ? `<div class="points-faibles"><strong>À noter</strong><ul>${pointsFaibles.map(p => `<li>${p}</li>`).join('')}</ul></div>`
+                    : '';
+                
+                const boutonHtml = isSelected
+                    ? `<button class="btn-remove" onclick="retirerProposition('${prop.Id}')">Retirer</button>`
+                    : `<button class="btn-select" onclick="ajouterProposition('${prop.Id}')">Sélectionner</button>`;
+                
+                html += `
+                    <div class="proposition-card ${isSelected ? 'selected' : ''}">
+                        ${isSelected ? '<div class="selected-badge">Sélectionnée</div>' : ''}
+                        <div class="proposition-header">
+                            <span class="proposition-strategie">
+                                <span>${strategieIcon}</span>
+                                ${strategieText}
+                            </span>
+                            <span class="proposition-score">${score}</span>
+                        </div>
+
+                        <div class="proposition-stats">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">${totalHeures}h</div>
+                                <div class="stat-mini-label">Total</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">${joursTravail}</div>
+                                <div class="stat-mini-label">Jours</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">${heuresCreuses}</div>
+                                <div class="stat-mini-label">Creuses</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">${respectPreferences}%</div>
+                                <div class="stat-mini-label">Conformité</div>
+                            </div>
+                        </div>
+
+                        ${emploiHtml}
+                        ${pointsFortsHtml}
+                        ${pointsFaiblesHtml}
+                        ${boutonHtml}
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+            updateSelectionCounter();
+        }
+
+function afficherEmploiMini(emploiParJour, strategie) {
+    if (!emploiParJour) return '<div class="emploi-mini">Aucun cours</div>';
+    
+    const joursList = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+    const heuresList = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+    
+    const matrice = {};
+    joursList.forEach(jour => {
+        matrice[jour] = {};
+        heuresList.forEach(heure => {
+            matrice[jour][heure] = null;
+        });
+    });
+    
+    Object.keys(emploiParJour).forEach(jourKey => {
+        const creneaux = emploiParJour[jourKey] || [];
+        creneaux.forEach(cours => {
+            const heureDebut = cours.HeureDebut;
+            const dureeHeures = cours.DureeMinutes / 60;
+            const indexDebut = heuresList.indexOf(heureDebut);
+            if (indexDebut !== -1) {
+                for (let i = 0; i < dureeHeures; i++) {
+                    const heureCourante = heuresList[indexDebut + i];
+                    if (heureCourante) {
+                        matrice[jourKey][heureCourante] = {
+                            ...cours,
+                            estPremiere: i === 0,
+                            dureeTotale: dureeHeures
+                        };
+                    }
+                }
+            }
+        });
+    });
+    
+    let html = '<div class="emploi-mini"><table><thead><tr>';
+    html += '<th style="background: linear-gradient(135deg, var(--primary-green), var(--primary-dark)); color: white; padding: 0.6rem 0.3rem; width: 50px;">H</th>';
+    joursList.forEach(jour => {
+        html += `<th style="background: linear-gradient(135deg, var(--primary-green), var(--primary-dark)); color: white; padding: 0.6rem 0.3rem; text-transform: capitalize;">${jour.substring(0,3)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    heuresList.forEach(heure => {
+        html += '<tr>';
+        html += `<td style="background: linear-gradient(135deg, var(--gray-bg), #f0f0f0); font-weight: 700; color: var(--accent-orange-dark); padding: 0.4rem 0.2rem; text-align: center; border: 1px solid var(--gray-border); font-family: monospace;">${heure}</td>`;
+        
+        joursList.forEach(jour => {
+            const cellData = matrice[jour][heure];
+            if (cellData) {
+                const couleur = (cellData.MatiereNom?.includes('Math') || cellData.matiereNom?.includes('Math')) ? '#fa5252' : 
+                               (cellData.MatiereNom?.includes('Fran') || cellData.matiereNom?.includes('Fran')) ? '#ff9466' : 
+                               (cellData.MatiereNom?.includes('Techno') || cellData.matiereNom?.includes('Techno')) ? '#4ca896' : '#ff9466';
+                
+                // Récupérer le nom de la matière (peut être dans MatiereNom ou matiereNom)
+                const matiereNom = cellData.MatiereNom || cellData.matiereNom || '';
+                // Récupérer le niveau (peut être dans Niveau, niveau, ou ClasseNiveau)
+                const niveau = cellData.Niveau || cellData.niveau || cellData.ClasseNiveau || '';
+                // Récupérer la durée
+                const duree = cellData.dureeTotale || (cellData.DureeMinutes ? cellData.DureeMinutes / 60 : 1);
+                
+                if (cellData.estPremiere) {
+                    html += `<td style="background: ${couleur}20; border-left: 4px solid ${couleur}; padding: 0.3rem; text-align: center; border: 1px solid var(--gray-border);">`;
+                    html += `<div style="font-weight: 700; color: ${couleur}; font-size: 0.75rem; margin-bottom: 0.1rem;">${matiereNom}</div>`;
+                    html += `<div style="font-size: 0.65rem; color: var(--text-soft); font-weight: 600;">`;
+                    // Afficher uniquement le niveau (sans texte supplémentaire)
+                    html += `<span style="background: rgba(255,148,102,0.1); padding: 0.1rem 0.3rem; border-radius: 10px;">${niveau}</span>`;
+                    html += `</div>`;
+                    html += `<div style="font-size: 0.6rem; color: #666; margin-top: 0.1rem;">${duree}h</div>`;
+                    html += '</td>';
+                } else {
+                    html += `<td style="background: ${couleur}10; border-left: 4px solid ${couleur}; padding: 0.3rem; text-align: center; border: 1px solid var(--gray-border);">`;
+                    html += `<div style="font-style: italic; font-size: 0.6rem; color: #666;">↳ suite</div>`;
+                    html += `<div style="font-size: 0.65rem; color: var(--text-soft);">${niveau}</div>`;
+                    html += '</td>';
+                }
+            } else {
+                html += `<td style="padding: 0.3rem; text-align: center; border: 1px solid var(--gray-border); background: white;">-</td>`;
+            }
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    return html;
+}
+
+        let currentPropositionId = null;
+
+        function ajouterProposition(propositionId) {
+            currentPropositionId = propositionId;
+            document.getElementById('modalMessage').innerHTML = 'Voulez-vous sélectionner cette proposition ?';
+            document.getElementById('confirmModal').classList.add('active');
+            document.getElementById('confirmSelectBtn').onclick = () => confirmerAjout(propositionId);
+        }
+
+        function confirmerAjout(propositionId) {
+            closeModal();
+            selectedPropositions.add(propositionId);
+            saveSelectedPropositions();
+            afficherPropositions(propositions);
+            showMessage('Proposition sélectionnée', 'success');
+        }
+
+        function retirerProposition(propositionId) {
+            selectedPropositions.delete(propositionId);
+            saveSelectedPropositions();
+            afficherPropositions(propositions);
+            showMessage('Proposition retirée', 'info');
+        }
+
+        function updateSelectionCounter() {
+            const counter = document.getElementById('selectionCounter');
+            const countSpan = document.getElementById('selectedPropositionsCount');
+            const count = selectedPropositions.size;
+            
+            if (count > 0) {
+                counter.style.display = 'flex';
+                countSpan.textContent = count;
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        async function envoyerToutesSelections() {
+            const count = selectedPropositions.size;
+            
+            if (count === 0) {
+                showMessage('Aucune proposition sélectionnée', 'warning');
+                return;
+            }
+            
+            document.getElementById('multipleCount').textContent = count;
+            document.getElementById('confirmMultipleModal').classList.add('active');
+            document.getElementById('confirmMultipleBtn').onclick = () => confirmerEnvoiMultiple();
+        }
+
+        async function confirmerEnvoiMultiple() {
+            closeMultipleModal();
+            
+            try {
+                const enseignantId = getCurrentEnseignantId();
+                const propositionsArray = Array.from(selectedPropositions);
+                
+                showMessage(`📤 Envoi des ${propositionsArray.length} proposition(s) favorite(s)...`, 'info');
+                
+                let successCount = 0;
+                
+                for (let i = 0; i < propositionsArray.length; i++) {
+                    const propId = propositionsArray[i];
+                    try {
+                        const response = await fetch(
+                            `${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}/selectionner-favori/${propId}`,
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify("Proposition favorite")
+                            }
+                        );
+                        const result = await response.json();
+                        if (result.success) successCount++;
+                    } catch (e) {
+                        console.error('Erreur réseau:', e);
+                    }
+                }
+                
+                if (successCount > 0) {
+                    selectedPropositions.clear();
+                    saveSelectedPropositions();
+                    const emploiExiste = await verifierEmploiExistant();
+                    const url = `enseignant-attente.html?success=${successCount}&total=${propositionsArray.length}&hasEmploi=${emploiExiste}`;
+                    window.location.href = url;
+                } else {
+                    showMessage('❌ Erreur lors de l\'envoi des favoris', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                showMessage('Erreur de connexion', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function closeMultipleModal() {
+            document.getElementById('confirmMultipleModal').classList.remove('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            const className = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-error' : 
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 5000);
+        }
+    </script>
+</body>
+</html>

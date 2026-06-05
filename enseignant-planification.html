@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SAGHIRY - Planification pédagogique (Style Cahier de Texte)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+        }
+
+        :root {
+            --primary: #2c7a6e;
+            --primary-dark: #1e5a50;
+            --secondary: #ff8c42;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --success: #10b981;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            background: #e9ecef;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-header {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .logo-text p {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            background: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Style tableau réel comme cahier de texte */
+        .planning-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        .planning-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem 1.5rem;
+            color: white;
+        }
+
+        .planning-header h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .planning-header p {
+            opacity: 0.9;
+            font-size: 0.8rem;
+        }
+
+        .planning-table-inner {
+            padding: 1.5rem;
+        }
+
+        /* Style tableau réel */
+        .real-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.85rem;
+        }
+
+        .real-table td, .real-table th {
+            border: 1px solid var(--gray-300);
+            padding: 10px 12px;
+            vertical-align: top;
+        }
+
+        .real-table th {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-700);
+            width: 180px;
+            font-size: 0.85rem;
+        }
+
+        .real-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .section-title-table {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            display: inline-block;
+            background: var(--gray-100);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .form-input-table, .form-select-table, .form-textarea-table {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input-table:focus, .form-select-table:focus, .form-textarea-table:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(44,122,110,0.1);
+        }
+
+        .form-textarea-table {
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .readonly-field-table {
+            background: var(--gray-100);
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: var(--gray-700);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .template-buttons-table {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .template-btn-table {
+            background: white;
+            border: 1px solid var(--gray-300);
+            padding: 3px 8px;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-btn-table:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .file-upload-area-table {
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            margin-top: 5px;
+        }
+
+        .file-upload-area-table:hover {
+            border-color: var(--primary);
+            background: var(--gray-50);
+        }
+
+        .file-list-table {
+            margin-top: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .file-item-table {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 3px;
+            border: 1px solid var(--gray-200);
+            font-size: 0.75rem;
+        }
+
+        .file-remove-table {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--error);
+            font-size: 0.9rem;
+            padding: 0 4px;
+        }
+
+        .form-actions-table {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--gray-200);
+        }
+
+        .btn-primary-table {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary-table:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary-table {
+            background: white;
+            border: 1px solid var(--gray-300);
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        .statut-select {
+            width: auto;
+            min-width: 180px;
+        }
+
+        .badge-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .alert-success { background: var(--success); color: white; }
+        .alert-error { background: var(--error); color: white; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .real-table th, .real-table td { display: block; width: 100%; }
+            .real-table tr { display: block; margin-bottom: 15px; border: 1px solid var(--gray-300); border-radius: 8px; }
+            .real-table th { background: var(--gray-100); border-bottom: none; }
+            .planning-table-inner { padding: 1rem; }
+            .form-actions-table { flex-direction: column; }
+            .btn-primary-table, .btn-secondary-table { text-align: center; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <div class="logo-icon">📋</div>
+                <div class="logo-text">
+                    <h1>Planification pédagogique</h1>
+                    <p>Cahier de texte - Format officiel</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="breadcrumb">
+            <a href="enseignant-cahier-texte.html">📖 Cahier de texte</a>
+            <span>›</span>
+            <span id="breadcrumbTitle">✏️ Nouvelle séance</span>
+        </div>
+
+        <div class="planning-table">
+            <div class="planning-header">
+                <h2>📐 Fiche de préparation pédagogique</h2>
+                <p>Remplissez le formulaire ci-dessous - Tous les champs sont conformes au référentiel officiel</p>
+            </div>
+            <div class="planning-table-inner">
+                <form id="planificationForm">
+                    <input type="hidden" id="seanceId">
+                    <input type="hidden" id="classeIdOriginal">
+                    <input type="hidden" id="matiereIdOriginal">
+                    <input type="hidden" id="dateOriginal">
+                    <input type="hidden" id="heureDebutOriginale">
+                    <input type="hidden" id="heureFinOriginale">
+
+                    <table class="real-table">
+                        <!-- Ligne 1: En-tête général -->
+                        <tr>
+                            <th style="width: 180px;">📌 IDENTIFICATION</th>
+                            <td>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                    <div>
+                                        <div class="section-title-table">Classe</div>
+                                        <div class="readonly-field-table"><span>🏫</span> <span id="classeNom">Chargement...</span></div>
+                                        <input type="hidden" id="classeId">
+                                    </div>
+                                    <div>
+                                        <div class="section-title-table">Matière</div>
+                                        <div class="readonly-field-table"><span>📚</span> <span id="matiereNom">Chargement...</span></div>
+                                        <input type="hidden" id="matiereId">
+                                    </div>
+                                    <div>
+                                        <div class="section-title-table">Enseignant</div>
+                                        <div class="readonly-field-table"><span>👨‍🏫</span> <span id="enseignantNom">Enseignant</span></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 2: Date et Horaire -->
+                        <tr>
+                            <th>📅 DATE & HORAIRE</th>
+                            <td>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <div class="section-title-table">Date</div>
+                                        <div class="readonly-field-table"><span>📅</span> <span id="dateAffichage">Chargement...</span></div>
+                                        <input type="hidden" id="date">
+                                    </div>
+                                    <div>
+                                        <div class="section-title-table">Horaire</div>
+                                        <div class="readonly-field-table"><span>⏰</span> <span id="horaireAffichage">Chargement...</span></div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 3: Domaine & Activité -->
+                        <tr>
+                            <th>🎯 DOMAINE & ACTIVITÉ</th>
+                            <td>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                                    <div>
+                                        <div class="section-title-table">Domaine</div>
+                                        <input type="text" id="domaine" class="form-input-table" placeholder="Ex: Sciences, Langues, Maths...">
+                                    </div>
+                                    <div>
+                                        <div class="section-title-table">Activité</div>
+                                        <input type="text" id="activite" class="form-input-table" placeholder="Ex: Compréhension orale">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="section-title-table">Titre du cours / Contenu principal</div>
+                                    <input type="text" id="contenu" class="form-input-table" placeholder="Ex: Chapitre 3 - La phrase complexe">
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 4: Compétences -->
+                        <tr>
+                            <th>🧩 COMPÉTENCES<br><span style="font-size:0.7rem; font-weight:normal;">& objectifs</span></th>
+                            <td>
+                                <div class="template-buttons-table">
+                                    <button type="button" class="template-btn-table" data-competences="Raisonner, Communiquer, Modéliser">🎯 Compétences clés</button>
+                                    <button type="button" class="template-btn-table" data-competences="Analyser, Synthétiser, Évaluer">📐 Analyse/Synthèse</button>
+                                    <button type="button" class="template-btn-table" data-objectifs-specifiques="Identifier les idées principales&#10;Justifier une démarche&#10;Produire un écrit">📝 Objectifs types</button>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Composante de la compétence</div>
+                                    <textarea id="composanteCompetence" class="form-textarea-table" rows="2" placeholder="Ex: Composante langagière, méthodologique..."></textarea>
+                                </div>
+                                <div>
+                                    <div class="section-title-table">Objectifs spécifiques</div>
+                                    <textarea id="objectifsSpecifiques" class="form-textarea-table" rows="3" placeholder="• Maîtriser la règle de trois&#10;• Rédiger une synthèse argumentée"></textarea>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 5: Objectif & Intention -->
+                        <tr>
+                            <th>📖 OBJECTIFS<br><span style="font-size:0.7rem; font-weight:normal;">& intentions</span></th>
+                            <td>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Objectif de la séance</div>
+                                    <textarea id="objectifSeance" class="form-textarea-table" rows="2" placeholder="Objectif principal de la séance (savoir, savoir-faire)"></textarea>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Intention d'apprentissage</div>
+                                    <textarea id="intentionApprentissage" class="form-textarea-table" rows="2" placeholder="Ce que l'élève va apprendre / comprendre"></textarea>
+                                </div>
+                                <div>
+                                    <div class="section-title-table">Compétence de vie</div>
+                                    <input type="text" id="competenceVie" class="form-input-table" placeholder="Ex: Autonomie, Esprit critique, Collaboration">
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 6: Unité & Progression -->
+                        <tr>
+                            <th>📚 UNITÉ & PROGRESSION</th>
+                            <td>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                    <div>
+                                        <div class="section-title-table">Unité</div>
+                                        <input type="text" id="unite" class="form-input-table" placeholder="Ex: Unité 3 : Environnement">
+                                    </div>
+                                    <div>
+                                        <div class="section-title-table">Numéro du jour / Séance</div>
+                                        <input type="text" id="numeroJour" class="form-input-table" placeholder="Ex: Jour 2 / Séance 5">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="section-title-table">Approche intégrative</div>
+                                    <textarea id="approcheIntegrative" class="form-textarea-table" rows="2" placeholder="Liens interdisciplinaires, projet, situation complexe..."></textarea>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 7: Évaluation / Remédiation -->
+                        <tr>
+                            <th>📊 ÉVALUATION & REMÉDIATION</th>
+                            <td>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Évaluation</div>
+                                    <textarea id="evaluation" class="form-textarea-table" rows="2" placeholder="Modalités d'évaluation : quiz, exercice bilan, observation..."></textarea>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Remédiation</div>
+                                    <textarea id="remediation" class="form-textarea-table" rows="2" placeholder="Activités de soutien / remédiation pour élèves en difficulté"></textarea>
+                                </div>
+                                <div>
+                                    <div class="section-title-table">Soutien / AP</div>
+                                    <textarea id="soutien" class="form-textarea-table" rows="2" placeholder="Accompagnement personnalisé, tutorat"></textarea>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 8: Ressources & Devoirs -->
+                        <tr>
+                            <th>📎 RESSOURCES & DEVOIRS</th>
+                            <td>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Supports / Ressources</div>
+                                    <textarea id="ressources" class="form-textarea-table" rows="2" placeholder="Manuel p.45, Vidéo, Diaporama..."></textarea>
+                                </div>
+                                <div style="margin-bottom: 10px;">
+                                    <div class="section-title-table">Devoirs donnés</div>
+                                    <textarea id="devoirs" class="form-textarea-table" rows="2" placeholder="Exercices à rendre, lecture à domicile"></textarea>
+                                </div>
+                                <div>
+                                    <div class="section-title-table">Pièces jointes</div>
+                                    <div class="file-upload-area-table" id="fileUploadArea">
+                                        <div class="file-upload-icon">📎</div>
+                                        <div class="file-upload-text" style="font-size: 0.7rem;">Cliquez ou glissez-déposez des fichiers (PDF, DOC, PPT, Images, Vidéos...)</div>
+                                        <input type="file" id="fileInput" multiple style="display: none;">
+                                    </div>
+                                    <div id="fileList" class="file-list-table"></div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 9: Remarques -->
+                        <tr>
+                            <th>📝 REMARQUES</th>
+                            <td>
+                                <textarea id="remarques" class="form-textarea-table" rows="2" placeholder="Observations, adaptations pédagogiques, notes diverses..."></textarea>
+                            </td>
+                        </tr>
+
+                        <!-- Ligne 10: Statut -->
+                        <tr>
+                            <th>🏷️ STATUT</th>
+                            <td>
+                                <select id="statut" class="form-select-table statut-select">
+                                    <option value="brouillon">📝 Brouillon</option>
+                                    <option value="soumis">📤 Soumettre à validation</option>
+                                </select>
+                                <span style="margin-left: 10px; font-size: 0.7rem; color: var(--gray-500);">Le statut "Soumettre à validation" enverra la séance à l'administration</span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="form-actions-table">
+                        <a href="enseignant-cahier-texte.html" class="btn-secondary-table">Annuler</a>
+                        <button type="submit" class="btn-primary-table">💾 Enregistrer la planification</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = null;
+        let seanceIdEdit = null;
+        let allCreneaux = [];
+        let classesList = [];
+        let matieresList = [];
+        let fichiersJoint = [];
+
+        function getAuthToken() { return localStorage.getItem('authToken') || sessionStorage.getItem('authToken'); }
+        function getCurrentUser() {
+            try {
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) return JSON.parse(userStr);
+            } catch(e) {}
+            return null;
+        }
+        function showMessage(msg, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = msg;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+        function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;});}
+        function formaterNomClasse(niveau, nomClasse) { return (niveau ? niveau.charAt(0) : '') + (nomClasse ? ' A '+nomClasse : ''); }
+        function formatDateFr(dateStr) { if(!dateStr) return ''; const d = new Date(dateStr); return d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' }); }
+        function decalerHeure(heure) { if(!heure) return '10:00'; if(heure.includes(':')){ let [h,m]=heure.split(':').map(Number); let nh=h+2; if(nh>=24) nh-=24; return `${nh.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`; } return '10:00'; }
+
+        async function chargerEmploiEnseignant() {
+            try {
+                const user = getCurrentUser();
+                const enseignantId = user?.id;
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if(response.ok) {
+                    const result = await response.json();
+                    if(result.success && result.data?.Creneaux) {
+                        allCreneaux = result.data.Creneaux;
+                        const classesMap = new Map(), matieresMap = new Map();
+                        for(const creneau of allCreneaux) {
+                            if(creneau.ClasseId && !classesMap.has(creneau.ClasseId))
+                                classesMap.set(creneau.ClasseId, { id: creneau.ClasseId, nom: creneau.ClasseNom, niveau: creneau.Niveau || '', affichage: formaterNomClasse(creneau.Niveau, creneau.ClasseNom) });
+                            if(creneau.MatiereId && !matieresMap.has(creneau.MatiereId))
+                                matieresMap.set(creneau.MatiereId, { id: creneau.MatiereId, nom: creneau.MatiereNom });
+                        }
+                        classesList = Array.from(classesMap.values());
+                        matieresList = Array.from(matieresMap.values());
+                        return true;
+                    }
+                }
+                return false;
+            } catch(e) { console.error(e); return false; }
+        }
+
+        async function chargerSeancePourEdition(id) {
+            try {
+                const resp = await fetch(`${API_BASE}/CahierTexte/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if(resp.ok) {
+                    const result = await resp.json();
+                    const seance = result.data || result;
+                    seanceIdEdit = id;
+                    document.getElementById('seanceId').value = seance.Id || seance._id;
+                    document.getElementById('breadcrumbTitle').textContent = '✏️ Modifier séance';
+
+                    document.getElementById('classeId').value = seance.ClasseId;
+                    const classe = classesList.find(c => c.id === seance.ClasseId);
+                    document.getElementById('classeNom').textContent = classe?.affichage || seance.ClasseNom || 'Classe';
+                    document.getElementById('matiereId').value = seance.MatiereId;
+                    const matiere = matieresList.find(m => m.id === seance.MatiereId);
+                    document.getElementById('matiereNom').textContent = matiere?.nom || seance.MatiereNom || 'Matière';
+                    const dateVal = seance.Date?.split('T')[0] || '';
+                    document.getElementById('date').value = dateVal;
+                    document.getElementById('dateAffichage').textContent = formatDateFr(dateVal);
+                    const heureDebutOrig = seance.Seance?.HeureDebut?.substring(0,5) || '08:00';
+                    const heureFinOrig = seance.Seance?.HeureFin?.substring(0,5) || '10:00';
+                    document.getElementById('heureDebutOriginale').value = heureDebutOrig;
+                    document.getElementById('heureFinOriginale').value = heureFinOrig;
+                    document.getElementById('horaireAffichage').textContent = `${decalerHeure(heureDebutOrig)} - ${decalerHeure(heureFinOrig)}`;
+
+                    const peda = seance.Pedagogie || {};
+                    document.getElementById('domaine').value = peda.Domaine || seance.Domaine || '';
+                    document.getElementById('activite').value = peda.Activite || seance.Activite || '';
+                    document.getElementById('contenu').value = seance.Lecon?.Titre || peda.Contenu || '';
+                    document.getElementById('composanteCompetence').value = peda.ComposanteCompetence || '';
+                    document.getElementById('objectifsSpecifiques').value = (peda.ObjectifsSpecifiques || []).join('\n');
+                    document.getElementById('objectifSeance').value = peda.ObjectifSeance || '';
+                    document.getElementById('intentionApprentissage').value = peda.IntentionApprentissage || '';
+                    document.getElementById('competenceVie').value = peda.CompetenceVie || '';
+                    document.getElementById('unite').value = peda.Unite || '';
+                    document.getElementById('numeroJour').value = peda.NumeroJour || '';
+                    document.getElementById('approcheIntegrative').value = peda.ApprocheIntegrative || '';
+                    document.getElementById('evaluation').value = peda.Evaluation || '';
+                    document.getElementById('remediation').value = peda.Remediation || '';
+                    document.getElementById('soutien').value = peda.Soutien || '';
+                    
+                    document.getElementById('ressources').value = (seance.Lecon?.Ressources || []).join('\n');
+                    document.getElementById('devoirs').value = (seance.DevoirsDonnes || []).map(d => d.Description || d).join('\n');
+                    document.getElementById('remarques').value = seance.Remarques || '';
+                    document.getElementById('statut').value = (seance.Statut === 'valide' ? 'brouillon' : seance.Statut) || 'brouillon';
+                    
+                    if(seance.Fichiers && seance.Fichiers.length) {
+                        fichiersJoint = seance.Fichiers.map(f => ({ id: f.id || Date.now()+Math.random(), name: f.nom, size: f.taille, type: f.type, dejaUpload: true }));
+                        afficherListeFichiers();
+                    }
+                    
+                    const user = getCurrentUser();
+                    if(user && user.nom) document.getElementById('enseignantNom').innerText = `${user.prenom || ''} ${user.nom || ''}`.trim() || 'Enseignant';
+                    showMessage('Planification chargée', 'success');
+                }
+            } catch(e) { console.error(e); showMessage('Erreur chargement', 'error'); }
+        }
+
+        async function initFormulaire() {
+            await chargerEmploiEnseignant();
+            const user = getCurrentUser();
+            if(user && user.nom) document.getElementById('enseignantNom').innerText = `${user.prenom || ''} ${user.nom || ''}`.trim() || 'Enseignant';
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('id');
+            if(editId) { await chargerSeancePourEdition(editId); return; }
+
+            const classeIdParam = urlParams.get('classeId');
+            const dateParam = urlParams.get('date');
+            const heureDebutParam = urlParams.get('heureDebut');
+            const heureFinParam = urlParams.get('heureFin');
+            const matiereIdParam = urlParams.get('matiereId');
+            if(classeIdParam && dateParam) {
+                const classe = classesList.find(c => c.id === classeIdParam);
+                const matiere = matieresList.find(m => m.id === matiereIdParam);
+                const hDebut = heureDebutParam || '08:00';
+                const hFin = heureFinParam || '10:00';
+                document.getElementById('heureDebutOriginale').value = hDebut;
+                document.getElementById('heureFinOriginale').value = hFin;
+                document.getElementById('classeId').value = classeIdParam;
+                document.getElementById('classeNom').textContent = classe?.affichage || 'Classe';
+                document.getElementById('matiereId').value = matiereIdParam || '';
+                document.getElementById('matiereNom').textContent = matiere?.nom || 'Matière';
+                document.getElementById('date').value = dateParam;
+                document.getElementById('dateAffichage').textContent = formatDateFr(dateParam);
+                document.getElementById('horaireAffichage').textContent = `${decalerHeure(hDebut)} - ${decalerHeure(hFin)}`;
+            }
+        }
+
+        function initTemplates() {
+            document.querySelectorAll('[data-competences]').forEach(btn => {
+                btn.addEventListener('click', () => { document.getElementById('composanteCompetence').value = btn.dataset.competences; });
+            });
+            document.querySelectorAll('[data-objectifs-specifiques]').forEach(btn => {
+                btn.addEventListener('click', () => { document.getElementById('objectifsSpecifiques').value = btn.dataset.objectifsSpecifiques; });
+            });
+        }
+
+        function setupFileUpload() {
+            const uploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                ajouterFichiers(Array.from(e.dataTransfer.files));
+            });
+            fileInput.addEventListener('change', (e) => {
+                ajouterFichiers(Array.from(e.target.files));
+                fileInput.value = '';
+            });
+        }
+
+        function ajouterFichiers(files) {
+            for (const file of files) {
+                if (file.size > 20 * 1024 * 1024) {
+                    showMessage(`Fichier ${file.name} trop volumineux (>20MB)`, 'error');
+                    continue;
+                }
+                fichiersJoint.push({
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    file: file
+                });
+            }
+            afficherListeFichiers();
+        }
+
+        function afficherListeFichiers() {
+            const container = document.getElementById('fileList');
+            if (fichiersJoint.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 0.5rem; color: var(--gray-400); font-size:0.7rem;">Aucun fichier joint</div>';
+                return;
+            }
+            container.innerHTML = fichiersJoint.map(f => {
+                let tailleKo = (f.size / 1024);
+                let tailleAffichee = tailleKo < 1024 ? `${tailleKo.toFixed(1)} KB` : `${(tailleKo / 1024).toFixed(1)} MB`;
+                
+                return `
+                    <div class="file-item-table">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1;">
+                            <span>${f.type?.includes('pdf') ? '📄' : f.type?.includes('image') ? '🖼️' : f.type?.includes('video') ? '🎬' : f.type?.includes('word') ? '📝' : '📎'}</span>
+                            <span style="font-weight: 500;">${escapeHtml(f.name)}</span>
+                            <span style="color: var(--gray-400);">(${tailleAffichee})</span>
+                        </div>
+                        <button type="button" class="file-remove-table" onclick="supprimerFichier('${f.id}')" title="Supprimer">✖</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function supprimerFichier(id) {
+            fichiersJoint = fichiersJoint.filter(f => f.id != id);
+            afficherListeFichiers();
+        }
+
+        async function saveSeance(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('seanceId').value;
+            const statut = document.getElementById('statut').value;
+            const heureDebutOriginale = document.getElementById('heureDebutOriginale').value;
+            const heureFinOriginale = document.getElementById('heureFinOriginale').value;
+            const dateValue = document.getElementById('date').value;
+            
+            if(!dateValue) { showMessage('Date requise', 'error'); return; }
+            
+            const currentUser = getCurrentUser();
+            const enseignantId = currentUser?.id;
+            if(!enseignantId) { showMessage('Utilisateur non identifié', 'error'); return; }
+
+            const [heuresD, minutesD] = heureDebutOriginale.split(':').map(Number);
+            const [heuresF, minutesF] = heureFinOriginale.split(':').map(Number);
+            let dureeMinutes = (heuresF*60+minutesF) - (heuresD*60+minutesD);
+            if(dureeMinutes < 0) dureeMinutes += 24*60;
+
+            const pedagogieObj = {
+                Domaine: document.getElementById('domaine').value,
+                Activite: document.getElementById('activite').value,
+                ComposanteCompetence: document.getElementById('composanteCompetence').value,
+                ObjectifsSpecifiques: document.getElementById('objectifsSpecifiques').value.split('\n').filter(o=>o.trim()),
+                ObjectifSeance: document.getElementById('objectifSeance').value,
+                IntentionApprentissage: document.getElementById('intentionApprentissage').value,
+                CompetenceVie: document.getElementById('competenceVie').value,
+                Unite: document.getElementById('unite').value,
+                NumeroJour: document.getElementById('numeroJour').value,
+                ApprocheIntegrative: document.getElementById('approcheIntegrative').value,
+                Evaluation: document.getElementById('evaluation').value,
+                Remediation: document.getElementById('remediation').value,
+                Soutien: document.getElementById('soutien').value
+            };
+
+            const data = {
+                EnseignantId: enseignantId,
+                ClasseId: document.getElementById('classeId').value,
+                MatiereId: document.getElementById('matiereId').value,
+                Date: new Date(dateValue).toISOString(),
+                Seance: {
+                    HeureDebut: heureDebutOriginale+':00',
+                    HeureFin: heureFinOriginale+':00',
+                    Duree: dureeMinutes
+                },
+                Lecon: {
+                    Titre: document.getElementById('contenu').value,
+                    Description: document.getElementById('approcheIntegrative').value || "Planification détaillée",
+                    Objectifs: document.getElementById('objectifsSpecifiques').value.split('\n').filter(o=>o.trim()),
+                    Ressources: document.getElementById('ressources').value.split('\n').filter(r=>r.trim())
+                },
+                DevoirsDonnes: document.getElementById('devoirs').value.split('\n').filter(d=>d.trim()).map(d => ({ 
+                    Description: d, 
+                    DateLimite: new Date(Date.now()+7*86400000).toISOString() 
+                })),
+                Remarques: document.getElementById('remarques').value,
+                Statut: statut,
+                Pedagogie: pedagogieObj
+            };
+            
+            try {
+                let nouvelleId = id;
+                
+                if (!id) {
+                    const resp = await fetch(`${API_BASE}/CahierTexte`, {
+                        method: 'POST',
+                        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+                        body: JSON.stringify(data)
+                    });
+                    if(!resp.ok) {
+                        const error = await resp.text();
+                        throw new Error(error);
+                    }
+                    const result = await resp.json();
+                    nouvelleId = result.data?.Id || result.data?._id || result.Id;
+                    showMessage('✅ Planification créée', 'success');
+                } else {
+                    const resp = await fetch(`${API_BASE}/CahierTexte/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+                        body: JSON.stringify(data)
+                    });
+                    if(!resp.ok) throw new Error('Erreur mise à jour');
+                    showMessage('✅ Planification mise à jour', 'success');
+                }
+                
+                const fichiersAUploader = fichiersJoint.filter(f => f.file && !f.dejaUpload);
+                
+                for (const fichier of fichiersAUploader) {
+                    const formData = new FormData();
+                    formData.append('fichier', fichier.file);
+                    
+                    const uploadResp = await fetch(`${API_BASE}/CahierTexte/${nouvelleId}/fichiers`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    
+                    if (uploadResp.ok) {
+                        fichier.dejaUpload = true;
+                        showMessage(`📎 ${fichier.name} uploadé`, 'success');
+                    } else {
+                        console.error(`Erreur upload ${fichier.name}`);
+                    }
+                }
+                
+                if(statut === 'soumis') {
+                    await fetch(`${API_BASE}/CahierTexte/${nouvelleId}/soumettre`, {
+                        method:'POST',
+                        headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+                        body: JSON.stringify({ Commentaire: '' })
+                    });
+                    showMessage('📤 Séance soumise pour validation', 'success');
+                }
+                
+                setTimeout(() => { 
+                    window.location.href = 'enseignant-cahier-texte.html'; 
+                }, 1500);
+                
+            } catch(error) {
+                console.error('Erreur:', error);
+                showMessage('❌ Erreur: ' + error.message, 'error');
+            }
+        }
+
+        async function init() {
+            token = getAuthToken();
+            if(!token) { window.location.href = 'saghiry-auth.html'; return; }
+            await initFormulaire();
+            initTemplates();
+            setupFileUpload();
+        }
+        
+        document.getElementById('planificationForm').addEventListener('submit', saveSeance);
+        window.supprimerFichier = supprimerFichier;
+        init();
+    </script>
+</body>
+</html>

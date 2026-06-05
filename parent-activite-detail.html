@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Détail de l'activité</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f5f8;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #4ca896;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link:hover {
+            color: #3d8a7f;
+        }
+
+        .activite-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e0e9e7;
+        }
+
+        .activite-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .activite-titre {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .type-badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .type-badge.devoir { background: #ff9466; color: white; }
+        .type-badge.projet { background: #4ca896; color: white; }
+        .type-badge.examen { background: #1e3b36; color: white; }
+        .type-badge.exercice { background: #5a9d91; color: white; }
+
+        .statut-badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .statut-badge.assigné { background: #e0e9e7; color: #3d5a54; }
+        .statut-badge.en-cours { background: #fff3e0; color: #ff9466; }
+        .statut-badge.terminé { background: #e0f5f0; color: #4ca896; }
+        .statut-badge.depasse { background: #ffebee; color: #ff6b6b; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            color: #5a9d91;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e3b36;
+        }
+
+        .description {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            color: #3d5a54;
+        }
+
+        .depot-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e0e9e7;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-upload {
+            border: 2px dashed #e0e9e7;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload:hover:not(.disabled) {
+            border-color: #4ca896;
+            background: #f0f9f7;
+        }
+
+        .file-upload.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .file-tag {
+            background: #e0e9e7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #4ca896;
+            border: none;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #3d8a7f;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #4ca896;
+            color: #4ca896;
+            padding: 0.7rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .discussion-section {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e0e9e7;
+        }
+
+        .discussion-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+        }
+
+        .parent-thread {
+            background: #f8fafc;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e9e7;
+            overflow: hidden;
+        }
+
+        .parent-header {
+            background: linear-gradient(135deg, #f8fdfc 0%, #eff9f7 100%);
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e9e7;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .parent-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4ca896, #2d6b63);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .parent-name {
+            font-weight: 700;
+            color: #1e3b36;
+            font-size: 1rem;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.parent {
+            justify-content: flex-end;
+        }
+
+        .message.enseignant {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 0.8rem 1rem;
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .message.parent .message-bubble {
+            background: #4ca896;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.enseignant .message-bubble {
+            background: white;
+            color: #1e3b36;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e0e9e7;
+        }
+
+        .message-author {
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .message-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .message-date {
+            font-size: 0.6rem;
+            margin-top: 0.3rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .message-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .message-actions button {
+            background: none;
+            border: none;
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 12px;
+        }
+
+        .message-actions .edit-btn {
+            color: #4ca896;
+        }
+
+        .message-actions .delete-btn {
+            color: #ff6b6b;
+        }
+
+        .message-input-area {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+            border-top: 1px solid #e0e9e7;
+            padding-top: 1rem;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e9e7;
+            border-radius: 20px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #4ca896;
+        }
+
+        .discussion-closed {
+            text-align: center;
+            padding: 1rem;
+            background: #fff3e0;
+            border-radius: 12px;
+            color: #ff9466;
+        }
+
+        .depot-existing {
+            background: #e0f5f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .depot-files-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .depot-file-link {
+            background: #e0e9e7;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: #1e3b36;
+            transition: all 0.2s;
+        }
+
+        .depot-file-link:hover {
+            background: #4ca896;
+            color: white;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            color: #ff9466;
+            border-left: 4px solid #ff9466;
+        }
+
+        .alert-info {
+            background: #e0f2f1;
+            color: #4ca896;
+            border-left: 4px solid #4ca896;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .toast-message {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e3b36;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-message.success {
+            background: #4ca896;
+        }
+
+        .toast-message.error {
+            background: #ff6b6b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .message-bubble { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContainer">
+        <div class="loading">Chargement...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = null;
+        let activiteId = null;
+        let activite = null;
+        let currentUser = null;
+        let currentEleve = null;
+        let currentEleveId = null;
+        let selectedFiles = [];
+
+        // Fonction utilitaire pour récupérer une propriété (gère majuscule/minuscule)
+        function getProp(obj, propName) {
+            if (!obj) return null;
+            if (obj[propName] !== undefined) return obj[propName];
+            const capitalized = propName.charAt(0).toUpperCase() + propName.slice(1);
+            if (obj[capitalized] !== undefined) return obj[capitalized];
+            const lowercased = propName.charAt(0).toLowerCase() + propName.slice(1);
+            if (obj[lowercased] !== undefined) return obj[lowercased];
+            return null;
+        }
+
+        function getToken() {
+            try {
+                if (window.parent && window.parent.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    return window.parent.ParentSpace.getToken();
+                }
+                if (window.ParentSpace && typeof window.parent.ParentSpace.getToken === 'function') {
+                    return window.ParentSpace.getToken();
+                }
+            } catch(e) { console.warn('Cannot access ParentSpace:', e); }
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        function requestTokenFromParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'REQUEST_TOKEN' }, '*');
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'SET_TOKEN') {
+                token = event.data.token;
+                console.log('✅ Token reçu du parent');
+                init();
+            }
+        });
+
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                activiteId: params.get('activiteId'),
+                enfantId: params.get('enfantId'),
+                enfantNom: decodeURIComponent(params.get('enfantNom') || ''),
+                activiteTitre: decodeURIComponent(params.get('activiteTitre') || '')
+            };
+        }
+
+        async function init() {
+            token = getToken();
+            if (!token) {
+                requestTokenFromParent();
+                setTimeout(() => {
+                    token = getToken();
+                    if (!token) {
+                        document.getElementById('mainContainer').innerHTML = `<div class="alert alert-warning">🔒 Session expirée. Veuillez vous reconnecter.</div>`;
+                    } else {
+                        init();
+                    }
+                }, 1000);
+                return;
+            }
+
+            const params = getUrlParams();
+            activiteId = params.activiteId;
+            currentEleveId = params.enfantId;
+            
+            if (!activiteId) {
+                document.getElementById('mainContainer').innerHTML = '<div class="alert alert-warning">⚠️ Activité non spécifiée</div>';
+                return;
+            }
+
+            await chargerUser();
+            await chargerActivite();
+            afficherInterface();
+        }
+
+        async function chargerUser() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data;
+                    console.log('Utilisateur chargé:', currentUser);
+                }
+            } catch(e) {
+                console.error('Erreur chargement user:', e);
+            }
+        }
+
+        async function chargerActivite() {
+            try {
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+                activite = result.Data || result.data || result;
+                console.log('Activité chargée:', activite);
+                console.log('Discussion:', getProp(activite, 'discussion'));
+                console.log('Dépôts:', getProp(activite, 'depotsTravail'));
+            } catch(e) {
+                console.error('Erreur chargement activité:', e);
+            }
+        }
+
+        function isDateDepassee() {
+            const dateLimite = getProp(activite, 'dateLimite');
+            if (!dateLimite) return false;
+            return new Date(dateLimite) < new Date();
+        }
+
+        function getStatutDisplay() {
+            const statut = getProp(activite, 'statut') || 'assigné';
+            if (statut === 'terminé') return { text: 'Terminé', class: 'terminé' };
+            if (isDateDepassee()) return { text: 'Date dépassée', class: 'depasse' };
+            if (statut === 'en cours') return { text: 'En cours', class: 'en-cours' };
+            return { text: 'Assigné', class: 'assigné' };
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Non définie';
+            try {
+                return new Date(dateStr).toLocaleDateString('fr-FR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+            } catch(e) { return 'Date invalide'; }
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return 'Non définie';
+            try {
+                return new Date(dateStr).toLocaleString('fr-FR');
+            } catch(e) { return 'Date invalide'; }
+        }
+
+        function getExistingDepot() {
+            const depots = getProp(activite, 'depotsTravail') || [];
+            return depots.find(d => {
+                const eleveId = getProp(d, 'eleveId');
+                return eleveId === currentEleveId;
+            }) || null;
+        }
+
+        function telechargerFichier(nomFichier) {
+            const contenu = `Contenu du fichier: ${nomFichier}\n\nCe document a été déposé par l'élève.\nDate: ${new Date().toLocaleString()}`;
+            const blob = new Blob([contenu], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomFichier;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`Téléchargement de ${nomFichier} démarré`, 'success');
+        }
+
+        async function envoyerMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (!message) {
+                showToast('Veuillez écrire un message', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('sendBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Envoi...';
+
+            try {
+                const nomParent = currentUser?.prenom && currentUser?.nom ? `${currentUser.prenom} ${currentUser.nom}` : (currentUser?.nom || 'Parent');
+                
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/discussion`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        auteurId: currentUser?.id || 'parent',
+                        auteurNom: nomParent,
+                        auteurRole: 'parent',
+                        message: message
+                    })
+                });
+
+                if (response.ok) {
+                    messageInput.value = '';
+                    await chargerActivite();
+                    afficherDiscussion();
+                    showToast('Message envoyé !', 'success');
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✉️ Envoyer';
+            }
+        }
+
+        async function modifierMessage(messageId, oldMessage) {
+            const nouveauMessage = prompt("Modifier votre message:", oldMessage);
+            if (!nouveauMessage || nouveauMessage === oldMessage) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/discussion/${messageId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: nouveauMessage })
+                });
+                
+                if (response.ok) {
+                    showToast('Message modifié !', 'success');
+                    await chargerActivite();
+                    afficherDiscussion();
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        async function supprimerMessage(messageId) {
+            if (!confirm('Supprimer ce message ?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/discussion/${messageId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    showToast('Message supprimé !', 'success');
+                    await chargerActivite();
+                    afficherDiscussion();
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        async function deposerTravail() {
+            if (selectedFiles.length === 0) {
+                showToast('Veuillez sélectionner au moins un fichier', 'error');
+                return;
+            }
+
+            const commentaire = document.getElementById('depotCommentaire')?.value || '';
+            const enfantNom = document.getElementById('enfantName')?.textContent || 'Élève';
+
+            const btn = document.getElementById('depotBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Dépôt en cours...';
+
+            try {
+                const fichiersSimules = selectedFiles.map(f => f.name);
+
+                const response = await fetch(`${API_BASE}/Activite/${activiteId}/depot`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        eleveId: currentEleveId,
+                        eleveNom: enfantNom,
+                        fichiers: fichiersSimules,
+                        commentaire: commentaire
+                    })
+                });
+
+                if (response.ok) {
+                    showToast('✅ Travail déposé avec succès !', 'success');
+                    selectedFiles = [];
+                    const fileList = document.getElementById('fileList');
+                    if (fileList) fileList.innerHTML = '';
+                    const depotCommentaire = document.getElementById('depotCommentaire');
+                    if (depotCommentaire) depotCommentaire.value = '';
+                    await chargerActivite();
+                    afficherSectionDepot();
+                } else {
+                    const error = await response.text();
+                    showToast('Erreur: ' + error, 'error');
+                }
+            } catch(e) {
+                showToast('Erreur réseau: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📎 Déposer le travail';
+            }
+        }
+
+        function ajouterFichier(event) {
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+                selectedFiles.push(files[i]);
+            }
+            afficherFileList();
+            event.target.value = '';
+        }
+
+        function afficherFileList() {
+            const container = document.getElementById('fileList');
+            if (!container) return;
+            
+            container.innerHTML = selectedFiles.map((f, idx) => `
+                <div class="file-tag">
+                    📎 ${escapeHtml(f.name)} (${(f.size / 1024).toFixed(1)} KB)
+                    <button onclick="retirerFichier(${idx})" style="background:none;border:none;cursor:pointer;color:#ff6b6b;">✖</button>
+                </div>
+            `).join('');
+        }
+
+        function retirerFichier(index) {
+            selectedFiles.splice(index, 1);
+            afficherFileList();
+        }
+
+        function showToast(msg, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-message ${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function afficherDiscussion() {
+            const container = document.getElementById('discussionMessages');
+            if (!container) return;
+
+            const discussion = getProp(activite, 'discussion') || [];
+            const dateDepassee = isDateDepassee();
+            const dateLimite = getProp(activite, 'dateLimite');
+
+            if (dateDepassee) {
+                container.innerHTML = `
+                    <div class="discussion-closed">
+                        🔒 La discussion est fermée car la date limite (${formatDate(dateLimite)}) est dépassée.
+                    </div>
+                `;
+                const inputArea = document.getElementById('messageInputArea');
+                if (inputArea) inputArea.style.display = 'none';
+                return;
+            }
+
+            const inputArea = document.getElementById('messageInputArea');
+            if (inputArea) inputArea.style.display = 'flex';
+
+            if (discussion.length === 0) {
+                container.innerHTML = `<div style="text-align:center;color:#5a9d91;padding:2rem;">💬 Aucun message pour le moment. Soyez le premier à poser une question !</div>`;
+                return;
+            }
+
+            // Afficher les messages dans l'ordre chronologique
+            let html = '';
+            for (const msg of discussion) {
+                const auteurRole = getProp(msg, 'auteurRole') || 'inconnu';
+                const auteurNom = getProp(msg, 'auteurNom') || 'Anonyme';
+                const messageTexte = getProp(msg, 'message') || '';
+                const dateMessage = getProp(msg, 'dateMessage');
+                const messageId = getProp(msg, 'id') || getProp(msg, '_id');
+                const isOwnMessage = auteurRole === 'parent';
+                
+                const actionButtons = isOwnMessage && !dateDepassee ? `
+                    <div class="message-actions">
+                        <button class="edit-btn" onclick="modifierMessage('${messageId}', '${escapeHtml(messageTexte).replace(/'/g, "\\'")}')">✏️ Modifier</button>
+                        <button class="delete-btn" onclick="supprimerMessage('${messageId}')">🗑️ Supprimer</button>
+                    </div>
+                ` : '';
+                
+                html += `
+                    <div class="message ${auteurRole === 'parent' ? 'parent' : 'enseignant'}">
+                        <div class="message-bubble">
+                            <div class="message-author">${escapeHtml(auteurNom)} (${auteurRole === 'parent' ? 'Parent' : 'Enseignant'})</div>
+                            <div class="message-text">${escapeHtml(messageTexte)}</div>
+                            <div class="message-date">${formatDateTime(dateMessage)}</div>
+                            ${actionButtons}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function afficherSectionDepot() {
+            const container = document.getElementById('depotContent');
+            if (!container) return;
+
+            const dateDepassee = isDateDepassee();
+            const existingDepot = getExistingDepot();
+            const dateLimite = getProp(activite, 'dateLimite');
+
+            if (dateDepassee) {
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        ⏰ La date limite (${formatDate(dateLimite)}) est dépassée. Vous ne pouvez plus déposer de travail.
+                    </div>
+                `;
+                return;
+            }
+
+            if (existingDepot) {
+                const fichiers = getProp(existingDepot, 'fichiers') || [];
+                const commentaire = getProp(existingDepot, 'commentaire') || '';
+                const note = getProp(existingDepot, 'note');
+                const dateDepot = getProp(existingDepot, 'dateDepot');
+                
+                container.innerHTML = `
+                    <div class="depot-existing">
+                        <strong>✅ Travail déjà déposé</strong><br>
+                        <strong>Date:</strong> ${formatDateTime(dateDepot)}<br>
+                        <strong>Fichiers:</strong>
+                        <div class="depot-files-list">
+                            ${fichiers.map(f => `
+                                <a href="#" class="depot-file-link" onclick="telechargerFichier('${escapeHtml(f)}'); return false;">
+                                    📄 ${escapeHtml(f)}
+                                </a>
+                            `).join('')}
+                        </div>
+                        ${commentaire ? `<br><strong>📝 Commentaire:</strong> "${escapeHtml(commentaire)}"` : ''}
+                        ${note ? `<br><br><strong>⭐ Note obtenue:</strong> <span style="font-size:1.2rem; color:#4ca896;">${note}/20</span>` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="file-upload" onclick="document.getElementById('hiddenFileInput').click()">
+                    <div>📎</div>
+                    <div>Cliquez pour ajouter des fichiers</div>
+                    <input type="file" id="hiddenFileInput" multiple style="display:none;" onchange="ajouterFichier(event)">
+                </div>
+                <div id="fileList" class="file-list"></div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;">Commentaire (optionnel)</label>
+                    <textarea id="depotCommentaire" class="message-input" rows="3" placeholder="Ajoutez un commentaire à votre travail..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="deposerTravail()" id="depotBtn">📎 Déposer le travail</button>
+            `;
+        }
+
+        function afficherInterface() {
+            if (!activite) {
+                document.getElementById('mainContainer').innerHTML = '<div class="loading">Chargement de l\'activité...</div>';
+                return;
+            }
+
+            const statut = getStatutDisplay();
+            const dateDepassee = isDateDepassee();
+            const type = getProp(activite, 'type') || 'devoir';
+            const titre = getProp(activite, 'titre') || 'Sans titre';
+            const description = getProp(activite, 'description') || '';
+            const dateLimite = getProp(activite, 'dateLimite');
+            const dateAssignation = getProp(activite, 'dateAssignation');
+            const coefficient = getProp(activite, 'coefficient') || 1;
+            const fichierJoint = getProp(activite, 'fichierJoint');
+
+            const container = document.getElementById('mainContainer');
+            const params = getUrlParams();
+
+            container.innerHTML = `
+                <div>
+                    <a href="parent-activites.html" class="back-link">← Retour aux activités</a>
+                    
+                    <div class="activite-card">
+                        <div class="activite-header">
+                            <div class="activite-titre">
+                                <span>${getTypeIcon(type)}</span>
+                                ${escapeHtml(titre)}
+                                <span class="type-badge ${type}">${type.toUpperCase()}</span>
+                            </div>
+                            <span class="statut-badge ${statut.class}">${statut.text}</span>
+                        </div>
+                        
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">📅 Date d'assignation</div>
+                                <div class="info-value">${formatDate(dateAssignation)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">⏰ Date limite</div>
+                                <div class="info-value ${dateDepassee ? 'depassee' : ''}">${formatDate(dateLimite)}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">⚖️ Coefficient</div>
+                                <div class="info-value">${coefficient}</div>
+                            </div>
+                        </div>
+                        
+                        ${description ? `<div class="description">📝 ${escapeHtml(description)}</div>` : ''}
+                        
+                        ${fichierJoint ? `<div class="alert alert-info">📎 Fichier joint: ${escapeHtml(fichierJoint)}</div>` : ''}
+                    </div>
+                    
+                    <div class="depot-section">
+                        <div class="section-title">
+                            📎 Dépôt du travail
+                            <span style="font-size:0.7rem; font-weight:normal; color:#5a9d91;" id="enfantName">Pour ${escapeHtml(params.enfantNom)}</span>
+                        </div>
+                        <div id="depotContent"></div>
+                    </div>
+                    
+                    <div class="discussion-section">
+                        <div class="section-title">
+                            💬 Discussion
+                            ${!dateDepassee ? '<span style="font-size:0.7rem; font-weight:normal; color:#5a9d91;">(Questions/Réponses)</span>' : '<span style="font-size:0.7rem; font-weight:normal; color:#ff9466;">(Fermée)</span>'}
+                        </div>
+                        <div id="discussionMessages" class="discussion-messages"></div>
+                        <div id="messageInputArea" class="message-input-area" style="display: ${dateDepassee ? 'none' : 'flex'}">
+                            <textarea id="messageInput" class="message-input" rows="2" placeholder="Posez une question à l'enseignant..."></textarea>
+                            <button id="sendBtn" class="btn-primary" onclick="envoyerMessage()" style="align-self:flex-end;">✉️ Envoyer</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            afficherDiscussion();
+            afficherSectionDepot();
+        }
+
+        function getTypeIcon(type) {
+            switch(type?.toLowerCase()) {
+                case 'devoir': return '📝';
+                case 'projet': return '🚀';
+                case 'examen': return '📊';
+                case 'exercice': return '✏️';
+                default: return '📋';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        // Exposer les fonctions globales
+        window.envoyerMessage = envoyerMessage;
+        window.deposerTravail = deposerTravail;
+        window.ajouterFichier = ajouterFichier;
+        window.retirerFichier = retirerFichier;
+        window.modifierMessage = modifierMessage;
+        window.supprimerMessage = supprimerMessage;
+        window.telechargerFichier = telechargerFichier;
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

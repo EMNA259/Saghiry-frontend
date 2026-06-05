@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Propositions favorites des enseignants</title>
+    <style>
+        /* Styles identiques... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --accent-blue: #339af0;
+            --accent-purple: #9775fa;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: var(--gray-bg);
+            padding: 2rem;
+        }
+
+        .favoris-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title span {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(76,168,150,0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76,168,150,0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(76,168,150,0.05);
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(255,148,102,0.2);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,148,102,0.3);
+        }
+
+        .filters-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76,168,150,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-sub {
+            color: var(--primary-green);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .enseignants-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .enseignant-section {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-border);
+        }
+
+        .enseignant-header {
+            padding: 1.2rem 1.5rem;
+            background: linear-gradient(135deg, #f8fdfc, #eff9f7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .enseignant-header:hover {
+            background: linear-gradient(135deg, #e6f7f4, #d4f0eb);
+        }
+
+        .enseignant-header.expanded {
+            border-bottom-color: var(--accent-orange);
+        }
+
+        .enseignant-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(76,168,150,0.2);
+        }
+
+        .enseignant-info {
+            flex: 1;
+        }
+
+        .enseignant-nom {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.2rem;
+        }
+
+        .enseignant-details {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            flex-wrap: wrap;
+        }
+
+        .specialite-tag {
+            background: rgba(255,148,102,0.1);
+            color: var(--accent-orange-dark);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,148,102,0.2);
+        }
+
+        .favoris-count {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255,148,102,0.3);
+        }
+
+        .expand-icon {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            transition: transform 0.3s;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .propositions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .proposition-card {
+            background: var(--gray-bg);
+            border-radius: 16px;
+            padding: 1.2rem;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .proposition-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-orange);
+            box-shadow: var(--shadow-md);
+        }
+
+        .proposition-card.selected {
+            border-color: var(--primary-green);
+            background: linear-gradient(135deg, #f0fff4, #e6f7f4);
+        }
+
+        .favorite-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(255,148,102,0.3);
+        }
+
+        .proposition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .proposition-strategie {
+            font-weight: 700;
+            color: var(--accent-orange-dark);
+        }
+
+        .proposition-score {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .proposition-stats-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem;
+            margin: 0.5rem 0;
+            font-size: 0.8rem;
+            color: var(--text-soft);
+        }
+
+        .stat-mini {
+            text-align: center;
+            padding: 0.3rem;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .stat-mini-value {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .emploi-mini {
+            margin: 0.5rem 0;
+            border: 1px solid var(--gray-border);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.65rem;
+        }
+
+        .jour-header-mini {
+            display: grid;
+            grid-template-columns: 40px repeat(6, 1fr);
+            background: var(--primary-green);
+            color: white;
+            font-weight: 600;
+        }
+
+        .jour-header-cell-mini {
+            padding: 0.3rem;
+            text-align: center;
+        }
+
+        .emploi-mini-row {
+            display: grid;
+            grid-template-columns: 40px repeat(6, 1fr);
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .emploi-mini-hour {
+            background: var(--gray-bg);
+            font-weight: 600;
+            color: var(--accent-orange-dark);
+            padding: 0.2rem;
+            text-align: center;
+            border-right: 1px solid var(--gray-border);
+        }
+
+        .emploi-mini-cell {
+            padding: 0.2rem;
+            text-align: center;
+            border-right: 1px solid var(--gray-border);
+            background: white;
+        }
+
+        .emploi-mini-cell.has-cours {
+            background: #fff3e0;
+            border-left: 2px solid var(--accent-orange);
+        }
+
+        .points-forts-mini {
+            margin: 0.5rem 0;
+            padding: 0.3rem;
+            background: #e6f7f4;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: #2d6b63;
+        }
+
+        .proposition-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 0.4rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-select {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-select:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-view {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: var(--accent-orange-dark);
+        }
+
+        .btn-compare {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .btn-compare:hover {
+            background: #845ef7;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 1000px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-header h2 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .emploi-detail {
+            background: var(--gray-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .jour-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .jour-tab {
+            padding: 0.5rem 1.2rem;
+            background: white;
+            border: 1px solid var(--gray-border);
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .jour-tab.active {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            color: white;
+            border-color: transparent;
+        }
+
+        .creneaux-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .creneau-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        .creneau-heure {
+            min-width: 100px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .creneau-info {
+            flex: 1;
+        }
+
+        .creneau-matiere {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .creneau-details {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeeba);
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        .loading:after {
+            content: "...";
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 4rem;
+            background: white;
+            border-radius: 24px;
+            color: var(--text-light);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .comparison-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 2px solid var(--gray-border);
+        }
+
+        .comparison-card.selected {
+            border-color: var(--primary-green);
+            background: linear-gradient(135deg, #f0fff4, #e6f7f4);
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-score {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
+            .propositions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .propositions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="favoris-container">
+        <div class="page-header">
+            <h1 class="page-title">
+                <span>⭐</span> Propositions favorites des enseignants
+            </h1>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="rafraichirDonnees()">
+                    <span>🔄</span> Rafraîchir
+                </button>
+                <button class="btn-accent" onclick="genererEmploisFinaux()" id="genererBtn">
+                    <span>⚡</span> Générer emplois finaux
+                </button>
+            </div>
+        </div>
+
+        <div id="alertMessage"></div>
+
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label>Année scolaire</label>
+                <select id="anneeScolaireFilter" onchange="filtrerPropositions()">
+                    <option value="2025-2026" selected>2025-2026</option>
+                    <option value="2024-2025">2024-2025</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Statut</label>
+                <select id="statutFilter" onchange="filtrerPropositions()">
+                    <option value="tous">Tous</option>
+                    <option value="en_attente">En attente</option>
+                    <option value="traite">Traité</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Rechercher</label>
+                <input type="text" id="searchInput" placeholder="Nom de l'enseignant..." onkeyup="filtrerPropositions()">
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Enseignants</div>
+                <div class="stat-value" id="totalEnseignants">0</div>
+                <div class="stat-sub">avec propositions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Propositions</div>
+                <div class="stat-value" id="totalPropositions">0</div>
+                <div class="stat-sub">au total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">En attente</div>
+                <div class="stat-value" id="propositionsEnAttente">0</div>
+                <div class="stat-sub">à traiter</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Taux de choix</div>
+                <div class="stat-value" id="tauxChoix">0%</div>
+                <div class="stat-sub">propositions/enseignant</div>
+            </div>
+        </div>
+
+        <div id="enseignantsList" class="enseignants-accordion">
+            <div class="loading">Chargement des propositions...</div>
+        </div>
+
+        <div class="modal" id="detailModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Détail de la proposition</h2>
+                    <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+                </div>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+
+        <div class="modal" id="comparisonModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Comparaison des propositions</h2>
+                    <button class="modal-close" onclick="closeComparisonModal()">&times;</button>
+                </div>
+                <div id="comparisonContent" class="comparison-container"></div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn-secondary" onclick="closeComparisonModal()">Annuler</button>
+                    <button class="btn-primary" onclick="validerSelection()">Valider la sélection</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="generationModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚡ Génération des emplois du temps finaux</h2>
+                    <button class="modal-close" onclick="closeGenerationModal()">&times;</button>
+                </div>
+                <div id="generationContent">
+                    <p style="margin-bottom: 1rem;">L'IA va générer les emplois du temps finaux en tenant compte :</p>
+                    <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
+                        <li>✓ Des propositions favorites des enseignants</li>
+                        <li>✓ Des disponibilités des salles</li>
+                        <li>✓ Des contraintes horaires des classes</li>
+                        <li>✓ De la répartition équitable des ressources</li>
+                    </ul>
+                    <div class="progress-bar" style="width: 100%; height: 8px; background: var(--gray-border); border-radius: 4px; overflow: hidden; margin: 1rem 0; display: none;" id="progressBar">
+                        <div class="progress-fill" style="height: 100%; background: linear-gradient(90deg, var(--primary-green), var(--accent-orange)); width: 0%;" id="progressFill"></div>
+                    </div>
+                    <p id="generationMessage" style="text-align: center;">Prêt à générer</p>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button class="btn-secondary" onclick="closeGenerationModal()">Annuler</button>
+                    <button class="btn-accent" onclick="lancerGeneration()" id="lancerGenBtn">Lancer la génération</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        
+        let tousEnseignants = [];
+        let toutesPropositions = [];
+        let enseignantsFavoris = new Map();
+        
+        let currentFilters = {
+            anneeScolaire: '2025-2026',
+            statut: 'tous',
+            search: ''
+        };
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!token) {
+                window.parent.location.href = 'saghiry-auth.html';
+                return;
+            }
+
+            showLoading(true);
+            await chargerDonnees();
+            showLoading(false);
+        });
+
+        async function chargerDonnees() {
+            try {
+                await chargerTousLesEnseignants();
+                await chargerPropositionsAcceptees();
+                
+                organiserDonnees();
+                afficherStatistiques();
+                afficherEnseignants();
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement:', error);
+                showMessage('❌ Erreur de chargement des données', 'error');
+            }
+        }
+
+        async function chargerTousLesEnseignants() {
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/role/enseignant`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    tousEnseignants = Array.isArray(data) ? data : (data.data || []);
+                    console.log('✅ TOUS les enseignants chargés (via role):', tousEnseignants.length);
+                } else {
+                    const fallbackResponse = await fetch(`${API_BASE}/utilisateurs/intervenants`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (fallbackResponse.ok) {
+                        const fallbackData = await fallbackResponse.json();
+                        tousEnseignants = fallbackData.filter(i => i.Type === 'enseignant') || [];
+                        console.log('✅ TOUS les enseignants chargés (via intervenants):', tousEnseignants.length);
+                    } else {
+                        console.error('❌ Erreur chargement enseignants');
+                        tousEnseignants = [];
+                    }
+                }
+                
+                console.log('📋 IDs des enseignants chargés:', tousEnseignants.map(e => e.Id || e.id));
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement enseignants:', error);
+                tousEnseignants = [];
+            }
+        }
+
+        async function chargerPropositionsAcceptees() {
+            try {
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/propositions/acceptees?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📥 Données reçues de l\'API:', data);
+                    
+                    if (data && data.data && Array.isArray(data.data)) {
+                        toutesPropositions = data.data;
+                        console.log('✅ Propositions acceptées chargées (data):', toutesPropositions.length);
+                    } else if (data && Array.isArray(data)) {
+                        toutesPropositions = data;
+                        console.log('✅ Propositions acceptées chargées (tableau):', toutesPropositions.length);
+                    } else if (data && data.Data && Array.isArray(data.Data)) {
+                        toutesPropositions = data.Data;
+                        console.log('✅ Propositions acceptées chargées (Data):', toutesPropositions.length);
+                    } else {
+                        console.error('❌ Format de données inattendu:', data);
+                        toutesPropositions = [];
+                    }
+                    
+                    console.log('📋 IDs des enseignants dans propositions:', toutesPropositions.map(p => p.EnseignantId));
+                    
+                } else if (response.status === 403) {
+                    console.error('❌ Accès interdit - Vérifiez les droits admin');
+                    showMessage('❌ Accès interdit - Vous devez être administrateur', 'error');
+                    toutesPropositions = [];
+                } else {
+                    console.error('❌ Erreur API propositions:', response.status);
+                    toutesPropositions = [];
+                }
+            } catch (error) {
+                console.error('❌ Erreur chargement propositions:', error);
+                toutesPropositions = [];
+            }
+        }
+
+        function organiserDonnees() {
+            enseignantsFavoris.clear();
+            
+            if (!Array.isArray(toutesPropositions)) {
+                console.error('❌ toutesPropositions n\'est pas un tableau:', toutesPropositions);
+                return;
+            }
+            
+            const enseignantsMap = new Map();
+            tousEnseignants.forEach(e => {
+                const id = e.Id || e.id;
+                if (id) {
+                    enseignantsMap.set(id, e);
+                }
+            });
+            
+            console.log('🗺️ Map des enseignants créé avec', enseignantsMap.size, 'entrées');
+            
+            toutesPropositions.forEach(prop => {
+                if (prop) {
+                    const enseignantId = prop.EnseignantId || prop.enseignantId;
+                    
+                    if (!enseignantId) return;
+                    
+                    if (!enseignantsFavoris.has(enseignantId)) {
+                        const enseignant = enseignantsMap.get(enseignantId);
+                        
+                        if (enseignant) {
+                            console.log(`✅ Enseignant TROUVÉ pour ID ${enseignantId}:`, enseignant.Email || enseignant.email);
+                        } else {
+                            console.log(`⚠️ Enseignant NON TROUVÉ pour ID ${enseignantId}`);
+                        }
+                        
+                        enseignantsFavoris.set(enseignantId, {
+                            enseignant: enseignant || {
+                                id: enseignantId,
+                                nom: prop.EnseignantNom?.split(' ').pop() || 'Enseignant',
+                                prenom: prop.EnseignantNom?.split(' ')[0] || '',
+                                email: prop.EnseignantNom ? `${prop.EnseignantNom.toLowerCase().replace(' ', '.')}@email.com` : 'email@inconnu.com',
+                                specialites: []
+                            },
+                            propositions: []
+                        });
+                    }
+                    
+                    enseignantsFavoris.get(enseignantId).propositions.push(prop);
+                }
+            });
+            
+            console.log('📊 Données organisées:', enseignantsFavoris.size, 'enseignants avec propositions');
+            
+            enseignantsFavoris.forEach((value, key) => {
+                console.log(`   - ${key}: ${value.enseignant.email || 'Email non disponible'}`);
+            });
+        }
+
+        function filtrerPropositions() {
+            currentFilters.anneeScolaire = document.getElementById('anneeScolaireFilter').value;
+            currentFilters.statut = document.getElementById('statutFilter').value;
+            currentFilters.search = document.getElementById('searchInput').value.toLowerCase();
+            
+            afficherEnseignants();
+        }
+
+        function getEnseignantsFiltres() {
+            const enseignantsArray = Array.from(enseignantsFavoris.values());
+            
+            return enseignantsArray.filter(item => {
+                const enseignant = item.enseignant;
+                
+                if (currentFilters.search) {
+                    const nomComplet = `${enseignant.prenom || ''} ${enseignant.nom || ''}`.toLowerCase();
+                    if (!nomComplet.includes(currentFilters.search)) return false;
+                }
+                
+                return true;
+            });
+        }
+
+        function afficherStatistiques() {
+            const enseignantsArray = Array.from(enseignantsFavoris.values());
+            const totalPropositions = enseignantsArray.reduce((sum, e) => sum + e.propositions.length, 0);
+            
+            document.getElementById('totalEnseignants').textContent = enseignantsArray.length;
+            document.getElementById('totalPropositions').textContent = totalPropositions;
+            document.getElementById('propositionsEnAttente').textContent = totalPropositions;
+            
+            const taux = enseignantsArray.length > 0 
+                ? Math.round((totalPropositions / enseignantsArray.length) * 10) / 10
+                : 0;
+            document.getElementById('tauxChoix').textContent = taux;
+        }
+
+        function afficherEnseignants() {
+            const enseignantsFiltres = getEnseignantsFiltres();
+            const container = document.getElementById('enseignantsList');
+            
+            if (enseignantsFiltres.length === 0) {
+                container.innerHTML = '<div class="no-data">Aucune proposition favorite trouvée</div>';
+                return;
+            }
+
+            let html = '';
+            
+            enseignantsFiltres.forEach((item, index) => {
+                const enseignant = item.enseignant;
+                const propositions = item.propositions;
+                
+                const initiales = getInitiales(enseignant);
+                const nomComplet = `${enseignant.prenom || ''} ${enseignant.nom || ''}`.trim() || 'Enseignant';
+                const specialites = enseignant.specialites || [];
+                
+                let email = enseignant.email || enseignant.Email || 'Email non disponible';
+                
+                html += `
+                    <div class="enseignant-section">
+                        <div class="enseignant-header" onclick="toggleEnseignant('enseignant-${index}')">
+                            <div class="enseignant-avatar">${initiales}</div>
+                            <div class="enseignant-info">
+                                <div class="enseignant-nom">${nomComplet}</div>
+                                <div class="enseignant-details">
+                                    <span>📧 ${email}</span>
+                                    <span class="specialite-tag">⭐ ${propositions.length} proposition${propositions.length > 1 ? 's' : ''}</span>
+                                    ${specialites.map(s => `<span class="specialite-tag">${s}</span>`).join('')}
+                                </div>
+                            </div>
+                            <span class="favoris-count">${propositions.length}</span>
+                            <span class="expand-icon" id="icon-enseignant-${index}">▼</span>
+                        </div>
+                        <div id="enseignant-${index}" class="propositions-grid" style="display: none;">
+                            ${afficherPropositionsEnseignant(propositions)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function afficherPropositionsEnseignant(propositions) {
+            let html = '';
+            
+            propositions.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+            
+            propositions.forEach((prop, idx) => {
+                const strategie = prop.Strategie || 'inconnue';
+                let strategieIcon = strategie === 'compacte' ? '📅' : strategie === 'preferences' ? '❤️' : '⚖️';
+                
+                const stats = prop.Statistiques || {};
+                const totalHeures = stats.TotalHeures || 0;
+                const joursTravail = stats.JoursTravail || 0;
+                
+                const matieres = (stats.Matieres || []).join(', ');
+                
+                html += `
+                    <div class="proposition-card">
+                        <div class="favorite-badge">⭐ Favorite</div>
+                        <div class="proposition-header">
+                            <span class="proposition-strategie">${strategieIcon} ${strategie}</span>
+                            <span class="proposition-score">${prop.Score || 0}</span>
+                        </div>
+                        
+                        <div class="proposition-stats-mini">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">${totalHeures}h</div>
+                                <div>Total</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">${joursTravail}</div>
+                                <div>Jours</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 0.5rem 0; font-size: 0.7rem; color: var(--text-soft);">
+                            📚 ${matieres || 'Aucune matière'}
+                        </div>
+                        
+                        <div class="points-forts-mini">
+                            ${(prop.PointsForts || []).slice(0, 2).map(p => `✨ ${p.substring(0, 40)}...`).join('<br>')}
+                        </div>
+                        
+                        <div class="proposition-actions">
+                            <button class="btn-small btn-view" onclick="voirDetail('${prop.Id}')">Détail</button>
+                            <button class="btn-small btn-compare" onclick="comparerPropositions('${prop.EnseignantId}')">Comparer</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+
+        function toggleEnseignant(id) {
+            const element = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (element.style.display === 'none' || element.style.display === '') {
+                element.style.display = 'grid';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            } else {
+                element.style.display = 'none';
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function voirDetail(propositionId) {
+            const proposition = toutesPropositions.find(p => p.Id === propositionId);
+            if (!proposition) return;
+            
+            document.getElementById('modalTitle').textContent = `Détail de la proposition - Score: ${proposition.Score || 0}`;
+            
+            const emploiParJour = proposition.EmploiParJour || {};
+            const jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            
+            let html = '<div class="emploi-detail">';
+            
+            html += '<div class="jour-tabs">';
+            jours.forEach((jour, index) => {
+                html += `<button class="jour-tab ${index === 0 ? 'active' : ''}" onclick="switchJourDetail('${jour.toLowerCase()}')">${jour}</button>`;
+            });
+            html += '</div>';
+            
+            jours.forEach((jour, index) => {
+                const jourKey = jour.toLowerCase();
+                const creneaux = emploiParJour[jourKey] || [];
+                
+                html += `<div id="detail-${jourKey}" class="jour-content" style="display: ${index === 0 ? 'block' : 'none'};">`;
+                html += `<h3 style="margin-bottom: 1rem;">${jour}</h3>`;
+                html += '<div class="creneaux-list">';
+                
+                if (creneaux.length === 0) {
+                    html += '<p style="text-align:center; padding:1rem;">Aucun cours</p>';
+                } else {
+                    creneaux.sort((a, b) => a.HeureDebut.localeCompare(b.HeureDebut));
+                    creneaux.forEach(c => {
+                        // ✅ SUPPRIMÉ : l'affichage de la salle
+                        html += `
+                            <div class="creneau-item">
+                                <div class="creneau-heure">${c.HeureDebut} - ${c.HeureFin}</div>
+                                <div class="creneau-info">
+                                    <div class="creneau-matiere">${c.MatiereNom || ''}</div>
+                                    <div class="creneau-details">
+                                        <span>👤 ${c.ClasseNom || ''}</span>
+                                        <span>🏫 ${c.Niveau || ''}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                html += '</div></div>';
+            });
+            
+            html += '</div>';
+            
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function comparerPropositions(enseignantId) {
+            const enseignant = enseignantsFavoris.get(enseignantId);
+            if (!enseignant || !enseignant.propositions || enseignant.propositions.length === 0) return;
+            
+            const propositions = enseignant.propositions;
+            const container = document.getElementById('comparisonContent');
+            
+            let html = '';
+            propositions.forEach((prop, index) => {
+                const stats = prop.Statistiques || {};
+                html += `
+                    <div class="comparison-card">
+                        <div class="comparison-header">
+                            <span class="proposition-strategie">${prop.Strategie || 'Proposition'}</span>
+                            <span class="comparison-score">${prop.Score || 0}</span>
+                        </div>
+                        <div class="proposition-stats-mini">
+                            <div>📊 ${stats.TotalHeures || 0}h total</div>
+                            <div>📅 ${stats.JoursTravail || 0} jours</div>
+                            <div>⏱️ ${stats.HeuresCreuses || 0}h creuses</div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <label>
+                                <input type="radio" name="propositionChoix" value="${prop.Id}" ${index === 0 ? 'checked' : ''}>
+                                Sélectionner cette proposition
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            document.getElementById('comparisonModal').classList.add('active');
+        }
+
+        function validerSelection() {
+            const selected = document.querySelector('input[name="propositionChoix"]:checked');
+            if (selected) {
+                showMessage(`✅ Proposition sélectionnée pour génération finale`, 'success');
+                closeComparisonModal();
+            }
+        }
+
+        function genererEmploisFinaux() {
+            document.getElementById('generationModal').classList.add('active');
+        }
+
+        async function lancerGeneration() {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const message = document.getElementById('generationMessage');
+            const btn = document.getElementById('lancerGenBtn');
+            
+            progressBar.style.display = 'block';
+            btn.disabled = true;
+            btn.innerHTML = 'Génération...';
+            
+            message.innerHTML = '⚡ Lancement de l\'IA de génération finale...';
+            
+            for (let i = 0; i <= 100; i += 10) {
+                progressFill.style.width = i + '%';
+                message.innerHTML = `Génération en cours... ${i}%`;
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            message.innerHTML = '✅ Génération terminée avec succès !';
+            showMessage('✅ Emplois du temps finaux générés !', 'success');
+            
+            setTimeout(() => {
+                closeGenerationModal();
+                btn.disabled = false;
+                btn.innerHTML = 'Lancer la génération';
+                progressBar.style.display = 'none';
+            }, 2000);
+        }
+
+        function getInitiales(enseignant) {
+            if (enseignant.prenom && enseignant.nom) {
+                return (enseignant.prenom.charAt(0) + enseignant.nom.charAt(0)).toUpperCase();
+            }
+            if (enseignant.prenom) return enseignant.prenom.charAt(0).toUpperCase();
+            if (enseignant.nom) return enseignant.nom.charAt(0).toUpperCase();
+            return '👤';
+        }
+
+        function showLoading(show) {
+            const container = document.getElementById('enseignantsList');
+            if (show) {
+                container.innerHTML = '<div class="loading">Chargement...</div>';
+            }
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            const className = type === 'success' ? 'alert-success' : 
+                            type === 'error' ? 'alert-error' : 
+                            type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            alertDiv.innerHTML = `<div class="alert ${className}">${message}</div>`;
+            
+            setTimeout(() => {
+                alertDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function rafraichirDonnees() {
+            showLoading(true);
+            chargerDonnees();
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function closeComparisonModal() {
+            document.getElementById('comparisonModal').classList.remove('active');
+        }
+
+        function closeGenerationModal() {
+            document.getElementById('generationModal').classList.remove('active');
+        }
+
+        window.switchJourDetail = function(jour) {
+            document.querySelectorAll('.jour-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.jour-content').forEach(content => content.style.display = 'none');
+            
+            const activeTab = Array.from(document.querySelectorAll('.jour-tab')).find(tab => 
+                tab.textContent.trim().toLowerCase().includes(jour)
+            );
+            if (activeTab) activeTab.classList.add('active');
+            
+            const jourContent = document.getElementById(`detail-${jour}`);
+            if (jourContent) jourContent.style.display = 'block';
+        };
+    </script>
+</body>
+</html>

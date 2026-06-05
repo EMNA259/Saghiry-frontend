@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>En attente de votre emploi du temps</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e9e7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .waiting-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h1 {
+            color: #ff9466;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .success-badge {
+            display: inline-block;
+            background: #4ca896;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        p {
+            color: #5a6e6a;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, #f8fafc, #e6f7f4);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 4px solid #ff9466;
+            text-align: left;
+        }
+
+        .status-card p {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-card .check {
+            color: #4ca896;
+            font-weight: bold;
+        }
+
+        .status-card .wait {
+            color: #ff9466;
+            font-weight: bold;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e9e7;
+            border-top-color: #ff9466;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896, #3d8a7f);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76,168,150,0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4ca896;
+            border: 2px solid #4ca896;
+            border-radius: 12px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #f0f0f0;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #9aa9a6;
+        }
+
+        .countdown {
+            font-size: 0.9rem;
+            color: #ff9466;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="waiting-container">
+        <div class="icon" id="pageIcon">✅</div>
+        <h1 id="pageTitle">Propositions envoyées !</h1>
+        <div class="success-badge" id="successBadge">✓ Envoi réussi</div>
+        
+        <p id="mainMessage">Vos propositions favorites ont été transmises à l'administration.</p>
+        
+        <div class="status-card">
+            <p>📋 <strong>Étape 1 :</strong> <span class="check" id="step1">✅ Propositions envoyées</span></p>
+            <p>⚙️ <strong>Étape 2 :</strong> <span id="step2" class="wait">⏳ En attente de validation par l'administration</span></p>
+            <p>📅 <strong>Étape 3 :</strong> <span id="step3">⏳ Génération de votre emploi du temps</span></p>
+        </div>
+
+        <div class="loading-spinner" id="spinner"></div>
+        
+        <p id="waitMessage" style="font-size: 0.9rem;">La génération peut prendre quelques minutes...</p>
+        
+        <div class="btn-group">
+            <button class="btn-primary" id="viewEmploiBtn" onclick="voirEmploiDuTemps()" style="display: none;">
+                📅 Voir mon emploi du temps
+            </button>
+            <button class="btn-secondary" onclick="retourPropositions()">
+                ⬅️ Retour aux propositions
+            </button>
+        </div>
+        
+        <div class="countdown" id="countdown"></div>
+        
+        <div class="footer">
+            <p>Une notification vous sera envoyée dès que votre emploi du temps sera prêt.</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        let verificationInterval = null;
+        let countdownSeconds = 0;
+        
+        // Récupérer les paramètres de l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const successCount = urlParams.get('success') || '2';
+        const totalCount = urlParams.get('total') || '2';
+        const hasEmploi = urlParams.get('hasEmploi') === 'true';
+        
+        function getCurrentEnseignantId() {
+            try {
+                if (window.parent && window.parent.ENSEIGNANT_CONFIG) {
+                    return window.parent.ENSEIGNANT_CONFIG.user?.id;
+                }
+            } catch (e) {}
+            
+            const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    return user.id;
+                } catch (e) {}
+            }
+            return null;
+        }
+        
+        async function verifierEmploi() {
+            const enseignantId = getCurrentEnseignantId();
+            if (!enseignantId) return false;
+            
+            try {
+                const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data && data.data.Creneaux && data.data.Creneaux.length > 0) {
+                        // Emploi du temps disponible !
+                        clearInterval(verificationInterval);
+                        afficherEmploiDisponible();
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.log("Erreur vérification:", error);
+                return false;
+            }
+        }
+        
+        function afficherEmploiDisponible() {
+            document.getElementById('pageIcon').innerHTML = '🎉';
+            document.getElementById('pageTitle').innerHTML = 'Votre emploi du temps est prêt !';
+            document.getElementById('successBadge').innerHTML = '✓ Emploi disponible';
+            document.getElementById('mainMessage').innerHTML = 'Votre emploi du temps a été généré avec succès.';
+            document.getElementById('step2').innerHTML = '✅ Validé par l\'administration';
+            document.getElementById('step2').className = 'check';
+            document.getElementById('step3').innerHTML = '✅ Emploi du temps généré';
+            document.getElementById('step3').className = 'check';
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('waitMessage').innerHTML = '🎉 Votre emploi du temps est maintenant disponible !';
+            document.getElementById('viewEmploiBtn').style.display = 'block';
+            document.getElementById('countdown').innerHTML = 'Redirection automatique dans 5 secondes...';
+            
+            // Compte à rebours
+            let countdown = 5;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').innerHTML = `Redirection automatique dans ${countdown} secondes...`;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    voirEmploiDuTemps();
+                }
+            }, 1000);
+        }
+        
+        function voirEmploiDuTemps() {
+            window.location.href = 'enseignant-emploi.html';
+        }
+        
+        function retourPropositions() {
+            window.location.href = 'enseignant-propositions.html';
+        }
+        
+        // Initialisation de la page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Afficher le nombre de propositions envoyées
+            document.getElementById('mainMessage').innerHTML = `${successCount}/${totalCount} proposition(s) favorite(s) envoyée(s) avec succès.<br>L'administration va analyser votre choix.`;
+            
+            // Si l'emploi existe déjà, l'afficher directement
+            if (hasEmploi) {
+                afficherEmploiDisponible();
+                return;
+            }
+            
+            // Sinon, vérifier périodiquement
+            verificationInterval = setInterval(async () => {
+                const disponible = await verifierEmploi();
+                if (disponible) {
+                    clearInterval(verificationInterval);
+                }
+            }, 10000); // Vérifier toutes les 10 secondes
+            
+            // Premier check immédiat
+            await verifierEmploi();
+        });
+        
+        // Nettoyer l'intervalle si la page est fermée
+        window.addEventListener('beforeunload', function() {
+            if (verificationInterval) {
+                clearInterval(verificationInterval);
+            }
+        });
+    </script>
+</body>
+</html>

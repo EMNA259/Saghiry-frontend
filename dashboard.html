@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Tableau de bord Administrateur</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '📊';
+            font-size: 1.8rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-refresh {
+            background: white;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-refresh:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .date-badge {
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-change {
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 1100px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 260px;
+            margin-bottom: 0.5rem;
+        }
+
+        canvas {
+            max-height: 260px;
+            width: 100%;
+        }
+
+        .classe-list, .personnel-list, .absence-list, .conge-list, .donation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .classe-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .classe-item:hover {
+            background: #e0f2f1;
+            transform: translateX(5px);
+        }
+
+        .classe-info {
+            flex: 1;
+        }
+
+        .classe-nom {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        .classe-niveau {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        .classe-effectif {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .effectif-nombre {
+            font-weight: 800;
+            color: var(--primary-green);
+            font-size: 1.3rem;
+        }
+
+        .effectif-label {
+            font-size: 0.65rem;
+            color: var(--text-light);
+        }
+
+        .donation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .donation-item:hover {
+            background: linear-gradient(135deg, #fef3e8, #fff5e8);
+            transform: translateX(5px);
+        }
+
+        .donation-info {
+            flex: 1;
+        }
+
+        .donation-donateur {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .donation-detail {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        .donation-montant {
+            font-weight: 800;
+            color: var(--accent-orange);
+            font-size: 1.1rem;
+        }
+
+        .donation-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .donation-badge.materiel {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .donation-badge.financiere {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .donation-badge.alimentaire {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .donation-date {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .absence-item, .conge-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .absence-item:hover, .conge-item:hover {
+            transform: translateX(5px);
+        }
+
+        .absence-item:hover {
+            background: #ffebee;
+        }
+
+        .conge-item:hover {
+            background: #e0f2f1;
+        }
+
+        .absence-info, .conge-info {
+            flex: 1;
+        }
+
+        .absence-eleve, .conge-enseignant {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .absence-detail, .conge-detail {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 0.2rem;
+        }
+
+        .absence-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .absence-badge.absence {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .absence-badge.retard {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .absence-badge.presence {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .conge-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .conge-badge.approuve {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .conge-badge.en_attente {
+            background: #fff8e1;
+            color: #f57c00;
+        }
+
+        .conge-badge.refuse {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .conge-badge.maladie {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .conge-badge.conge_annuel {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .conge-badge.personnel {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .absence-date, .conge-date {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .personnel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: var(--gray-bg);
+            border-radius: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .personnel-item:hover {
+            background: #e0f2f1;
+            transform: translateX(5px);
+        }
+
+        .personnel-nom {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .personnel-role {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        .personnel-badge {
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-enseignant {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-permanent {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .alert-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(30px);
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .eleve-list-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .eleve-modal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem;
+            background: var(--gray-bg);
+            border-radius: 10px;
+        }
+
+        .eleve-modal-nom {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .eleve-modal-identifiant {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        .niveau-section {
+            margin-bottom: 1rem;
+        }
+
+        .niveau-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            padding: 0.3rem 0.5rem;
+            background: rgba(76, 168, 150, 0.1);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .status-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--gray-bg);
+            color: var(--text-light);
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .filter-chip:hover {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container" id="dashboardContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <!-- Modal détails classe -->
+    <div class="modal" id="classeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Élèves de la classe</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal détails absence -->
+    <div class="modal" id="absenceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="absenceModalTitle">Détails de l'absence</h2>
+                <button class="modal-close" onclick="closeAbsenceModal()">&times;</button>
+            </div>
+            <div id="absenceModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal détails congé -->
+    <div class="modal" id="congeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="congeModalTitle">Détails du congé</h2>
+                <button class="modal-close" onclick="closeCongeModal()">&times;</button>
+            </div>
+            <div id="congeModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal détails donation -->
+    <div class="modal" id="donationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="donationModalTitle">Détails du don</h2>
+                <button class="modal-close" onclick="closeDonationModal()">&times;</button>
+            </div>
+            <div id="donationModalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267';
+        let token = null;
+        
+        const niveauOrder = [
+            '1ère année', '1ere année', '1ere annee', '1ère annee',
+            '2ème année', '2eme année', '2eme annee', '2ème annee',
+            '3ème année', '3eme année', '3eme annee', '3ème annee',
+            '4ème année', '4eme année', '4eme annee', '4ème annee',
+            '5ème année', '5eme année', '5eme annee', '5ème annee',
+            '6ème année', '6eme année', '6eme annee', '6ème annee'
+        ];
+        
+        function getNiveauRank(niveau) {
+            if (!niveau) return 999;
+            const lowerNiveau = niveau.toLowerCase().trim();
+            for (let i = 0; i < niveauOrder.length; i++) {
+                if (lowerNiveau === niveauOrder[i].toLowerCase()) {
+                    return i;
+                }
+            }
+            const match = lowerNiveau.match(/(\d+)/);
+            if (match) {
+                const num = parseInt(match[1]);
+                if (num >= 1 && num <= 6) return num - 1;
+            }
+            return 999;
+        }
+
+        function sortClassesByNiveau(classes) {
+            return [...classes].sort((a, b) => {
+                const niveauA = a.niveau || a.Niveau || '';
+                const niveauB = b.niveau || b.Niveau || '';
+                const rankA = getNiveauRank(niveauA);
+                const rankB = getNiveauRank(niveauB);
+                if (rankA !== rankB) return rankA - rankB;
+                const nomA = a.nomClasse || a.NomClasse || '';
+                const nomB = b.nomClasse || b.NomClasse || '';
+                return nomA.localeCompare(nomB);
+            });
+        }
+
+        function groupClassesByNiveau(classes) {
+            const groups = {};
+            classes.forEach(classe => {
+                const niveau = classe.niveau || classe.Niveau || 'Non défini';
+                if (!groups[niveau]) {
+                    groups[niveau] = [];
+                }
+                groups[niveau].push(classe);
+            });
+            return groups;
+        }
+
+        function extractIdFromObject(obj) {
+            if (!obj) return null;
+            
+            if (typeof obj === 'string') {
+                return obj.replace(/^["']|["']$/g, '');
+            }
+            
+            if (obj.$oid) {
+                return obj.$oid;
+            }
+            
+            if (obj._id) {
+                return extractIdFromObject(obj._id);
+            }
+            
+            if (obj.Id) {
+                return obj.Id;
+            }
+            
+            if (obj.id) {
+                return obj.id;
+            }
+            
+            return null;
+        }
+
+        function formatDate(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                let dateStr = dateValue;
+                if (typeof dateValue === 'object' && dateValue.$date) dateStr = dateValue.$date;
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Date inconnue';
+                return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        function formatDateLong(dateValue) {
+            if (!dateValue) return 'Date inconnue';
+            try {
+                let dateStr = dateValue;
+                if (typeof dateValue === 'object' && dateValue.$date) dateStr = dateValue.$date;
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Date inconnue';
+                return date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            } catch(e) {
+                return 'Date inconnue';
+            }
+        }
+
+        let stats = {
+            totalEleves: 0,
+            totalEnseignants: 0,
+            totalPermanents: 0,
+            totalClasses: 0,
+            totalAbsences: 0,
+            totalPresences: 0,
+            totalRetards: 0
+        };
+        
+        let donationsStats = {
+            totalMontant: 0,
+            totalDonations: 0,
+            parType: {}
+        };
+        
+        let classesData = [];
+        let enseignantsData = [];
+        let permanentsData = [];
+        let elevesData = [];
+        let absencesData = [];
+        let congesData = [];
+        let donationsData = [];
+        let elevesMap = new Map();
+        let enseignantsMap = new Map();
+        
+        let chartClasses = null;
+        let chartPersonnel = null;
+        let chartAbsences = null;
+        let chartDonations = null;
+        
+        let congesFilter = 'all';
+
+        function getAuthToken() {
+            try {
+                return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        async function chargerToutesDonnees() {
+            token = getAuthToken();
+            if (!token) {
+                showMessage('Session expirée, veuillez vous reconnecter', 'error');
+                document.getElementById('dashboardContainer').innerHTML = `
+                    <div class="card" style="text-align: center; padding: 3rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b;"></i>
+                        <h3 style="margin: 1rem 0;">Session expirée</h3>
+                        <p>Veuillez vous reconnecter pour accéder au tableau de bord.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Charger d'abord les élèves pour remplir elevesMap
+            await chargerTousEleves();
+            
+            // Puis charger le reste en parallèle
+            await Promise.all([
+                chargerStats(),
+                chargerClasses(),
+                chargerEnseignants(),
+                chargerPermanents(),
+                chargerAbsences(),
+                chargerConges(),
+                chargerDonations()
+            ]);
+            
+            afficherDashboard();
+        }
+
+        async function chargerStats() {
+            try {
+                const classesRes = await fetch(`${API_BASE}/api/Classe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (classesRes.ok) {
+                    let data = await classesRes.json();
+                    stats.totalClasses = Array.isArray(data) ? data.length : (data.data?.length || 0);
+                }
+            } catch (error) {
+                console.error('Erreur chargement stats:', error);
+            }
+        }
+
+        async function chargerDonations() {
+            try {
+                const response = await fetch(`${API_BASE}/api/Donation`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    let donations = [];
+                    if (data.Success && data.Data) {
+                        donations = data.Data;
+                    } else if (data.success && data.data) {
+                        donations = data.data;
+                    } else if (Array.isArray(data)) {
+                        donations = data;
+                    } else if (data.$values) {
+                        donations = data.$values;
+                    } else {
+                        donations = [];
+                    }
+                    
+                    donationsData = donations;
+                    
+                    // Calculer les stats des donations
+                    donationsStats.totalDonations = donationsData.length;
+                    donationsStats.totalMontant = 0;
+                    donationsStats.parType = {
+                        'Financière': 0,
+                        'Matériel': 0,
+                        'Alimentaire': 0
+                    };
+                    
+                    for (let d of donationsData) {
+                        const montant = d.montant || d.Montant || 0;
+                        donationsStats.totalMontant += montant;
+                        
+                        const type = (d.type || d.Type || 'financière').toLowerCase();
+                        if (type.includes('matériel') || type.includes('materiel')) {
+                            donationsStats.parType['Matériel'] += montant;
+                        } else if (type.includes('alimentaire')) {
+                            donationsStats.parType['Alimentaire'] += montant;
+                        } else {
+                            donationsStats.parType['Financière'] += montant;
+                        }
+                        
+                        // Formater les données pour l'affichage
+                        d.typeAffichage = type.includes('matériel') ? 'Matériel' : (type.includes('alimentaire') ? 'Alimentaire' : 'Financière');
+                        d.montantAffichage = montant;
+                        d.donateurNom = d.donateurNom || d.DonateurNom || (d.estAnonyme ? 'Anonyme' : 'Donateur');
+                        d.estAnonymeAffichage = d.estAnonyme || d.EstAnonyme || false;
+                        d.dateAffichage = d.date || d.Date;
+                        if (d.dateAffichage && d.dateAffichage.$date) d.dateAffichage = d.dateAffichage.$date;
+                        d.messageAffichage = d.message || d.Message || '';
+                    }
+                    
+                    // Trier par date décroissante
+                    donationsData.sort((a, b) => {
+                        const dateA = a.dateAffichage ? new Date(a.dateAffichage) : 0;
+                        const dateB = b.dateAffichage ? new Date(b.dateAffichage) : 0;
+                        return dateB - dateA;
+                    });
+                    
+                    console.log(`✅ ${donationsData.length} donations chargées, total: ${donationsStats.totalMontant} DT`);
+                } else {
+                    console.error('Erreur chargement donations:', response.status);
+                    donationsData = [];
+                }
+            } catch (error) {
+                console.error('Erreur chargement donations:', error);
+                donationsData = [];
+            }
+        }
+
+        async function chargerClasses() {
+            try {
+                const response = await fetch(`${API_BASE}/api/Classe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    classesData = Array.isArray(data) ? data : (data.data || []);
+                    console.log(`✅ ${classesData.length} classes chargées`);
+                    
+                    for (let classe of classesData) {
+                        try {
+                            const effectifRes = await fetch(`${API_BASE}/api/Classe/${classe.id || classe.Id}/effectif`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (effectifRes.ok) {
+                                const effectif = await effectifRes.json();
+                                classe.effectifReel = effectif;
+                            } else {
+                                classe.effectifReel = classe.effectif || classe.Effectif || 0;
+                            }
+                        } catch(e) {
+                            classe.effectifReel = classe.effectif || classe.Effectif || 0;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement classes:', error);
+                classesData = [];
+            }
+        }
+
+        async function chargerTousEleves() {
+            try {
+                const response = await fetch(`${API_BASE}/api/Eleve`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    if (data.Success && data.Data) {
+                        elevesData = data.Data;
+                    } else if (data.success && data.data) {
+                        elevesData = data.data;
+                    } else if (Array.isArray(data)) {
+                        elevesData = data;
+                    } else if (data.$values) {
+                        elevesData = data.$values;
+                    } else {
+                        elevesData = [];
+                    }
+                    
+                    stats.totalEleves = elevesData.length;
+                    
+                    elevesMap.clear();
+                    
+                    for (let eleve of elevesData) {
+                        const id = eleve.id || eleve.Id || extractIdFromObject(eleve._id);
+                        const prenom = eleve.prenom || eleve.Prenom || '';
+                        const nom = eleve.nom || eleve.Nom || '';
+                        const nomComplet = `${prenom} ${nom}`.trim();
+                        const nomAAfficher = nomComplet || 'Élève sans nom';
+                        
+                        if (id) {
+                            elevesMap.set(id, {
+                                nom: nomAAfficher,
+                                prenom: prenom,
+                                nomFamille: nom,
+                                classeId: eleve.classeId || eleve.ClasseId,
+                                niveau: eleve.niveau || eleve.Niveau
+                            });
+                        }
+                    }
+                    
+                    console.log(`✅ ${elevesData.length} élèves chargés, ${elevesMap.size} dans la map`);
+                } else {
+                    console.error('Erreur chargement élèves:', response.status);
+                    elevesData = [];
+                }
+            } catch (error) {
+                console.error('Erreur chargement élèves:', error);
+                elevesData = [];
+            }
+        }
+
+        async function chargerEnseignants() {
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/role/enseignant`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    if (data.Success && data.Data) {
+                        enseignantsData = data.Data;
+                    } else if (data.success && data.data) {
+                        enseignantsData = data.data;
+                    } else if (Array.isArray(data)) {
+                        enseignantsData = data;
+                    } else if (data.$values) {
+                        enseignantsData = data.$values;
+                    } else {
+                        enseignantsData = [];
+                    }
+                    
+                    stats.totalEnseignants = enseignantsData.length;
+                    
+                    for (let e of enseignantsData) {
+                        const id = e.id || e.Id;
+                        const prenom = e.prenom || e.Prenom || '';
+                        const nom = e.nom || e.Nom || '';
+                        const nomComplet = `${prenom} ${nom}`.trim();
+                        enseignantsMap.set(id, nomComplet || e.email || e.Email || 'Enseignant');
+                    }
+                    console.log(`✅ ${enseignantsData.length} enseignants chargés`);
+                }
+            } catch (error) {
+                console.error('Erreur chargement enseignants:', error);
+                enseignantsData = [];
+            }
+        }
+
+        async function chargerPermanents() {
+            try {
+                const response = await fetch(`${API_BASE}/api/utilisateurs/role/permanent`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    if (data.Success && data.Data) {
+                        permanentsData = data.Data;
+                    } else if (data.success && data.data) {
+                        permanentsData = data.data;
+                    } else if (Array.isArray(data)) {
+                        permanentsData = data;
+                    } else if (data.$values) {
+                        permanentsData = data.$values;
+                    } else {
+                        permanentsData = [];
+                    }
+                    
+                    stats.totalPermanents = permanentsData.length;
+                    
+                    for (let p of permanentsData) {
+                        const id = p.id || p.Id;
+                        const prenom = p.prenom || p.Prenom || '';
+                        const nom = p.nom || p.Nom || '';
+                        const nomComplet = `${prenom} ${nom}`.trim();
+                        enseignantsMap.set(id, nomComplet || p.email || p.Email || 'Permanent');
+                    }
+                    console.log(`✅ ${permanentsData.length} permanents chargés`);
+                }
+            } catch (error) {
+                console.error('Erreur chargement permanents:', error);
+                permanentsData = [];
+            }
+        }
+
+        async function chargerAbsences() {
+            try {
+                const response = await fetch(`${API_BASE}/api/Absence`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    let absences = [];
+                    if (data.Success && data.Data) {
+                        absences = data.Data;
+                    } else if (data.success && data.data) {
+                        absences = data.data;
+                    } else if (Array.isArray(data)) {
+                        absences = data;
+                    } else if (data.$values) {
+                        absences = data.$values;
+                    } else {
+                        absences = [];
+                    }
+                    
+                    absencesData = absences;
+                    
+                    stats.totalAbsences = 0;
+                    stats.totalPresences = 0;
+                    stats.totalRetards = 0;
+                    
+                    for (let absence of absencesData) {
+                        let eleveId = null;
+                        
+                        if (absence.eleve) {
+                            eleveId = extractIdFromObject(absence.eleve);
+                        } else if (absence.EleveId) {
+                            eleveId = extractIdFromObject(absence.EleveId);
+                        } else if (absence.eleveId) {
+                            eleveId = extractIdFromObject(absence.eleveId);
+                        }
+                        
+                        const enseignantId = extractIdFromObject(absence.enseignant || absence.EnseignantId || absence.enseignantId);
+                        
+                        let eleveInfo = null;
+                        
+                        if (eleveId) {
+                            eleveInfo = elevesMap.get(eleveId);
+                            if (!eleveInfo && typeof eleveId === 'string') {
+                                eleveInfo = elevesMap.get(eleveId.trim());
+                            }
+                        }
+                        
+                        let type = (absence.type || absence.Type || 'absence').toLowerCase();
+                        if (type === 'absence') type = 'absence';
+                        else if (type === 'retard') type = 'retard';
+                        else if (type === 'presence' || type === 'present') type = 'presence';
+                        
+                        let absenceDate = absence.date || absence.Date;
+                        if (absenceDate && absenceDate.$date) absenceDate = absenceDate.$date;
+                        
+                        absence.eleveIdExtracted = eleveId;
+                        absence.enseignantIdExtracted = enseignantId;
+                        absence.eleveNom = eleveInfo ? eleveInfo.nom : (absence.eleveNom || 'Chargement...');
+                        absence.typeAffichage = type;
+                        absence.motifAffichage = absence.motif || absence.Motif || '-';
+                        absence.dateAffichage = absenceDate;
+                        absence.enseignantNom = enseignantsMap.get(enseignantId) || (absence.enseignantNom || 'Enseignant');
+                        absence.dureeAffichage = absence.duree || absence.Duree || 1;
+                        
+                        if (type === 'absence') stats.totalAbsences++;
+                        else if (type === 'retard') stats.totalRetards++;
+                        else if (type === 'presence') stats.totalPresences++;
+                    }
+                    
+                    absencesData.sort((a, b) => {
+                        const dateA = a.dateAffichage ? new Date(a.dateAffichage) : 0;
+                        const dateB = b.dateAffichage ? new Date(b.dateAffichage) : 0;
+                        return dateB - dateA;
+                    });
+                    
+                    console.log(`✅ ${absencesData.length} enregistrements chargés`);
+                }
+            } catch (error) {
+                console.error('Erreur chargement absences:', error);
+                absencesData = [];
+            }
+        }
+
+        async function chargerConges() {
+            try {
+                const response = await fetch(`${API_BASE}/api/Conge/toutes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    let conges = [];
+                    if (data.Success && data.Data) {
+                        conges = data.Data;
+                    } else if (data.success && data.data) {
+                        conges = data.data;
+                    } else if (Array.isArray(data)) {
+                        conges = data;
+                    } else if (data.$values) {
+                        conges = data.$values;
+                    } else {
+                        conges = [];
+                    }
+                    
+                    congesData = conges;
+                    
+                    for (let conge of congesData) {
+                        const enseignantId = extractIdFromObject(conge.enseignantId || conge.EnseignantId);
+                        const enseignantInfo = enseignantsMap.get(enseignantId);
+                        
+                        let dateDebut = conge.dateDebut || conge.DateDebut;
+                        let dateFin = conge.dateFin || conge.DateFin;
+                        if (dateDebut && dateDebut.$date) dateDebut = dateDebut.$date;
+                        if (dateFin && dateFin.$date) dateFin = dateFin.$date;
+                        
+                        conge.enseignantIdExtracted = enseignantId;
+                        conge.enseignantNom = enseignantInfo || (conge.enseignantNom || 'Enseignant inconnu');
+                        conge.typeAffichage = conge.type || conge.Type || 'congé';
+                        conge.statutAffichage = (conge.statut || conge.Statut || 'en_attente').toLowerCase();
+                        conge.motifAffichage = conge.motif || conge.Motif || '-';
+                        conge.dateDebutAffichage = dateDebut;
+                        conge.dateFinAffichage = dateFin;
+                        conge.dateApprobationAffichage = conge.dateApprobation || conge.DateApprobation;
+                        if (conge.dateApprobationAffichage && conge.dateApprobationAffichage.$date) {
+                            conge.dateApprobationAffichage = conge.dateApprobationAffichage.$date;
+                        }
+                    }
+                    
+                    congesData.sort((a, b) => {
+                        const dateA = a.dateDebutAffichage ? new Date(a.dateDebutAffichage) : 0;
+                        const dateB = b.dateDebutAffichage ? new Date(b.dateDebutAffichage) : 0;
+                        return dateB - dateA;
+                    });
+                    
+                    console.log(`✅ ${congesData.length} congés chargés`);
+                }
+            } catch (error) {
+                console.error('Erreur chargement congés:', error);
+                congesData = [];
+            }
+        }
+
+        function getFilteredConges() {
+            if (congesFilter === 'all') return congesData;
+            return congesData.filter(c => c.statutAffichage === congesFilter);
+        }
+
+        function setCongesFilter(filter) {
+            congesFilter = filter;
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                if (chip.dataset.filter === filter) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            afficherDashboard();
+        }
+
+        async function getElevesByClasse(classeId, classeNom) {
+            try {
+                const response = await fetch(`${API_BASE}/api/Classe/${classeId}/eleves`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    let eleves = await response.json();
+                    
+                    if (eleves.Success && eleves.Data) {
+                        eleves = eleves.Data;
+                    } else if (eleves.success && eleves.data) {
+                        eleves = eleves.data;
+                    } else if (eleves.$values) {
+                        eleves = eleves.$values;
+                    } else if (!Array.isArray(eleves)) {
+                        eleves = [];
+                    }
+                    
+                    const modalTitle = document.getElementById('modalTitle');
+                    modalTitle.innerHTML = `<i class="fas fa-users"></i> Élèves de ${classeNom}`;
+                    
+                    const modalContent = document.getElementById('modalContent');
+                    
+                    if (!eleves || eleves.length === 0) {
+                        modalContent.innerHTML = '<div class="empty-state"><i class="fas fa-user-graduate"></i><p>Aucun élève dans cette classe</p></div>';
+                    } else {
+                        modalContent.innerHTML = `
+                            <div class="eleve-list-modal">
+                                ${eleves.map(e => `
+                                    <div class="eleve-modal-item">
+                                        <div>
+                                            <div class="eleve-modal-nom">${escapeHtml(e.prenom || e.Prenom || '')} ${escapeHtml(e.nom || e.Nom || '')}</div>
+                                            <div class="eleve-modal-identifiant">${escapeHtml(e.identifiantEcole || e.IdentifiantEcole || 'ID: ' + (e.id || e.Id || '-'))}</div>
+                                        </div>
+                                        <div>
+                                            <span style="font-size:0.7rem; color: var(--primary-green);">${escapeHtml(e.niveau || e.Niveau || '')}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="margin-top: 1rem; padding: 0.8rem; background: var(--gray-bg); border-radius: 12px; text-align: center;">
+                                <strong>Total: ${eleves.length} élève(s)</strong>
+                            </div>
+                        `;
+                    }
+                    
+                    document.getElementById('classeModal').classList.add('active');
+                } else {
+                    showMessage('Impossible de charger les élèves de cette classe', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage('Erreur lors du chargement des élèves', 'error');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showAbsenceDetails(absence) {
+            const modalTitle = document.getElementById('absenceModalTitle');
+            modalTitle.innerHTML = `<i class="fas fa-calendar-times"></i> Détails de l'enregistrement`;
+            
+            const modalContent = document.getElementById('absenceModalContent');
+            let typeClass = 'absence';
+            let typeLabel = '❌ Absence';
+            
+            if (absence.typeAffichage === 'retard') {
+                typeClass = 'retard';
+                typeLabel = '⏰ Retard';
+            } else if (absence.typeAffichage === 'presence') {
+                typeClass = 'presence';
+                typeLabel = '✅ Présence';
+            }
+            
+            modalContent.innerHTML = `
+                <div style="background: var(--gray-bg); border-radius: 16px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="absence-badge ${typeClass}" style="font-size:0.9rem;">${typeLabel}</span>
+                        <span style="font-size:0.8rem; color: var(--text-light);">${formatDateLong(absence.dateAffichage)}</span>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Élève</div>
+                        <div style="font-weight:700; font-size:1.1rem;">${escapeHtml(absence.eleveNom)}</div>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Enseignant</div>
+                        <div style="font-weight:600;">${escapeHtml(absence.enseignantNom)}</div>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Motif / Détail</div>
+                        <div style="background: white; padding: 0.5rem; border-radius: 8px; margin-top: 0.2rem;">${escapeHtml(absence.motifAffichage || '-')}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem; color: var(--text-light);">Durée</div>
+                        <div>${absence.dureeAffichage} heure(s)</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('absenceModal').classList.add('active');
+        }
+
+        function showCongeDetails(conge) {
+            const modalTitle = document.getElementById('congeModalTitle');
+            modalTitle.innerHTML = `<i class="fas fa-calendar-alt"></i> Détails du congé`;
+            
+            const modalContent = document.getElementById('congeModalContent');
+            
+            let typeClass = 'conge_annuel';
+            let typeLabel = '📅 Congé annuel';
+            
+            if (conge.typeAffichage === 'maladie') {
+                typeClass = 'maladie';
+                typeLabel = '🏥 Congé maladie';
+            } else if (conge.typeAffichage === 'personnel') {
+                typeClass = 'personnel';
+                typeLabel = '👤 Congé personnel';
+            }
+            
+            let statutClass = 'en_attente';
+            let statutLabel = '⏳ En attente';
+            
+            if (conge.statutAffichage === 'approuve' || conge.statutAffichage === 'approuvé') {
+                statutClass = 'approuve';
+                statutLabel = '✅ Approuvé';
+            } else if (conge.statutAffichage === 'refuse' || conge.statutAffichage === 'refusé') {
+                statutClass = 'refuse';
+                statutLabel = '❌ Refusé';
+            }
+            
+            const jours = Math.ceil((new Date(conge.dateFinAffichage) - new Date(conge.dateDebutAffichage)) / (1000 * 60 * 60 * 24)) + 1;
+            
+            modalContent.innerHTML = `
+                <div style="background: var(--gray-bg); border-radius: 16px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <span class="conge-badge ${typeClass}" style="font-size:0.9rem;">${typeLabel}</span>
+                        <span class="conge-badge ${statutClass}" style="font-size:0.9rem;">${statutLabel}</span>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Enseignant</div>
+                        <div style="font-weight:700; font-size:1.1rem;">${escapeHtml(conge.enseignantNom)}</div>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Période</div>
+                        <div><strong>Du :</strong> ${formatDateLong(conge.dateDebutAffichage)}</div>
+                        <div><strong>Au :</strong> ${formatDateLong(conge.dateFinAffichage)}</div>
+                        <div style="margin-top: 0.3rem;"><strong>Durée :</strong> ${jours} jour(s)</div>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Motif</div>
+                        <div style="background: white; padding: 0.5rem; border-radius: 8px; margin-top: 0.2rem;">${escapeHtml(conge.motifAffichage || '-')}</div>
+                    </div>
+                    ${conge.dateApprobationAffichage ? `
+                        <div>
+                            <div style="font-size:0.7rem; color: var(--text-light);">Date d'approbation</div>
+                            <div>${formatDateLong(conge.dateApprobationAffichage)}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('congeModal').classList.add('active');
+        }
+
+        function showDonationDetails(donation) {
+            const modalTitle = document.getElementById('donationModalTitle');
+            modalTitle.innerHTML = `<i class="fas fa-hand-holding-heart"></i> Détails du don`;
+            
+            const modalContent = document.getElementById('donationModalContent');
+            
+            let typeClass = 'financiere';
+            let typeIcon = '💰';
+            if (donation.typeAffichage === 'Matériel') {
+                typeClass = 'materiel';
+                typeIcon = '📦';
+            } else if (donation.typeAffichage === 'Alimentaire') {
+                typeClass = 'alimentaire';
+                typeIcon = '🍎';
+            }
+            
+            modalContent.innerHTML = `
+                <div style="background: var(--gray-bg); border-radius: 16px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="donation-badge ${typeClass}" style="font-size:0.9rem;">${typeIcon} ${donation.typeAffichage}</span>
+                        <span style="font-size:0.8rem; color: var(--text-light);">${formatDateLong(donation.dateAffichage)}</span>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Donateur</div>
+                        <div style="font-weight:700; font-size:1.1rem;">${escapeHtml(donation.donateurNom)} ${donation.estAnonymeAffichage ? '<span style="font-size:0.7rem;">(Anonyme)</span>' : ''}</div>
+                    </div>
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-size:0.7rem; color: var(--text-light);">Montant / Valeur</div>
+                        <div style="font-weight:800; font-size:1.3rem; color: var(--accent-orange);">${donation.montantAffichage.toLocaleString()} DT</div>
+                    </div>
+                    ${donation.messageAffichage ? `
+                        <div style="margin-bottom: 0.8rem;">
+                            <div style="font-size:0.7rem; color: var(--text-light);">Message</div>
+                            <div style="background: white; padding: 0.5rem; border-radius: 8px; margin-top: 0.2rem; font-style: italic;">"${escapeHtml(donation.messageAffichage)}"</div>
+                        </div>
+                    ` : ''}
+                    ${donation.description ? `
+                        <div>
+                            <div style="font-size:0.7rem; color: var(--text-light);">Description</div>
+                            <div style="background: white; padding: 0.5rem; border-radius: 8px; margin-top: 0.2rem;">${escapeHtml(donation.description)}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('donationModal').classList.add('active');
+        }
+
+        // Redirection vers la page de gestion des congés
+        function redirectToConges() {
+            window.location.href = 'conges.html';
+        }
+
+        // Redirection vers la page de gestion des présences
+        function redirectToPresences() {
+            window.location.href = 'gestion-presences-classe.html';
+        }
+
+        function redirectToClasses() {
+            window.location.href = 'classes.html';
+        }
+
+        function redirectToEleves() {
+            window.location.href = 'eleves.html';
+        }
+        
+        function redirectToDonations() {
+            window.location.href = 'donations.html';
+        }
+
+        function creerGraphiqueClasses() {
+            const ctx = document.getElementById('chartClasses');
+            if (!ctx) return;
+            if (chartClasses) chartClasses.destroy();
+            
+            if (classesData.length === 0) return;
+            
+            const classesTriees = sortClassesByNiveau(classesData);
+            const topClasses = classesTriees.slice(0, 8);
+            
+            const effectifs = topClasses.map(c => c.effectifReel || c.effectif || c.Effectif || 0);
+            const noms = topClasses.map(c => {
+                const nom = c.nomClasse || c.NomClasse || 'Classe';
+                const niveau = c.niveau || c.Niveau || '';
+                return niveau ? `${nom} (${niveau})` : nom;
+            });
+            const colors = ['#4ca896', '#ff9466', '#339af0', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#ec489a'];
+            
+            chartClasses = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: noms,
+                    datasets: [{
+                        label: "Nombre d'élèves",
+                        data: effectifs,
+                        backgroundColor: colors.slice(0, effectifs.length),
+                        borderRadius: 10,
+                        barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { size: 11 } } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.raw} élèves` } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e0e9e7' }, title: { display: true, text: 'Effectif' }, ticks: { stepSize: 1 } },
+                        x: { ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 45 } }
+                    }
+                }
+            });
+        }
+
+        function creerGraphiquePersonnel() {
+            const ctx = document.getElementById('chartPersonnel');
+            if (!ctx) return;
+            if (chartPersonnel) chartPersonnel.destroy();
+            
+            chartPersonnel = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Enseignants', 'Vacataires (Permanents)'],
+                    datasets: [{
+                        data: [stats.totalEnseignants, stats.totalPermanents],
+                        backgroundColor: ['#4ca896', '#ff9466'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw} personne(s)` } }
+                    }
+                }
+            });
+        }
+
+        function creerGraphiqueAbsences() {
+            const ctx = document.getElementById('chartAbsences');
+            if (!ctx) return;
+            if (chartAbsences) chartAbsences.destroy();
+            
+            chartAbsences = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Absences', 'Retards', 'Présences'],
+                    datasets: [{
+                        data: [stats.totalAbsences, stats.totalRetards, stats.totalPresences],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}` } }
+                    }
+                }
+            });
+        }
+
+        function creerGraphiqueDonations() {
+            const ctx = document.getElementById('chartDonations');
+            if (!ctx) return;
+            if (chartDonations) chartDonations.destroy();
+            
+            const labels = Object.keys(donationsStats.parType);
+            const values = Object.values(donationsStats.parType);
+            
+            if (values.every(v => v === 0)) {
+                // Pas de données, on cache ou on affiche un message
+                return;
+            }
+            
+            chartDonations = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#10b981', '#339af0', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw.toLocaleString()} DT` } }
+                    }
+                }
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('classeModal').classList.remove('active');
+        }
+
+        function closeAbsenceModal() {
+            document.getElementById('absenceModal').classList.remove('active');
+        }
+
+        function closeCongeModal() {
+            document.getElementById('congeModal').classList.remove('active');
+        }
+        
+        function closeDonationModal() {
+            document.getElementById('donationModal').classList.remove('active');
+        }
+
+        function afficherDashboard() {
+            const container = document.getElementById('dashboardContainer');
+            const dateActuelle = new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            const classesTriees = sortClassesByNiveau(classesData);
+            const classesParNiveau = groupClassesByNiveau(classesTriees);
+            
+            let totalEffectif = 0;
+            for (let classe of classesTriees) {
+                totalEffectif += (classe.effectifReel || classe.effectif || classe.Effectif || 0);
+            }
+            
+            const derniersEnseignants = [...enseignantsData].slice(0, 5);
+            const derniersPermanents = [...permanentsData].slice(0, 5);
+            const dernieresAbsences = absencesData.slice(0, 6);
+            const congesFiltres = getFilteredConges();
+            const derniersConges = congesFiltres.slice(0, 6);
+            const dernieresDonations = donationsData.slice(0, 6);
+            
+            let classesHtml = '';
+            const niveauLabels = ['1ère année', '2ème année', '3ème année', '4ème année', '5ème année', '6ème année'];
+            
+            for (let niveauLabel of niveauLabels) {
+                let classesDuNiveau = [];
+                for (let [niveau, classes] of Object.entries(classesParNiveau)) {
+                    if (niveau.toLowerCase().includes(niveauLabel.toLowerCase().replace('ème', 'eme').replace('è', 'e'))) {
+                        classesDuNiveau = classes;
+                        break;
+                    }
+                }
+                
+                if (classesDuNiveau.length > 0) {
+                    classesHtml += `<div class="niveau-section"><div class="niveau-title">📚 ${niveauLabel}</div>`;
+                    for (let c of classesDuNiveau) {
+                        const effectif = c.effectifReel || c.effectif || c.Effectif || 0;
+                        const nomClasse = c.nomClasse || c.NomClasse || 'Classe';
+                        const classeId = c.id || c.Id;
+                        classesHtml += `
+                            <div class="classe-item" onclick="getElevesByClasse('${classeId}', '${nomClasse.replace(/'/g, "\\'")}')">
+                                <div class="classe-info">
+                                    <div class="classe-nom">${escapeHtml(nomClasse)}</div>
+                                    <div class="classe-niveau">${escapeHtml(c.salle || c.Salle || '')}</div>
+                                </div>
+                                <div class="classe-effectif">
+                                    <div class="effectif-nombre">${effectif}</div>
+                                    <div class="effectif-label">élèves</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    classesHtml += `</div>`;
+                }
+            }
+            
+
+            
+            container.innerHTML = `
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Tableau de bord Administrateur</h1>
+                        <p class="page-subtitle">Vue d'ensemble de l'établissement SAGHIRY</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="date-badge">
+                            <i class="fas fa-calendar-alt"></i> ${dateActuelle}
+                        </div>
+                        <button class="btn-refresh" onclick="rafraichirTout()">
+                            <i class="fas fa-sync-alt"></i> Actualiser
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👨‍🎓</div>
+                        <div class="stat-label">Total élèves</div>
+                        <div class="stat-value">${stats.totalEleves}</div>
+                        <div class="stat-change">répartis dans ${stats.totalClasses} classes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👨‍🏫</div>
+                        <div class="stat-label">Enseignants</div>
+                        <div class="stat-value">${stats.totalEnseignants}</div>
+                        <div class="stat-change">corps professoral</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👔</div>
+                        <div class="stat-label">Vacataires</div>
+                        <div class="stat-value">${stats.totalPermanents}</div>
+                        <div class="stat-change">personnel de remplacement</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-label">Demandes de congé</div>
+                        <div class="stat-value">${congesData.length}</div>
+                        <div class="stat-change">demandes enregistrées</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-label">Enregistrements</div>
+                        <div class="stat-value">${absencesData.length}</div>
+                        <div class="stat-change">Abs:${stats.totalAbsences} | Ret:${stats.totalRetards} | Pre:${stats.totalPresences}</div>
+                    </div>
+                    <div class="stat-card" onclick="redirectToDonations()">
+                        <div class="stat-icon">🎁</div>
+                        <div class="stat-label">Dons collectés</div>
+                        <div class="stat-value">${donationsStats.totalMontant.toLocaleString()} DT</div>
+                        <div class="stat-change">${donationsStats.totalDonations} don(s) reçu(s)</div>
+                    </div>
+                </div>
+                
+                <div class="main-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-school"></i> Effectifs par classe</h3>
+                            <a onclick="redirectToClasses()">Gérer les classes →</a>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartClasses"></canvas>
+                        </div>
+                        <div class="classe-list" style="margin-top: 0.5rem;">
+                            ${classesHtml}
+                        </div>
+                        <div style="margin-top: 0.8rem; padding: 0.5rem; background: #e0f2f1; border-radius: 10px; text-align: center; font-size: 0.8rem;">
+                            <strong>📊 Total inscrits: ${totalEffectif} élèves</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-pie"></i> Répartition du personnel</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartPersonnel"></canvas>
+                        </div>
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #4ca896; border-radius: 50%; margin-right: 5px;"></span>
+                            Enseignants: ${stats.totalEnseignants}
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #ff9466; border-radius: 50%; margin-left: 15px; margin-right: 5px;"></span>
+                            Vacataires: ${stats.totalPermanents}
+                            <span style="margin-left: 15px;"><strong>Total: ${stats.totalEnseignants + stats.totalPermanents}</strong></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="main-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chalkboard-user"></i> Derniers enseignants</h3>
+                            <a onclick="window.location.href='enseignants.html'">Voir tous →</a>
+                        </div>
+                        ${derniersEnseignants.length > 0 ? `
+                            <div class="personnel-list">
+                                ${derniersEnseignants.map(e => `
+                                    <div class="personnel-item">
+                                        <div>
+                                            <div class="personnel-nom">${escapeHtml(e.prenom || e.Prenom || '')} ${escapeHtml(e.nom || e.Nom || '')}</div>
+                                            <div class="personnel-role">${escapeHtml(e.email || e.Email || '')}</div>
+                                        </div>
+                                        <span class="personnel-badge badge-enseignant">Enseignant</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div class="empty-state"><i class="fas fa-users"></i><p>Aucun enseignant</p></div>'}
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-user-clock"></i> Derniers vacataires</h3>
+                            <a onclick="window.location.href='enseignants.html'">Voir tous →</a>
+                        </div>
+                        ${derniersPermanents.length > 0 ? `
+                            <div class="personnel-list">
+                                ${derniersPermanents.map(p => `
+                                    <div class="personnel-item">
+                                        <div>
+                                            <div class="personnel-nom">${escapeHtml(p.prenom || p.Prenom || '')} ${escapeHtml(p.nom || p.Nom || '')}</div>
+                                            <div class="personnel-role">${escapeHtml(p.email || p.Email || '')}</div>
+                                        </div>
+                                        <span class="personnel-badge badge-permanent">Vacataire</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div class="empty-state"><i class="fas fa-user-clock"></i><p>Aucun vacataire</p></div>'}
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Demandes de congé des enseignants</h3>
+                        <a onclick="redirectToConges()">Gérer les congés →</a>
+                    </div>
+                    <div class="status-filters">
+                        <div class="filter-chip ${congesFilter === 'all' ? 'active' : ''}" data-filter="all" onclick="setCongesFilter('all')">Tous</div>
+                        <div class="filter-chip ${congesFilter === 'en_attente' ? 'active' : ''}" data-filter="en_attente" onclick="setCongesFilter('en_attente')">⏳ En attente</div>
+                        <div class="filter-chip ${congesFilter === 'approuve' ? 'active' : ''}" data-filter="approuve" onclick="setCongesFilter('approuve')">✅ Approuvés</div>
+                        <div class="filter-chip ${congesFilter === 'refuse' ? 'active' : ''}" data-filter="refuse" onclick="setCongesFilter('refuse')">❌ Refusés</div>
+                    </div>
+                    ${derniersConges.length > 0 ? `
+                        <div class="conge-list">
+                            ${derniersConges.map(c => {
+                                let typeClass = 'conge_annuel';
+                                let typeIcon = '📅';
+                                
+                                if (c.typeAffichage === 'maladie') {
+                                    typeClass = 'maladie';
+                                    typeIcon = '🏥';
+                                } else if (c.typeAffichage === 'personnel') {
+                                    typeClass = 'personnel';
+                                    typeIcon = '👤';
+                                }
+                                
+                                let statutClass = 'en_attente';
+                                let statutIcon = '⏳';
+                                
+                                if (c.statutAffichage === 'approuve' || c.statutAffichage === 'approuvé') {
+                                    statutClass = 'approuve';
+                                    statutIcon = '✅';
+                                } else if (c.statutAffichage === 'refuse' || c.statutAffichage === 'refusé') {
+                                    statutClass = 'refuse';
+                                    statutIcon = '❌';
+                                }
+                                
+                                const jours = Math.ceil((new Date(c.dateFinAffichage) - new Date(c.dateDebutAffichage)) / (1000 * 60 * 60 * 24)) + 1;
+                                
+                                return `
+                                    <div class="conge-item" onclick='showCongeDetails(${JSON.stringify(c).replace(/'/g, "\\'")})'>
+                                        <div class="conge-info">
+                                            <div class="conge-enseignant">${escapeHtml(c.enseignantNom)}</div>
+                                            <div class="conge-detail">${typeIcon} ${c.typeAffichage === 'maladie' ? 'Maladie' : (c.typeAffichage === 'personnel' ? 'Personnel' : 'Annuel')} - ${jours} jour(s) - ${escapeHtml(c.motifAffichage.substring(0, 30))}${c.motifAffichage.length > 30 ? '...' : ''}</div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <span class="conge-badge ${statutClass}">${statutIcon} ${c.statutAffichage === 'approuve' ? 'Approuvé' : (c.statutAffichage === 'refuse' ? 'Refusé' : 'En attente')}</span>
+                                            <div class="conge-date">Du ${formatDate(c.dateDebutAffichage)}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div style="margin-top: 0.8rem; padding: 0.5rem; background: var(--gray-bg); border-radius: 10px; text-align: center; font-size: 0.8rem;">
+                            <strong>📋 Total des demandes: ${congesData.length} (${congesData.filter(c => c.statutAffichage === 'en_attente').length} en attente)</strong>
+                        </div>
+                    ` : '<div class="empty-state"><i class="fas fa-calendar-check"></i><p>Aucune demande de congé</p></div>'}
+                </div>
+                
+
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-calendar-times"></i> Derniers enregistrements (Absences/Retards/Présences)</h3>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="chartAbsences"></canvas>
+                        </div>
+                        ${dernieresAbsences.length > 0 ? `
+                            <div class="absence-list" style="margin-top: 1rem;">
+                                ${dernieresAbsences.map(a => {
+                                    let typeClass = 'absence';
+                                    let typeLabel = '❌ Absence';
+                                    if (a.typeAffichage === 'retard') {
+                                        typeClass = 'retard';
+                                        typeLabel = '⏰ Retard';
+                                    } else if (a.typeAffichage === 'presence') {
+                                        typeClass = 'presence';
+                                        typeLabel = '✅ Présence';
+                                    }
+                                    return `
+                                        <div class="absence-item" onclick='showAbsenceDetails(${JSON.stringify(a).replace(/'/g, "\\'")})'>
+                                            <div class="absence-info">
+                                                <div class="absence-eleve">${escapeHtml(a.eleveNom)}</div>
+                                                <div class="absence-detail">${escapeHtml(a.motifAffichage ? (a.motifAffichage.length > 40 ? a.motifAffichage.substring(0, 40) + '...' : a.motifAffichage) : '-')}</div>
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <span class="absence-badge ${typeClass}">${typeLabel}</span>
+                                                <div class="absence-date">${formatDate(a.dateAffichage)}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <div style="margin-top: 0.8rem; padding: 0.5rem; background: var(--gray-bg); border-radius: 10px; text-align: center; font-size: 0.8rem;">
+                                <strong>📋 Total des enregistrements: ${absencesData.length}</strong>
+                            </div>
+                        ` : '<div class="empty-state"><i class="fas fa-check-circle"></i><p>Aucun enregistrement</p></div>'}
+                    </div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                creerGraphiqueClasses();
+                creerGraphiquePersonnel();
+                creerGraphiqueAbsences();
+                creerGraphiqueDonations();
+            }, 100);
+        }
+
+        async function rafraichirTout() {
+            showMessage('Actualisation des données...', 'success');
+            await chargerToutesDonnees();
+            showMessage('Données actualisées avec succès', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📊 Dashboard administrateur initialisé');
+            chargerToutesDonnees();
+        });
+    </script>
+</body>
+</html>

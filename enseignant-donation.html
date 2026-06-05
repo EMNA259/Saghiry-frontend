@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Faire un don (Enseignant)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2f1 100%);
+            min-height: 100vh;
+        }
+
+        .donations-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .donations-header {
+            margin-bottom: 2rem;
+        }
+
+        .donations-header h1 {
+            font-size: 2rem;
+            color: var(--primary-deep);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .donations-header h1 span {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            width: 45px;
+            height: 45px;
+            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .donations-header p {
+            color: var(--text-light);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-deep);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(76, 168, 150, 0.25);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 168, 150, 0.35);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--gray-border);
+            color: var(--text-soft);
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-border);
+            padding-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .tab.active {
+            color: var(--primary-green);
+            background: rgba(76, 168, 150, 0.1);
+            border-bottom: 3px solid var(--primary-green);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--primary-deep);
+            background: rgba(76, 168, 150, 0.05);
+        }
+
+        .donations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .donation-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-border);
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .donation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .donation-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-deep);
+            margin-bottom: 0.5rem;
+        }
+
+        .donation-amount small {
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: var(--text-light);
+        }
+
+        .donation-type {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .type-materiel { background: #e6f7f4; color: #4ca896; }
+        .type-frais { background: #fff5e6; color: #ff9466; }
+        .type-libre { background: #e6e6ff; color: #9775fa; }
+
+        .donation-info {
+            margin: 1rem 0;
+            padding: 0.8rem 0;
+            border-top: 1px solid var(--gray-border);
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .donation-date {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .donation-message {
+            margin-top: 0.8rem;
+            padding: 0.8rem;
+            background: #f8faf9;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--text-soft);
+            font-style: italic;
+        }
+
+        .anonymous-badge {
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-visible {
+            background: #e6f7f4;
+            color: #4ca896;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-deep);
+            font-size: 1.3rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff6b6b;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .loading, .empty-state {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            grid-column: 1/-1;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            z-index: 1100;
+            animation: slideInRight 0.3s ease;
+            border-left: 4px solid;
+        }
+
+        .toast-success { border-left-color: var(--primary-green); }
+        .toast-error { border-left-color: #ff6b6b; }
+        .toast-info { border-left-color: var(--accent-orange); }
+
+        .info-banner {
+            background: linear-gradient(135deg, rgba(76, 168, 150, 0.1) 0%, rgba(76, 168, 150, 0.05) 100%);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .info-banner-icon {
+            font-size: 1.5rem;
+        }
+
+        .info-banner-text {
+            color: var(--text-soft);
+            font-size: 0.9rem;
+        }
+
+        .info-banner-text strong {
+            color: var(--primary-green);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .donations-container {
+                padding: 1rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .donations-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="donations-container">
+        <div class="donations-header">
+            <h1>
+                <span>🤝</span>
+                Faire un don
+            </h1>
+            <p>En tant qu'enseignant, vous pouvez faire un don pour soutenir l'école et ses projets</p>
+        </div>
+
+        <div class="info-banner">
+            <div class="info-banner-icon">📌</div>
+            <div class="info-banner-text">
+                <strong>Vos dons sont précieux !</strong> Ils contribuent au développement de l'école et aident à financer des projets éducatifs.
+                Vous retrouverez ici l'historique de tous vos dons effectués.
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="totalDonations">0</div>
+                <div class="stat-label">Total des dons</div>
+                <div class="stat-sub">Montant total que vous avez donné</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-value" id="donationsCount">0</div>
+                <div class="stat-label">Nombre de dons</div>
+                <div class="stat-sub">Vos contributions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="avgAmount">0</div>
+                <div class="stat-label">Montant moyen</div>
+                <div class="stat-sub">Par donation</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-primary" id="makeDonationBtn">
+                <span>🎁</span> Faire un don
+            </button>
+            <button class="btn-secondary" id="refreshBtn">
+                <span>🔄</span> Actualiser
+            </button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="all">📋 Tous mes dons</button>
+            <button class="tab" data-tab="materiel">📚 Matériel</button>
+            <button class="tab" data-tab="frais">🎓 Frais scolaires</button>
+            <button class="tab" data-tab="libre">💝 Don libre</button>
+        </div>
+
+        <div id="donationsList" class="donations-grid"></div>
+    </div>
+
+    <!-- Modal pour faire un don -->
+    <div id="donationModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🎁 Faire un don</h3>
+                <button class="modal-close" onclick="closeDonationModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <form id="donationForm">
+                    <div class="form-group">
+                        <label class="form-label">Type de donation *</label>
+                        <select id="donationType" class="form-select" required>
+                            <option value="">Sélectionnez un type</option>
+                            <option value="materiel">📚 Matériel scolaire</option>
+                            <option value="frais">🎓 Frais de scolarité</option>
+                            <option value="libre">💝 Don libre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Montant (DT) *</label>
+                        <input type="number" id="donationAmount" class="form-input" placeholder="0.00" step="0.01" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label checkbox-group">
+                            <input type="checkbox" id="donationAnonymous">
+                            <span>Faire un don anonyme</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message (optionnel)</label>
+                        <textarea id="donationMessage" class="form-textarea" placeholder="Votre message de soutien..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDonationModal()">Annuler</button>
+                <button class="btn-primary" id="submitDonationBtn">Confirmer le don</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_PORT = '5267';
+        const API_BASE_URL = `http://localhost:${BACKEND_PORT}`;
+        const DONATION_API_URL = `${API_BASE_URL}/api/Donation`;
+
+        let myDonations = [];
+        let currentUser = null;
+        let currentTab = 'all';
+        let isLoading = false;
+
+        function extractId(id) {
+            if (!id) return null;
+            if (typeof id === 'object' && id.$oid) return id.$oid;
+            if (typeof id === 'object' && id._id) return extractId(id._id);
+            return String(id);
+        }
+
+        function getUserId() {
+            if (!currentUser) return null;
+            const id = currentUser.id || currentUser._id || currentUser.userId;
+            return extractId(id);
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadCurrentUser();
+            await loadMyDonations();
+            attachEventListeners();
+        });
+
+        async function loadCurrentUser() {
+            try {
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) {
+                    currentUser = JSON.parse(userStr);
+                }
+            } catch (e) {
+                console.error('Erreur chargement utilisateur:', e);
+            }
+        }
+
+        async function loadMyDonations() {
+            if (isLoading) return;
+            isLoading = true;
+            
+            showLoading();
+            
+            try {
+                const userId = getUserId();
+                
+                if (!userId) {
+                    myDonations = [];
+                    updateStats();
+                    renderDonations();
+                    isLoading = false;
+                    return;
+                }
+                
+                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                const headers = { 'Content-Type': 'application/json' };
+                
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(DONATION_API_URL, { headers });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                let allDonations = [];
+                
+                if (result.Data && Array.isArray(result.Data)) {
+                    allDonations = result.Data;
+                } else if (result.data && Array.isArray(result.data)) {
+                    allDonations = result.data;
+                } else if (Array.isArray(result)) {
+                    allDonations = result;
+                }
+                
+                myDonations = allDonations.filter(donation => {
+                    const donationDonateurId = donation.DonateurId || donation.donateurId;
+                    const extractedId = extractId(donationDonateurId);
+                    return extractedId === userId;
+                });
+                
+                updateStats();
+                renderDonations();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast('Erreur de chargement de vos dons', 'error');
+                myDonations = [];
+                updateStats();
+                renderDonations();
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function updateStats() {
+            const totalAmount = myDonations.reduce((sum, d) => sum + (parseFloat(d.Montant || d.montant) || 0), 0);
+            const donationsCount = myDonations.length;
+            const avgAmount = donationsCount > 0 ? totalAmount / donationsCount : 0;
+            
+            document.getElementById('totalDonations').textContent = formatCurrency(totalAmount);
+            document.getElementById('donationsCount').textContent = donationsCount;
+            document.getElementById('avgAmount').textContent = formatCurrency(avgAmount);
+        }
+
+        function renderDonations() {
+            const container = document.getElementById('donationsList');
+            
+            let filteredDonations = myDonations;
+            
+            if (currentTab !== 'all') {
+                filteredDonations = myDonations.filter(d => (d.TypeDonation || d.typeDonation) === currentTab);
+            }
+            
+            if (!filteredDonations || filteredDonations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎁</div>
+                        <h3>Aucun don</h3>
+                        <p>Vous n'avez pas encore fait de don. Cliquez sur "Faire un don" pour contribuer !</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredDonations.map(donation => renderDonationCard(donation)).join('');
+        }
+
+        function renderDonationCard(donation) {
+            const isAnonymous = donation.Anonyme === true || donation.anonyme === true;
+            const montant = donation.Montant || donation.montant;
+            const typeDonation = donation.TypeDonation || donation.typeDonation;
+            const message = donation.Message || donation.message;
+            const dateDonation = donation.DateDonation || donation.dateDonation || donation.CreatedAt || donation.createdAt;
+            
+            const typeLabels = {
+                'materiel': { label: 'Matériel scolaire', class: 'type-materiel', icon: '📚' },
+                'frais': { label: 'Frais scolaires', class: 'type-frais', icon: '🎓' },
+                'libre': { label: 'Don libre', class: 'type-libre', icon: '💝' }
+            };
+            const typeInfo = typeLabels[typeDonation] || { label: typeDonation || 'Don', class: '', icon: '🎁' };
+            
+            const date = new Date(dateDonation || Date.now());
+            const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            const badgeClass = isAnonymous ? 'anonymous-badge' : 'anonymous-badge badge-visible';
+            const badgeText = isAnonymous ? '🔒 Don anonyme' : '👤 Don visible';
+            
+            return `
+                <div class="donation-card">
+                    <div class="donation-amount">
+                        ${formatCurrency(montant)}
+                        <small>DT</small>
+                    </div>
+                    <span class="donation-type ${typeInfo.class}">
+                        ${typeInfo.icon} ${typeInfo.label}
+                    </span>
+                    <div class="donation-info">
+                        <span class="${badgeClass}">${badgeText}</span>
+                    </div>
+                    ${message ? `
+                        <div class="donation-message">
+                            "${escapeHtml(message)}"
+                        </div>
+                    ` : ''}
+                    <div class="donation-date">
+                        📅 ${formattedDate}
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatCurrency(amount) {
+            const num = parseFloat(amount);
+            if (isNaN(num)) return '0';
+            return new Intl.NumberFormat('fr-TN', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function createDonation(donationData) {
+            const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            
+            if (!token) {
+                throw new Error('Vous devez être connecté pour faire un don');
+            }
+            
+            const response = await fetch(DONATION_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(donationData)
+            });
+            
+            if (!response.ok) {
+                let errorMessage = `Erreur ${response.status}`;
+                try {
+                    const error = await response.json();
+                    errorMessage = error.message || errorMessage;
+                } catch (e) {}
+                throw new Error(errorMessage);
+            }
+            
+            const result = await response.json();
+            return result.Data || result.data || result;
+        }
+
+        function attachEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentTab = tab.dataset.tab;
+                    renderDonations();
+                });
+            });
+            
+            document.getElementById('makeDonationBtn').addEventListener('click', openDonationModal);
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                loadMyDonations();
+                showToast('Vos dons ont été actualisés', 'success');
+            });
+            document.getElementById('submitDonationBtn').addEventListener('click', handleSubmitDonation);
+        }
+
+        function openDonationModal() {
+            if (!currentUser) {
+                showToast('Veuillez vous connecter pour faire un don', 'error');
+                return;
+            }
+            
+            document.getElementById('donationForm').reset();
+            document.getElementById('donationModal').style.display = 'flex';
+        }
+
+        function closeDonationModal() {
+            document.getElementById('donationModal').style.display = 'none';
+        }
+
+        async function handleSubmitDonation() {
+            const type = document.getElementById('donationType').value;
+            const montant = parseFloat(document.getElementById('donationAmount').value);
+            const anonyme = document.getElementById('donationAnonymous').checked;
+            const message = document.getElementById('donationMessage').value;
+            
+            if (!type) {
+                showToast('Veuillez sélectionner un type de donation', 'error');
+                return;
+            }
+            
+            if (!montant || montant <= 0) {
+                showToast('Veuillez entrer un montant valide', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('submitDonationBtn');
+            button.disabled = true;
+            button.textContent = 'Envoi en cours...';
+            
+            try {
+                const donationData = {
+                    montant: montant,
+                    typeDonation: type,
+                    donateurId: getUserId(),
+                    anonyme: anonyme,
+                    message: message || null
+                };
+                
+                await createDonation(donationData);
+                await loadMyDonations();
+                
+                closeDonationModal();
+                showToast('Merci pour votre générosité ! Votre don a été enregistré avec succès.', 'success');
+                
+                window.parent.postMessage({ type: 'donation-submitted', success: true }, '*');
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast(error.message || 'Erreur lors de l\'enregistrement du don', 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Confirmer le don';
+            }
+        }
+
+        function showLoading() {
+            const container = document.getElementById('donationsList');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem; color: var(--text-light);">Chargement de vos dons...</p>
+                </div>
+            `;
+        }
+
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span>${escapeHtml(message)}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('donationModal');
+            if (e.target === modal) {
+                closeDonationModal();
+            }
+        });
+        
+        window.EnseignantDonationsModule = {
+            loadDonations: loadMyDonations,
+            refresh: loadMyDonations
+        };
+    </script>
+</body>
+</html>

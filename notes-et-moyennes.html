@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Notes et Moyennes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .notes-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            color: #1e3b36;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #5a9d91;
+        }
+
+        .filters-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3d5a54;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #1e3b36;
+        }
+
+        .btn-secondary:hover {
+            background: #e4e7ec;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #4ca896;
+            color: #4ca896;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: #4ca896;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #5a9d91;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e3b36;
+        }
+
+        .students-table-wrapper {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .students-table th {
+            background: #f8fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #1e3b36;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .students-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e9e7;
+            color: #3d5a54;
+        }
+
+        .students-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e9e7;
+        }
+
+        .modal-header h2 {
+            color: #1e3b36;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #5a9d91;
+        }
+
+        .notes-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .notes-table th, .notes-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .notes-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .moyenne-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .moyenne-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .moyenne-average {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .moyenne-bad {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #5a9d91;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .search-wrapper {
+            flex: 2;
+            min-width: 280px;
+            position: relative;
+        }
+
+        .search-wrapper label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3d5a54;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-container input {
+            width: 100%;
+            padding: 12px 45px 12px 45px;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input-container input:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5a9d91;
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .search-clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #b0bec5;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .search-clear-btn:hover {
+            color: #1e3b36;
+            background: #f0f2f5;
+        }
+
+        .search-info {
+            font-size: 12px;
+            color: #5a9d91;
+            margin-top: 6px;
+            padding-left: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-badge {
+            background: #4ca89620;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #4ca896;
+        }
+    </style>
+</head>
+<body>
+    <div class="notes-container">
+        <div class="page-header">
+            <h1>📊 Notes et Moyennes</h1>
+            <p>Consultez et gérez les notes des élèves par classe</p>
+        </div>
+
+        <div class="filters-card">
+            <div class="filter-group">
+                <label>📚 Classe</label>
+                <select id="classeSelect">
+                    <option value="">Chargement des classes...</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📅 Année scolaire</label>
+                <select id="anneeSelect">
+                    <option value="2025-2026">2025-2026</option>
+                </select>
+            </div>
+            <div class="search-wrapper">
+                <label>🔍 Rechercher un élève</label>
+                <div class="search-input-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Nom, prénom ou identifiant...">
+                    <button class="search-clear-btn" id="clearSearchBtn" style="display: none;">✖</button>
+                </div>
+                <div class="search-info" id="searchInfo"></div>
+            </div>
+            <button class="btn btn-secondary" id="refreshBtn">⟳ Actualiser</button>
+        </div>
+
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card">
+                <h3>📊 Nombre d'élèves</h3>
+                <div class="value" id="totalStudents">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>📈 Moyenne générale</h3>
+                <div class="value" id="generalAverage">0.00</div>
+            </div>
+            <div class="stat-card">
+                <h3>⭐ Meilleure moyenne</h3>
+                <div class="value" id="bestAverage">0.00</div>
+            </div>
+            <div class="stat-card">
+                <h3>⚠️ Moyenne &lt; 10</h3>
+                <div class="value" id="belowAverageCount">0</div>
+            </div>
+        </div>
+
+        <div class="students-table-wrapper">
+            <div id="studentsTableContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 10px;">Chargement des classes en cours...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="notesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalStudentName">Notes de l'élève</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent">
+                <div class="loading">Chargement des notes...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5267/api';
+        let currentStudents = [];
+        let currentClasseId = null;
+        let matieresMap = new Map();
+
+        const niveauOrder = {
+            '1': 1, '1ère': 1, 'première': 1, 'premiere': 1,
+            '2': 2, '2ème': 2, 'deuxième': 2, 'deuxieme': 2,
+            '3': 3, '3ème': 3, 'troisième': 3, 'troisieme': 3,
+            '4': 4, '4ème': 4, 'quatrième': 4, 'quatrieme': 4,
+            '5': 5, '5ème': 5, 'cinquième': 5, 'cinquieme': 5,
+            '6': 6, '6ème': 6, 'sixième': 6, 'sixieme': 6
+        };
+
+        function extractNiveauNumber(niveauStr) {
+            if (!niveauStr) return 99;
+            const str = String(niveauStr).toLowerCase();
+            for (const [key, value] of Object.entries(niveauOrder)) {
+                if (str.includes(key)) return value;
+            }
+            const match = str.match(/\d+/);
+            if (match) return parseInt(match[0]);
+            return 99;
+        }
+
+        function extractLettre(classeNom) {
+            if (!classeNom) return 'A';
+            const match = classeNom.match(/[A-Za-z]/);
+            return match ? match[0] : 'A';
+        }
+
+        function extractNumeroClasse(classeNom) {
+            if (!classeNom) return '';
+            const match = classeNom.match(/\d+/);
+            return match ? match[0] : '';
+        }
+
+        function formatClasseDisplay(classe) {
+            const classeNom = getClasseNom(classe);
+            const niveau = getClasseNiveau(classe);
+            
+            let niveauNum = '';
+            if (niveau) {
+                const niveauNumber = extractNiveauNumber(niveau);
+                if (niveauNumber <= 6) {
+                    niveauNum = niveauNumber;
+                }
+            }
+            
+            const lettre = extractLettre(classeNom);
+            const numero = extractNumeroClasse(classeNom);
+            
+            // Format: 1 A 3 (niveau + A + numéro de classe)
+            if (niveauNum && numero) {
+                return `${niveauNum} ${lettre} ${numero}`;
+            } else if (niveauNum) {
+                return `${niveauNum} ${lettre} ${classeNom}`;
+            }
+            return classeNom;
+        }
+
+        function getAuthToken() {
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        function getHeaders() {
+            const token = getAuthToken();
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
+
+        async function loadMatieres() {
+            try {
+                console.log('📚 Chargement des matières...');
+                const response = await fetch(`${API_BASE_URL}/Matiere`, {
+                    headers: getHeaders()
+                });
+                
+                if (response.ok) {
+                    const matieres = await response.json();
+                    if (Array.isArray(matieres)) {
+                        matieres.forEach(matiere => {
+                            const id = matiere.id || matiere._id;
+                            const nom = matiere.nomMatiere || matiere.NomMatiere || matiere.nom;
+                            if (id && nom) {
+                                matieresMap.set(id, nom);
+                            }
+                        });
+                    }
+                    console.log(`✅ ${matieresMap.size} matières chargées`);
+                }
+            } catch (error) {
+                console.error('Erreur chargement matières:', error);
+            }
+        }
+
+        function getMatiereNom(matiereId) {
+            return matieresMap.get(matiereId) || matiereId?.slice(-8) || 'Matière inconnue';
+        }
+
+        function getEleveId(eleve) {
+            return eleve?.id || eleve?._id || eleve?.Id || null;
+        }
+
+        function getEleveNom(eleve) {
+            return eleve?.nom || eleve?.Nom || '';
+        }
+
+        function getElevePrenom(eleve) {
+            return eleve?.prenom || eleve?.Prenom || '';
+        }
+
+        function getEleveIdentifiant(eleve) {
+            return eleve?.identifiantEcole || eleve?.IdentifiantEcole || eleve?.id?.slice(-6) || '';
+        }
+
+        function getClasseId(classe) {
+            return classe?.id || classe?._id || classe?.Id || null;
+        }
+
+        function getClasseNom(classe) {
+            return classe?.nomClasse || classe?.NomClasse || classe?.nom || classe?.Nom || '';
+        }
+
+        function getClasseNiveau(classe) {
+            return classe?.niveau || classe?.Niveau || '';
+        }
+
+        function getClasseEffectif(classe) {
+            if (classe?.effectif !== undefined && classe.effectif !== null) return classe.effectif;
+            if (classe?.Effectif !== undefined && classe.Effectif !== null) return classe.Effectif;
+            if (classe?.elevesIds && Array.isArray(classe.elevesIds)) return classe.elevesIds.length;
+            return 0;
+        }
+
+        async function loadClasses() {
+            const classeSelect = document.getElementById('classeSelect');
+            classeSelect.innerHTML = '<option value="">Chargement des classes...</option>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/Classe`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP ${response.status}`);
+                }
+                
+                let classes = await response.json();
+                
+                if (!classes || classes.length === 0) {
+                    classeSelect.innerHTML = '<option value="">Aucune classe disponible</option>';
+                    return;
+                }
+                
+                classes.sort((a, b) => {
+                    const niveauA = extractNiveauNumber(getClasseNiveau(a));
+                    const niveauB = extractNiveauNumber(getClasseNiveau(b));
+                    if (niveauA !== niveauB) return niveauA - niveauB;
+                    
+                    const nomA = getClasseNom(a);
+                    const nomB = getClasseNom(b);
+                    return nomA.localeCompare(nomB);
+                });
+                
+                classeSelect.innerHTML = '<option value="">-- Sélectionner une classe --</option>';
+                
+                classes.forEach((classe) => {
+                    const classeId = getClasseId(classe);
+                    if (!classeId) return;
+                    
+                    const displayText = formatClasseDisplay(classe);
+                    const classeEffectif = getClasseEffectif(classe);
+                    
+                    const option = document.createElement('option');
+                    option.value = classeId;
+                    let finalText = displayText;
+                    if (classeEffectif > 0) {
+                        finalText += ` (${classeEffectif} élève${classeEffectif > 1 ? 's' : ''})`;
+                    }
+                    option.textContent = finalText;
+                    classeSelect.appendChild(option);
+                });
+                
+                document.getElementById('studentsTableContainer').innerHTML = `
+                    <div class="loading">
+                        <p>✅ ${classes.length} classes disponibles</p>
+                        <p>Veuillez sélectionner une classe</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                classeSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            }
+        }
+
+        async function loadStudentsByClass(classeId) {
+            if (!classeId) {
+                document.getElementById('studentsTableContainer').innerHTML = `
+                    <div class="loading"><p>📚 Veuillez sélectionner une classe</p></div>
+                `;
+                document.getElementById('statsGrid').style.display = 'none';
+                document.getElementById('searchInput').value = '';
+                updateSearchInfo(0, 0);
+                return;
+            }
+            
+            document.getElementById('studentsTableContainer').innerHTML = `
+                <div class="loading"><div class="spinner"></div><p>Chargement des élèves...</p></div>
+            `;
+            document.getElementById('statsGrid').style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/Eleve/par-classe/${classeId}`, {
+                    headers: getHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur ${response.status}`);
+                }
+                
+                const students = await response.json();
+                
+                if (!students || students.length === 0) {
+                    document.getElementById('studentsTableContainer').innerHTML = `
+                        <div class="loading"><p>📭 Aucun élève dans cette classe</p></div>
+                    `;
+                    document.getElementById('searchInput').value = '';
+                    updateSearchInfo(0, 0);
+                    return;
+                }
+                
+                currentStudents = students;
+                currentClasseId = classeId;
+                
+                await calculateAveragesForStudents(students);
+                displayStudentsTable(students);
+                displayStats(students);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('studentsTableContainer').innerHTML = `
+                    <div class="error-message">❌ Erreur: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function calculateAveragesForStudents(students) {
+            for (const student of students) {
+                try {
+                    const studentId = getEleveId(student);
+                    if (!studentId) {
+                        student.notes = [];
+                        student.moyenne = 0;
+                        continue;
+                    }
+                    
+                    const notesResponse = await fetch(`${API_BASE_URL}/Note/eleve/${studentId}`, {
+                        headers: getHeaders()
+                    });
+                    
+                    if (notesResponse.ok) {
+                        const notes = await notesResponse.json();
+                        student.notes = notes;
+                        student.moyenne = calculateStudentAverage(notes);
+                    } else {
+                        student.notes = [];
+                        student.moyenne = 0;
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    student.notes = [];
+                    student.moyenne = 0;
+                }
+            }
+        }
+
+        function calculateStudentAverage(notes) {
+            if (!notes || notes.length === 0) return 0;
+            
+            let totalPondere = 0;
+            let totalCoefficient = 0;
+            
+            notes.forEach(note => {
+                let valeur = note.valeur ?? note.Valeur ?? note.note ?? note.Note ?? 0;
+                if (typeof valeur === 'string') {
+                    valeur = parseFloat(valeur);
+                }
+                
+                let coeff = note.coefficient ?? note.Coefficient ?? 1;
+                if (typeof coeff === 'string') {
+                    coeff = parseFloat(coeff);
+                }
+                
+                if (isNaN(valeur)) valeur = 0;
+                if (isNaN(coeff)) coeff = 1;
+                
+                totalPondere += valeur * coeff;
+                totalCoefficient += coeff;
+            });
+            
+            if (totalCoefficient === 0) return 0;
+            const moyenne = totalPondere / totalCoefficient;
+            return isNaN(moyenne) ? 0 : moyenne;
+        }
+
+        function updateSearchInfo(filteredCount, totalCount) {
+            const searchInfo = document.getElementById('searchInfo');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const searchInput = document.getElementById('searchInput');
+            
+            if (searchInput.value.trim() !== '') {
+                clearBtn.style.display = 'flex';
+                if (filteredCount !== totalCount && totalCount > 0) {
+                    searchInfo.innerHTML = `
+                        <span>🔍 ${filteredCount} résultat${filteredCount > 1 ? 's' : ''} sur ${totalCount} élèves</span>
+                        <span class="search-badge">${Math.round((filteredCount/totalCount)*100)}%</span>
+                    `;
+                } else {
+                    searchInfo.innerHTML = `<span>✅ ${filteredCount} élève${filteredCount > 1 ? 's' : ''} trouvé${filteredCount > 1 ? 's' : ''}</span>`;
+                }
+            } else {
+                clearBtn.style.display = 'none';
+                searchInfo.innerHTML = '';
+            }
+        }
+
+        function displayStudentsTable(students) {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            let filteredStudents = students;
+            
+            if (searchTerm !== '') {
+                filteredStudents = students.filter(s => {
+                    const nom = getEleveNom(s).toLowerCase();
+                    const prenom = getElevePrenom(s).toLowerCase();
+                    const identifiant = getEleveIdentifiant(s).toLowerCase();
+                    return nom.includes(searchTerm) || prenom.includes(searchTerm) || identifiant.includes(searchTerm);
+                });
+            }
+            
+            updateSearchInfo(filteredStudents.length, students.length);
+            
+            if (filteredStudents.length === 0) {
+                if (searchTerm !== '') {
+                    document.getElementById('studentsTableContainer').innerHTML = `
+                        <div class="loading">
+                            <p>🔍 Aucun élève ne correspond à "${escapeHtml(searchTerm)}"</p>
+                            <p style="font-size: 12px; margin-top: 10px;">Essayez avec un autre nom, prénom ou identifiant</p>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('studentsTableContainer').innerHTML = `
+                        <div class="loading"><p>📭 Aucun élève dans cette classe</p></div>
+                    `;
+                }
+                return;
+            }
+            
+            let html = `
+                <table class="students-table">
+                    <thead>
+                        <tr><th>Identifiant</th><th>Nom et prénom</th><th>Date naissance</th><th>Moyenne</th><th>Appréciation</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filteredStudents.forEach(student => {
+                const studentId = getEleveId(student);
+                const nom = getEleveNom(student);
+                const prenom = getElevePrenom(student);
+                const identifiant = getEleveIdentifiant(student);
+                const moyenne = student.moyenne || 0;
+                const appreciation = getAppreciation(moyenne);
+                const moyenneClass = getMoyenneClass(moyenne);
+                const nomComplet = `${nom} ${prenom}`.trim() || 'Sans nom';
+                const dateNaissance = student.dateNaissance ? new Date(student.dateNaissance).toLocaleDateString('fr-FR') : '-';
+                
+                html += `
+                    <tr>
+                        <td>${escapeHtml(identifiant)}</td>
+                        <td><strong>${escapeHtml(nomComplet)}</strong></td>
+                        <td>${dateNaissance}</td>
+                        <td><span class="moyenne-badge ${moyenneClass}">${moyenne.toFixed(2)} / 20</span></td>
+                        <td>${appreciation}</td>
+                        <td><button class="btn-outline" onclick="viewStudentNotes('${studentId}', '${escapeHtml(nomComplet).replace(/'/g, "\\'")}')">📝 Voir notes</button></td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody>`;
+            html += `</table>`;
+            document.getElementById('studentsTableContainer').innerHTML = html;
+            document.getElementById('statsGrid').style.display = 'grid';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function getAppreciation(moyenne) {
+            if (moyenne >= 16) return '🏆 Excellent';
+            if (moyenne >= 14) return '🌟 Très bien';
+            if (moyenne >= 12) return '👍 Bien';
+            if (moyenne >= 10) return '✅ Passable';
+            if (moyenne >= 8) return '⚠️ Insuffisant';
+            return '❌ Faible';
+        }
+
+        function getMoyenneClass(moyenne) {
+            if (moyenne >= 12) return 'moyenne-good';
+            if (moyenne >= 10) return 'moyenne-average';
+            return 'moyenne-bad';
+        }
+
+        function displayStats(students) {
+            const total = students.length;
+            let totalMoyenne = 0;
+            let best = 0;
+            let below10 = 0;
+            
+            students.forEach(s => {
+                const moyenne = s.moyenne || 0;
+                totalMoyenne += moyenne;
+                if (moyenne > best) best = moyenne;
+                if (moyenne < 10) below10++;
+            });
+            
+            document.getElementById('totalStudents').textContent = total;
+            const moyenneGenerale = total > 0 ? (totalMoyenne / total) : 0;
+            document.getElementById('generalAverage').textContent = moyenneGenerale.toFixed(2);
+            document.getElementById('bestAverage').textContent = best.toFixed(2);
+            document.getElementById('belowAverageCount').textContent = below10;
+        }
+
+        window.viewStudentNotes = async function(studentId, studentName) {
+            if (!studentId) {
+                alert('ID élève invalide');
+                return;
+            }
+            
+            const modal = document.getElementById('notesModal');
+            const modalStudentName = document.getElementById('modalStudentName');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalStudentName.textContent = `📝 Notes de ${studentName}`;
+            modalContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>Chargement des notes...</p></div>';
+            modal.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/Note/eleve/${studentId}`, {
+                    headers: getHeaders()
+                });
+                
+                if (response.ok) {
+                    const notes = await response.json();
+                    displayNotesModal(notes);
+                } else if (response.status === 404) {
+                    modalContent.innerHTML = '<div class="loading"><p>📝 Aucune note enregistrée</p></div>';
+                } else {
+                    modalContent.innerHTML = `<div class="error-message">Erreur ${response.status}</div>`;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                modalContent.innerHTML = `<div class="error-message">Erreur: ${error.message}</div>`;
+            }
+        };
+        
+        function displayNotesModal(notes) {
+            if (!notes || notes.length === 0) {
+                document.getElementById('modalContent').innerHTML = `
+                    <div class="loading"><p>📝 Aucune note enregistrée</p></div>
+                `;
+                return;
+            }
+            
+            const notesByMatiere = new Map();
+            notes.forEach(note => {
+                const matiereId = note.matiereId || note.MatiereId || note.matiere || note.Matiere;
+                if (!matiereId) return;
+                if (!notesByMatiere.has(matiereId)) {
+                    notesByMatiere.set(matiereId, []);
+                }
+                notesByMatiere.get(matiereId).push(note);
+            });
+            
+            const moyenneGenerale = calculateStudentAverage(notes);
+            
+            let html = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #f0f2f5; border-radius: 12px;">
+                    <h3>📊 Moyenne générale: <strong>${moyenneGenerale.toFixed(2)} / 20</strong></h3>
+                    <p>Total: ${notes.length} note(s)</p>
+                </div>
+                <table class="notes-table">
+                    <thead>
+                        <tr><th>Matière</th><th>Notes</th><th>Moyenne</th><th>Coeff</th><th>Appréciation</th></tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            for (const [matiereId, matiereNotes] of notesByMatiere) {
+                let totalPondere = 0;
+                let totalCoeff = 0;
+                let notesList = [];
+                
+                matiereNotes.forEach(note => {
+                    let valeur = note.valeur ?? note.Valeur ?? note.note ?? note.Note ?? 0;
+                    if (typeof valeur === 'string') valeur = parseFloat(valeur);
+                    
+                    let coeff = note.coefficient ?? note.Coefficient ?? 1;
+                    if (typeof coeff === 'string') coeff = parseFloat(coeff);
+                    
+                    if (isNaN(valeur)) valeur = 0;
+                    if (isNaN(coeff)) coeff = 1;
+                    
+                    totalPondere += valeur * coeff;
+                    totalCoeff += coeff;
+                    notesList.push(`${valeur}${coeff > 1 ? `(x${coeff})` : ''}`);
+                });
+                
+                const moyenneMatiere = totalCoeff > 0 ? totalPondere / totalCoeff : 0;
+                const appreciation = getAppreciation(moyenneMatiere);
+                const moyenneClass = getMoyenneClass(moyenneMatiere);
+                const matiereNom = getMatiereNom(matiereId);
+                
+                html += `
+                    <tr>
+                        <td><strong>${escapeHtml(matiereNom)}</strong></td>
+                        <td>${notesList.join(', ')}</td>
+                        <td><span class="moyenne-badge ${moyenneClass}">${moyenneMatiere.toFixed(2)}</span></td>
+                        <td>${totalCoeff}</td>
+                        <td>${appreciation}</td>
+                    </tr>
+                `;
+            }
+            
+            html += `</tbody>`;
+            html += `</table>`;
+            document.getElementById('modalContent').innerHTML = html;
+        }
+
+        function closeModal() {
+            document.getElementById('notesModal').classList.remove('active');
+        }
+
+        function exportToCSV() {
+            if (!currentStudents.length) {
+                alert('Aucun élève à exporter');
+                return;
+            }
+            
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            let studentsToExport = currentStudents;
+            
+            if (searchTerm !== '') {
+                studentsToExport = currentStudents.filter(s => {
+                    const nom = getEleveNom(s).toLowerCase();
+                    const prenom = getElevePrenom(s).toLowerCase();
+                    const identifiant = getEleveIdentifiant(s).toLowerCase();
+                    return nom.includes(searchTerm) || prenom.includes(searchTerm) || identifiant.includes(searchTerm);
+                });
+            }
+            
+            const headers = ['Identifiant', 'Nom', 'Prénom', 'Date de naissance', 'Moyenne', 'Appréciation'];
+            const rows = studentsToExport.map(s => [
+                getEleveIdentifiant(s),
+                getEleveNom(s),
+                getElevePrenom(s),
+                s.dateNaissance ? new Date(s.dateNaissance).toLocaleDateString('fr-FR') : '',
+                (s.moyenne || 0).toFixed(2),
+                getAppreciation(s.moyenne || 0)
+            ]);
+            
+            const csvContent = [headers, ...rows].map(row => row.join(';')).join('\n');
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `notes_classe_${currentClasseId}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadMatieres();
+            await loadClasses();
+            
+            document.getElementById('classeSelect').addEventListener('change', (e) => {
+                const classeId = e.target.value;
+                if (classeId) {
+                    loadStudentsByClass(classeId);
+                } else {
+                    loadStudentsByClass(null);
+                }
+            });
+            
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', () => {
+                if (currentStudents.length) {
+                    displayStudentsTable(currentStudents);
+                }
+            });
+            
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            clearSearchBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                if (currentStudents.length) {
+                    displayStudentsTable(currentStudents);
+                }
+                searchInput.focus();
+            });
+            
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                loadClasses();
+                if (currentClasseId) loadStudentsByClass(currentClasseId);
+            });
+            
+            const exportBtn = document.createElement('button');
+            exportBtn.className = 'btn btn-secondary';
+            exportBtn.innerHTML = '📥 Exporter CSV';
+            exportBtn.addEventListener('click', exportToCSV);
+            document.querySelector('.filters-card').appendChild(exportBtn);
+        });
+        
+        window.closeModal = closeModal;
+        window.viewStudentNotes = viewStudentNotes;
+    </script>
+</body>
+</html>

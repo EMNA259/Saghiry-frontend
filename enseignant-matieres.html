@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Mes Matières</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            padding: 24px;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e3b36;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title-icon {
+            font-size: 2rem;
+        }
+
+        .page-subtitle {
+            color: #5a9d91;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        .specialites-card {
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            border-radius: 20px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .specialites-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .specialites-info h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .specialites-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .specialite-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .specialites-stats {
+            text-align: right;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .remplacement-badge {
+            background: #ff9466;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .remplacement-partiel-badge {
+            background: #f59e0b;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e0e9e7;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e3b36;
+        }
+
+        .stat-label {
+            color: #5a9d91;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .filters-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 320px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 2px solid #e0e9e7;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #4ca896;
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: #5a9d91;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 20px;
+            background: white;
+            border: 2px solid #e0e9e7;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3d5a54;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab:hover {
+            border-color: #4ca896;
+            background: #f0f9f7;
+        }
+
+        .filter-tab.active {
+            background: #4ca896;
+            border-color: #4ca896;
+            color: white;
+        }
+
+        .matieres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 24px;
+        }
+
+        .matiere-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e0e9e7;
+        }
+
+        .matiere-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .matiere-header {
+            background: linear-gradient(135deg, #f8fdfc 0%, #eff9f7 100%);
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid #e0e9e7;
+        }
+
+        .matiere-nom {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .matiere-coefficient {
+            background: #ff9466;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .matiere-body {
+            padding: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e0e9e7;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #5a9d91;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #1e3b36;
+        }
+
+        .info-value.highlight {
+            color: #ff9466;
+            font-size: 1.1rem;
+        }
+
+        .classes-list {
+            margin-top: 12px;
+        }
+
+        .classe-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e9e7;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+
+        .classe-item:hover {
+            background: #f0f9f7;
+            transform: translateX(4px);
+        }
+
+        .classe-item:last-child {
+            border-bottom: none;
+        }
+
+        .classe-badge {
+            background: #4ca896;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .classe-info {
+            flex: 1;
+        }
+
+        .classe-nom {
+            font-weight: 600;
+            color: #1e3b36;
+        }
+
+        .classe-niveau {
+            font-size: 0.7rem;
+            color: #5a9d91;
+        }
+
+        .heure-total {
+            font-weight: 700;
+            color: #ff9466;
+        }
+
+        .classe-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            color: #5a9d91;
+        }
+
+        .btn-icon:hover {
+            background: #e0e9e7;
+            transform: scale(1.05);
+        }
+
+        .btn-icon.notes {
+            color: #4ca896;
+        }
+
+        .btn-icon.activity {
+            color: #ff9466;
+        }
+
+        .matiere-footer {
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e0e9e7;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            border: 1px solid #e0e9e7;
+            color: #3d5a54;
+            text-decoration: none;
+        }
+
+        .btn-action:hover {
+            border-color: #4ca896;
+            background: #f0f9f7;
+        }
+
+        .btn-primary {
+            background: #4ca896;
+            border-color: #4ca896;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3d8a7f;
+            border-color: #3d8a7f;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #e0e9e7;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e3b36;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            color: #5a9d91;
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e9e7;
+            border-top-color: #4ca896;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 28px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e9e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: #1e3b36;
+            font-size: 1.2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #5a9d91;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e0e9e7;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .toast-message {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e3b36;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-message.success {
+            background: #4ca896;
+        }
+
+        .toast-message.error {
+            background: #ff6b6b;
+        }
+
+        .info-banner {
+            background: #e8f4f1;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #4ca896;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .specialites-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .specialites-stats {
+                text-align: center;
+            }
+            
+            .specialites-badges {
+                justify-content: center;
+            }
+            
+            .matieres-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .classe-actions {
+                flex-direction: row;
+                gap: 4px;
+            }
+            
+            .classe-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="page-title">
+            <span class="page-title-icon">📚</span>
+            Mes Matières
+        </div>
+        <div class="page-subtitle">
+            Cliquez sur 📝 pour saisir les notes | Cliquez sur 📋 pour préparer une activité
+        </div>
+    </div>
+
+    <div id="infoBanner" style="display: none;" class="info-banner"></div>
+
+    <div class="specialites-card">
+        <div class="specialites-info">
+            <h3>📌 Mes spécialités</h3>
+            <h2 id="enseignantNom">Enseignant</h2>
+            <div class="specialites-badges" id="specialitesBadges">
+                <span class="specialite-badge">📖 Chargement...</span>
+            </div>
+        </div>
+        <div class="specialites-stats">
+            <div class="stat-number" id="totalMatieres">0</div>
+            <div class="stat-label">Matières enseignées</div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value" id="statCoefficientMoyen">0</div>
+            <div class="stat-label">Coefficient moyen</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-value" id="statVolumeTotal">0</div>
+            <div class="stat-label">Heures/semaine</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏫</div>
+            <div class="stat-value" id="statClassesCount">0</div>
+            <div class="stat-label">Classes</div>
+        </div>
+    </div>
+
+    <div class="filters-bar">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Rechercher une matière ou une classe..." autocomplete="off">
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">Toutes</button>
+            <button class="filter-tab" data-filter="arabe">Langue arabe</button>
+            <button class="filter-tab" data-filter="islamique">Éducation islamique</button>
+        </div>
+    </div>
+
+    <div id="matieresContainer">
+        <div class="loader">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="matiereModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Détails de la matière</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-action" onclick="closeModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5267/api';
+        let emploiEnseignant = null;
+        let matieresParClasse = [];
+        let filterActif = 'all';
+        let searchTerm = '';
+        let enseignantInfo = null;
+        let userRole = null;
+        let remplacementComplet = true;
+        let mesSpecialites = [];
+
+        function getAuthToken() {
+            return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        }
+
+        function getCurrentUser() {
+            try {
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) return JSON.parse(userStr);
+            } catch (e) {
+                console.error('Erreur parsing user:', e);
+            }
+            return null;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ✅ Fonction pour formater le nom de la classe: niveau + " A " + nom
+        function formatClasseName(classeNom, niveau) {
+            if (!classeNom && !niveau) return 'Classe';
+            
+            // Extraire le numéro de la classe du nom (ex: "3" de "6ème A 3" ou "3" de "Classe 3")
+            let classeNumber = '';
+            if (classeNom) {
+                // Chercher un nombre dans le nom
+                const match = classeNom.match(/\d+$/);
+                if (match) {
+                    classeNumber = match[0];
+                } else {
+                    // Si pas de nombre, utiliser le nom complet
+                    classeNumber = classeNom;
+                }
+            }
+            
+            // Formater: niveau + " A " + numéro
+            if (niveau && niveau !== 'Non défini' && classeNumber) {
+                return `${niveau} A ${classeNumber}`;
+            } else if (niveau && niveau !== 'Non défini') {
+                return niveau;
+            } else if (classeNumber) {
+                return classeNumber;
+            }
+            return classeNom || 'Classe';
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast-message ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        function ouvrirSaisieNotes(matiereId, matiereNom, classeId, classeNom, niveau, coefficient) {
+            console.log('📝 Ouverture saisie notes:', { matiereId, matiereNom, classeId, classeNom, niveau });
+            if (!classeId || classeId === 'undefined' || classeId === 'null') {
+                showToast('Erreur: ID de classe invalide', 'error');
+                return;
+            }
+            // Chercher la matière dans notre liste pour avoir le bon ID
+            const matiere = matieresParClasse.find(m => m.matiereNom === matiereNom);
+            const finalMatiereId = matiere?.matiereId || matiereId;
+            window.location.href = `enseignant-notes.html?matiereId=${finalMatiereId}&matiereNom=${encodeURIComponent(matiereNom)}&classeId=${classeId}&classeNom=${encodeURIComponent(classeNom)}&niveau=${encodeURIComponent(niveau || '')}&coefficient=${coefficient || 1}`;
+        }
+
+        function ouvrirPreparerActivite(matiereId, matiereNom, classeId, classeNom, niveau, coefficient) {
+            console.log('📋 Ouverture préparation activité:', { matiereId, matiereNom, classeId, classeNom, niveau });
+            if (!classeId || classeId === 'undefined' || classeId === 'null') {
+                showToast('Erreur: ID de classe invalide', 'error');
+                return;
+            }
+            // Chercher la matière dans notre liste pour avoir le bon ID
+            const matiere = matieresParClasse.find(m => m.matiereNom === matiereNom);
+            const finalMatiereId = matiere?.matiereId || matiereId;
+            window.location.href = `enseignant-activites.html?matiereId=${finalMatiereId}&matiereNom=${encodeURIComponent(matiereNom)}&classeId=${classeId}&classeNom=${encodeURIComponent(classeNom)}&niveau=${encodeURIComponent(niveau || '')}&coefficient=${coefficient || 1}`;
+        }
+
+        async function chargerDonneesEnseignant() {
+            console.log('🔄 Chargement des données enseignant...');
+            
+            let token = getAuthToken();
+            
+            if (!token) {
+                const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+                if (userStr) {
+                    try {
+                        const user = JSON.parse(userStr);
+                        token = user.token;
+                        if (token) localStorage.setItem('authToken', token);
+                    } catch(e) {}
+                }
+            }
+            
+            if (!token) {
+                console.error('❌ Aucun token trouvé!');
+                document.getElementById('specialitesBadges').innerHTML = '<span class="specialite-badge">⚠️ Non authentifié</span>';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/utilisateurs/me`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Données enseignant:', data);
+                    
+                    enseignantInfo = data;
+                    const specialites = data.Specialites || data.specialites || [];
+                    userRole = (data.role || data.Role || '').toLowerCase();
+                    remplacementComplet = data.remplacementComplet !== false;
+                    mesSpecialites = specialites;
+                    
+                    const nomElement = document.getElementById('enseignantNom');
+                    if (nomElement) {
+                        const nomComplet = `${data.prenom || ''} ${data.nom || ''}`.trim() || 'Enseignant';
+                        nomElement.textContent = nomComplet;
+                    }
+                    
+                    const badgesContainer = document.getElementById('specialitesBadges');
+                    if (badgesContainer) {
+                        if (specialites.length > 0) {
+                            badgesContainer.innerHTML = specialites.map(s => 
+                                `<span class="specialite-badge">📖 ${escapeHtml(s)}</span>`
+                            ).join('');
+                        } else {
+                            badgesContainer.innerHTML = '<span class="specialite-badge">📖 Aucune spécialité définie</span>';
+                        }
+                    }
+                    
+                    const infoBanner = document.getElementById('infoBanner');
+                    if (userRole === 'permanent' || userRole === 'vacataire') {
+                        if (!remplacementComplet && specialites.length > 0) {
+                            infoBanner.style.display = 'flex';
+                            infoBanner.innerHTML = `
+                                <i>📌</i>
+                                <div>
+                                    <strong>Remplacement partiel</strong><br>
+                                    Vous remplacez uniquement pour les spécialités : <strong>${specialites.join(', ')}</strong><br>
+                                    Seules les matières correspondant à ces spécialités vous sont accessibles.
+                                </div>
+                            `;
+                        } else if (remplacementComplet) {
+                            infoBanner.style.display = 'flex';
+                            infoBanner.innerHTML = `
+                                <i>✅</i>
+                                <div>
+                                    <strong>Remplacement complet</strong><br>
+                                    Vous remplacez l'enseignant pour toutes ses spécialités.<br>
+                                    Toutes ses matières vous sont accessibles.
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    const currentUser = getCurrentUser();
+                    const updatedUser = { ...currentUser, ...data, specialites: specialites };
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    
+                } else {
+                    console.error('❌ Erreur API:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Erreur réseau:', error);
+            }
+        }
+
+        function extractId(obj) {
+            if (!obj) return null;
+            if (typeof obj === 'string') return obj;
+            if (obj.$oid) return obj.$oid;
+            if (obj._id) return extractId(obj._id);
+            if (obj.Id) return obj.Id;
+            return null;
+        }
+
+        async function chargerEmploiEnseignant() {
+            const container = document.getElementById('matieresContainer');
+            container.innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+            
+            try {
+                const token = getAuthToken();
+                const user = getCurrentUser();
+                const enseignantId = user?.id;
+                
+                if (!enseignantId) {
+                    throw new Error('Enseignant non identifié');
+                }
+                
+                let creneaux = [];
+                
+                // Pour les vacataires/permanents, utiliser l'endpoint permanent
+                if (userRole === 'permanent' || userRole === 'vacataire') {
+                    console.log('📚 Vacataire - Chargement des matières via endpoint permanent');
+                    const response = await fetch(`${API_BASE}/EmploiDuTemps/permanent/${enseignantId}?anneeScolaire=2025-2026`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erreur HTTP: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('📅 Emploi vacataire:', result);
+                    
+                    if (result.Success && result.Data && result.Data.emploi && result.Data.emploi.emploiParJour) {
+                        const emploiParJour = result.Data.emploi.emploiParJour;
+                        
+                        for (const [jour, seances] of Object.entries(emploiParJour)) {
+                            if (Array.isArray(seances)) {
+                                for (const seance of seances) {
+                                    creneaux.push({
+                                        MatiereId: seance.matiereId,
+                                        MatiereNom: seance.matiereNom,
+                                        ClasseId: seance.classeId,
+                                        ClasseNom: seance.classeNom,
+                                        Niveau: seance.niveau,
+                                        DureeMinutes: seance.dureeHeures ? seance.dureeHeures * 60 : 60,
+                                        Jour: jour,
+                                        HeureDebut: seance.heureDebut,
+                                        HeureFin: seance.heureFin,
+                                        Salle: seance.salle,
+                                        Coefficient: 1
+                                    });
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Enseignant normal
+                    console.log('📚 Enseignant - Chargement des matières');
+                    const response = await fetch(`${API_BASE}/EmploiDuTemps/enseignant/${enseignantId}?anneeScolaire=2025-2026`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erreur HTTP: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    console.log('📅 Emploi enseignant:', result);
+                    
+                    if (result.success && result.data && result.data.Creneaux) {
+                        creneaux = result.data.Creneaux;
+                    } else if (result.data && result.data.Creneaux) {
+                        creneaux = result.data.Creneaux;
+                    }
+                }
+                
+                console.log(`📊 ${creneaux.length} créneaux trouvés`);
+                
+                if (creneaux.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-title">Aucun emploi du temps</div>
+                            <div class="empty-text">Votre emploi du temps n'a pas encore été généré.</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Regrouper par NOM DE MATIÈRE uniquement (pas par ID)
+                const matiereMap = new Map();
+                
+                for (const creneau of creneaux) {
+                    const matiereNom = creneau.MatiereNom;
+                    const matiereId = creneau.MatiereId;
+                    const classeId = creneau.ClasseId;
+                    const classeNom = creneau.ClasseNom;
+                    const niveau = creneau.Niveau;
+                    const dureeMinutes = creneau.DureeMinutes || 60;
+                    
+                    if (!classeId) {
+                        console.warn('⚠️ Créneau sans classeId:', creneau);
+                        continue;
+                    }
+                    
+                    // Filtre pour remplacement partiel
+                    const estRemplacementPartiel = (userRole === 'permanent' || userRole === 'vacataire') && !remplacementComplet && mesSpecialites.length > 0;
+                    
+                    if (estRemplacementPartiel && matiereNom) {
+                        const matiereCorrespond = mesSpecialites.some(specialite => 
+                            matiereNom.toLowerCase().includes(specialite.toLowerCase()) ||
+                            specialite.toLowerCase().includes(matiereNom.toLowerCase())
+                        );
+                        
+                        if (!matiereCorrespond) {
+                            console.log(`⏭️ Matière filtrée: ${matiereNom} (non dans spécialités)`);
+                            continue;
+                        }
+                    }
+                    
+                    // Utiliser le NOM comme clé principale pour regrouper
+                    const key = matiereNom;
+                    
+                    if (!matiereMap.has(key)) {
+                        matiereMap.set(key, {
+                            matiereId: matiereId,
+                            matiereNom: matiereNom,
+                            classes: [],
+                            totalHeures: 0,
+                            coefficient: 1,
+                            allIds: new Set()
+                        });
+                    }
+                    
+                    const matiere = matiereMap.get(key);
+                    matiere.allIds.add(matiereId);
+                    
+                    // Vérifier si la classe existe déjà
+                    const classeExistante = matiere.classes.find(c => c.classeId === classeId);
+                    
+                    if (!classeExistante) {
+                        matiere.classes.push({
+                            classeId: classeId,
+                            classeNom: classeNom,
+                            niveau: niveau,
+                            heures: dureeMinutes / 60,
+                            coefficient: 1,
+                            creneaux: [creneau]
+                        });
+                    } else {
+                        classeExistante.heures += dureeMinutes / 60;
+                        classeExistante.creneaux.push(creneau);
+                    }
+                    
+                    matiere.totalHeures += dureeMinutes / 60;
+                }
+                
+                matieresParClasse = Array.from(matiereMap.values());
+                
+                // Afficher un warning si des doublons ont été détectés
+                const matieresAvecMultiplesIds = matieresParClasse.filter(m => m.allIds.size > 1);
+                if (matieresAvecMultiplesIds.length > 0) {
+                    console.warn('⚠️ Matières avec plusieurs IDs détectées:', 
+                        matieresAvecMultiplesIds.map(m => `${m.matiereNom} (${m.allIds.size} IDs)`));
+                }
+                
+                console.log(`📊 ${matieresParClasse.length} matière(s) unique(s) trouvée(s) après regroupement`);
+                
+                mettreAJourStatistiques();
+                afficherMatieres();
+                
+            } catch (error) {
+                console.error('❌ Erreur chargement emploi:', error);
+                document.getElementById('matieresContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Erreur de chargement</div>
+                        <div class="empty-text">${error.message}</div>
+                        <button class="btn-action btn-primary" onclick="chargerEmploiEnseignant()">Réessayer</button>
+                    </div>
+                `;
+            }
+        }
+
+        function mettreAJourStatistiques() {
+            const totalMatieres = matieresParClasse.length;
+            const totalHeures = matieresParClasse.reduce((sum, m) => sum + m.totalHeures, 0);
+            const classesUniques = new Set();
+            
+            matieresParClasse.forEach(m => {
+                m.classes.forEach(c => classesUniques.add(c.classeNom));
+            });
+            
+            const coeffMoyen = totalMatieres > 0 ? (matieresParClasse.reduce((sum, m) => sum + (m.coefficient || 1), 0) / totalMatieres).toFixed(1) : 0;
+            
+            document.getElementById('totalMatieres').textContent = totalMatieres;
+            document.getElementById('statCoefficientMoyen').textContent = coeffMoyen;
+            document.getElementById('statVolumeTotal').textContent = totalHeures;
+            document.getElementById('statClassesCount').textContent = classesUniques.size;
+        }
+
+        function afficherMatieres() {
+            let matieresAAfficher = [...matieresParClasse];
+            
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                matieresAAfficher = matieresAAfficher.filter(m => 
+                    m.matiereNom.toLowerCase().includes(term) ||
+                    m.classes.some(c => {
+                        const formattedName = formatClasseName(c.classeNom, c.niveau);
+                        return formattedName.toLowerCase().includes(term) || 
+                               (c.niveau && c.niveau.toLowerCase().includes(term));
+                    })
+                );
+            }
+            
+            if (filterActif !== 'all') {
+                matieresAAfficher = matieresAAfficher.filter(m => {
+                    if (filterActif === 'arabe') return m.matiereNom.toLowerCase().includes('arabe');
+                    if (filterActif === 'islamique') return m.matiereNom.toLowerCase().includes('islam');
+                    return true;
+                });
+            }
+            
+            const container = document.getElementById('matieresContainer');
+            
+            if (matieresAAfficher.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">Aucune matière trouvée</div>
+                        <div class="empty-text">Aucune matière ne correspond à vos critères</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="matieres-grid">
+                    ${matieresAAfficher.map(matiere => renderMatiereCard(matiere)).join('')}
+                </div>
+            `;
+        }
+
+        function renderMatiereCard(matiere) {
+            const totalHeures = matiere.totalHeures;
+            
+            return `
+                <div class="matiere-card">
+                    <div class="matiere-header">
+                        <div class="matiere-nom">
+                            ${escapeHtml(matiere.matiereNom)}
+                            <span class="matiere-coefficient">Coef. ${matiere.coefficient || 1}</span>
+                        </div>
+                    </div>
+                    <div class="matiere-body">
+                        <div class="info-row">
+                            <span class="info-label">⏱️ Total heures/semaine</span>
+                            <span class="info-value highlight">${totalHeures}h</span>
+                        </div>
+                        
+                        <div class="classes-list">
+                            <div class="info-label" style="margin-bottom: 8px;">🏫 Classes enseignées</div>
+                            ${matiere.classes.map(classe => {
+                                const formattedClasseName = formatClasseName(classe.classeNom, classe.niveau);
+                                return `
+                                <div class="classe-item">
+                                    <span class="classe-badge">${escapeHtml(classe.niveau || 'N/A')}</span>
+                                    <div class="classe-info">
+                                        <div class="classe-nom">${escapeHtml(formattedClasseName)}</div>
+                                        <div class="classe-niveau">${escapeHtml(classe.niveau || 'Niveau non spécifié')}</div>
+                                    </div>
+                                    <div class="heure-total">${classe.heures}h</div>
+                                    <div class="classe-actions">
+                                        <button class="btn-icon notes" onclick="ouvrirSaisieNotes('${matiere.matiereId}', '${escapeHtml(matiere.matiereNom)}', '${classe.classeId}', '${escapeHtml(classe.classeNom)}', '${escapeHtml(classe.niveau || '')}', '${classe.coefficient || 1}')" title="Saisir les notes">
+                                            📝
+                                        </button>
+                                        <button class="btn-icon activity" onclick="ouvrirPreparerActivite('${matiere.matiereId}', '${escapeHtml(matiere.matiereNom)}', '${classe.classeId}', '${escapeHtml(classe.classeNom)}', '${escapeHtml(classe.niveau || '')}', '${classe.coefficient || 1}')" title="Préparer une activité">
+                                            📋
+                                        </button>
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
+                        
+                        <div class="info-row" style="margin-top: 12px;">
+                            <span class="info-label">📅 Nombre de créneaux</span>
+                            <span class="info-value">${matiere.classes.reduce((sum, c) => sum + c.creneaux.length, 0)}</span>
+                        </div>
+                    </div>
+                    <div class="matiere-footer">
+                        <button class="btn-action" onclick="voirDetails('${matiere.matiereId}', '${escapeHtml(matiere.matiereNom)}')">📖 Détails</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function voirDetails(matiereId, matiereNom) {
+            const matiere = matieresParClasse.find(m => m.matiereNom === matiereNom);
+            if (!matiere) return;
+            
+            const modal = document.getElementById('matiereModal');
+            document.getElementById('modalTitle').textContent = matiere.matiereNom;
+            
+            let horairesHtml = '';
+            for (const classe of matiere.classes) {
+                const formattedClasseName = formatClasseName(classe.classeNom, classe.niveau);
+                horairesHtml += `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: #1e3b36; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            🏫 ${escapeHtml(formattedClasseName)} (${escapeHtml(classe.niveau || 'N/A')})
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-action" style="padding: 4px 12px; font-size: 0.7rem; width: auto;" onclick="ouvrirSaisieNotes('${matiere.matiereId}', '${escapeHtml(matiere.matiereNom)}', '${classe.classeId}', '${escapeHtml(classe.classeNom)}', '${escapeHtml(classe.niveau || '')}', '${classe.coefficient || 1}')">📝 Saisir notes</button>
+                                <button class="btn-action" style="padding: 4px 12px; font-size: 0.7rem; width: auto; background: #ff9466; border-color: #ff9466; color: white;" onclick="ouvrirPreparerActivite('${matiere.matiereId}', '${escapeHtml(matiere.matiereNom)}', '${classe.classeId}', '${escapeHtml(classe.classeNom)}', '${escapeHtml(classe.niveau || '')}', '${classe.coefficient || 1}')">📋 Préparer activité</button>
+                            </div>
+                        </h4>
+                        <div style="background: #f8fafc; padding: 12px; border-radius: 12px;">
+                            ${classe.creneaux.map(c => `
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e9e7;">
+                                    <span style="font-weight: 600;">${c.Jour}</span>
+                                    <span>${c.HeureDebut} - ${c.HeureFin}</span>
+                                    <span>${c.Salle || 'Salle non spécifiée'}</span>
+                                    <span>${c.DureeMinutes} min</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #1e3b36; margin-bottom: 12px;">📋 Description</h4>
+                    <p style="color: #5a9d91;">${matiere.description || 'Aucune description disponible.'}</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #1e3b36; margin-bottom: 12px;">📊 Statistiques</h4>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span>Coefficient:</span> <strong>${matiere.coefficient || 1}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span>Total heures/semaine:</span> <strong>${matiere.totalHeures}h</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Nombre de classes:</span> <strong>${matiere.classes.length}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color: #1e3b36; margin-bottom: 12px;">⏰ Horaires détaillés</h4>
+                    ${horairesHtml}
+                </div>
+            `;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('matiereModal').classList.remove('active');
+        }
+
+        function initEventListeners() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                afficherMatieres();
+            });
+            
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    filterActif = tab.dataset.filter;
+                    afficherMatieres();
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await chargerDonneesEnseignant();
+            await chargerEmploiEnseignant();
+            initEventListeners();
+        });
+
+        window.voirDetails = voirDetails;
+        window.closeModal = closeModal;
+        window.chargerEmploiEnseignant = chargerEmploiEnseignant;
+        window.ouvrirSaisieNotes = ouvrirSaisieNotes;
+        window.ouvrirPreparerActivite = ouvrirPreparerActivite;
+    </script>
+</body>
+</html>

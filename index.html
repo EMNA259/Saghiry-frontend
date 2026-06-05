@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Interface Administration</title>
+    <style>
+        /* ============ VARIABLES SAGHIRY - STYLE ENSEIGNANT ============ */
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 50%, var(--primary-deep) 100%);
+            min-height: 100vh;
+            display: flex;
+            position: relative;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+        }
+
+        body.dark-mode .saghiry-sidebar {
+            background: #16213e;
+            border-right-color: #2d2d44;
+        }
+
+        body.dark-mode .sidebar-header {
+            background: linear-gradient(to bottom, #16213e, #1a1a2e);
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .sidebar-logo-text {
+            color: #6abfad;
+        }
+
+        body.dark-mode .user-profile-card {
+            background: linear-gradient(135deg, #1e2a3a 0%, #16213e 100%);
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .profile-name {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .sidebar-search .search-input {
+            background: #0a0a1a;
+            border-color: #2d2d44;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .nav-item {
+            color: #b0b0b0;
+        }
+
+        body.dark-mode .nav-item:hover {
+            background: rgba(76, 168, 150, 0.15);
+            color: #6abfad;
+        }
+
+        body.dark-mode .nav-section-title {
+            color: #6abfad;
+        }
+
+        body.dark-mode .sidebar-session {
+            background: rgba(76, 168, 150, 0.15);
+            color: #6abfad;
+        }
+
+        body.dark-mode .logout-section .logout-btn {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.2);
+        }
+
+        body.dark-mode .notifications-dropdown {
+            background: #16213e;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .notification-item {
+            border-bottom-color: #2d2d44;
+        }
+
+        body.dark-mode .notification-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .notifications-footer {
+            background: #1a1a2e;
+            border-top-color: #2d2d44;
+        }
+
+        /* Direction RTL pour l'arabe */
+        body[dir="rtl"] .sidebar-header,
+        body[dir="rtl"] .nav-item,
+        body[dir="rtl"] .user-profile-card,
+        body[dir="rtl"] .profile-info {
+            text-align: right;
+        }
+
+        body[dir="rtl"] .nav-badge {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        body[dir="rtl"] .notification-item.unread {
+            border-left: none;
+            border-right: 4px solid var(--primary-green);
+        }
+
+        body[dir="rtl"] .sidebar-logo {
+            transform: scaleX(-1);
+        }
+
+        body[dir="rtl"] .search-icon {
+            left: auto;
+            right: 1rem;
+        }
+
+        body[dir="rtl"] .search-input {
+            padding: 0.9rem 2.8rem 0.9rem 1rem;
+        }
+
+        body[dir="rtl"] .nav-badge {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .saghiry-sidebar {
+            width: 300px;
+            background: white;
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        body.dark-mode .saghiry-sidebar::-webkit-scrollbar-track {
+            background: #2d2d44;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.8rem 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+            background: linear-gradient(to bottom, white, #fcfdfd);
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            filter: drop-shadow(0 4px 8px rgba(45, 107, 99, 0.2));
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-deep);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .sidebar-session {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            background: rgba(76, 168, 150, 0.1);
+            border-radius: 12px;
+            color: var(--primary-dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .session-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
+        body[dir="rtl"] .session-badge {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
+
+        .sidebar-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            background: rgba(76, 168, 150, 0.1);
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .notification-icon:hover {
+            background: rgba(76, 168, 150, 0.2);
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-orange);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .user-profile-card {
+            margin: 1.5rem 1.5rem;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #f8fdfc 0%, #eff9f7 100%);
+            border-radius: 20px;
+            border: 1px solid #c8e0dc;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .user-profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(255, 148, 102, 0.25);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-deep);
+            margin-bottom: 0.2rem;
+            line-height: 1.2;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-email {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-search {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--gray-border);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            background: #f8faf9;
+            border: 2px solid var(--gray-border);
+            border-radius: 16px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(76, 168, 150, 0.1);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .nav-section-title {
+            color: var(--text-light);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: var(--text-soft);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item i, .nav-icon {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            background: rgba(76, 168, 150, 0.08);
+            color: var(--primary-deep);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.25);
+        }
+
+        .nav-item.active .nav-icon {
+            color: white;
+        }
+
+        .nav-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: auto;
+            min-width: 22px;
+            text-align: center;
+        }
+
+        .logout-section {
+            padding: 1.5rem 1.5rem 1.8rem;
+            border-top: 1px solid var(--gray-border);
+            margin-top: auto;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            background: rgba(255, 107, 107, 0.05);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.15);
+            color: #c92a2a;
+        }
+
+        .main-content-area {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            width: calc(100% - 300px);
+            background: transparent;
+        }
+
+        .dynamic-iframe {
+            width: 100%;
+            border: none;
+            background: white;
+            border-radius: 16px;
+            min-height: calc(100vh - 4rem);
+            height: auto;
+            display: block;
+            box-shadow: var(--shadow-sm);
+        }
+
+        @media (max-width: 1024px) {
+            .saghiry-sidebar { width: 280px; }
+            .main-content-area { margin-left: 280px; width: calc(100% - 280px); }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .saghiry-sidebar { position: relative; width: 100%; border-right: none; border-bottom: 1px solid var(--gray-border); }
+            .main-content-area { margin-left: 0; width: 100%; padding: 1rem; }
+        }
+
+        .hidden { display: none !important; }
+        .text-accent { color: var(--accent-orange); }
+        .page-transition { animation: fadeInPage 0.4s ease; }
+
+        @keyframes fadeInPage {
+            from { opacity: 0.7; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notifications-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .notifications-overlay.show {
+            display: block;
+        }
+
+        .notifications-dropdown {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 550px;
+            max-height: 80vh;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            display: none;
+            overflow: hidden;
+            border: 1px solid var(--gray-border);
+            flex-direction: column;
+        }
+
+        .notifications-dropdown.show { 
+            display: flex; 
+            animation: fadeIn 0.3s ease; 
+        }
+
+        .notifications-header {
+            padding: 1.2rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .mark-all-read {
+            cursor: pointer;
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            transition: background 0.2s;
+        }
+
+        .mark-all-read:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .close-notifications {
+            cursor: pointer;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .close-notifications:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .notifications-list { 
+            flex: 1;
+            overflow-y: auto; 
+            padding: 0.5rem 0;
+        }
+
+        .notification-item { 
+            padding: 1rem 1.2rem; 
+            border-bottom: 1px solid var(--gray-border); 
+            cursor: pointer; 
+            transition: background 0.2s ease;
+            margin: 0.3rem 0.8rem;
+            border-radius: 16px;
+        }
+
+        .notification-item:hover { 
+            background: var(--gray-bg); 
+        }
+
+        .notification-item.unread { 
+            background: rgba(76, 168, 150, 0.1); 
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon-type {
+            font-size: 1.3rem;
+        }
+
+        .notification-type-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-message { background: #e3f2fd; color: #1976d2; }
+        .badge-absence { background: #ffebee; color: #c62828; }
+        .badge-retard { background: #fff8e1; color: #f57c00; }
+        .badge-note { background: #e8f5e9; color: #2e7d32; }
+        .badge-annonce { background: #f3e5f5; color: #7b1fa2; }
+
+        .notification-title { 
+            font-weight: 700; 
+            color: var(--text-dark); 
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .notification-message { 
+            font-size: 0.85rem; 
+            color: var(--text-soft); 
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .notification-time { 
+            font-size: 0.7rem; 
+            color: var(--text-light);
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .notifications-empty { 
+            padding: 3rem 2rem; 
+            text-align: center; 
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .notifications-footer { 
+            padding: 1rem; 
+            text-align: center; 
+            border-top: 1px solid var(--gray-border); 
+            background: var(--gray-bg);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .notifications-footer button { 
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notifications-footer button:hover {
+            background: var(--primary-dark);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .notification-toast {
+            background: var(--primary-green);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            cursor: pointer;
+            min-width: 280px;
+            max-width: 350px;
+        }
+
+        .notification-toast:hover {
+            transform: scale(1.02);
+        }
+
+        .notification-toast strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .notification-toast small {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 4rem);
+            background: white;
+            border-radius: 16px;
+        }
+
+        body.dark-mode .loading-container {
+            background: #1a1a2e;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+    </style>
+</head>
+<body>
+    <aside class="saghiry-sidebar" id="saghirySidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-top">
+                <div class="logo-wrapper">
+                    <img src="public/images/Logo-saghiry.png" alt="SAGHIRY" class="sidebar-logo" onerror="this.style.display='none'">
+                    <span class="sidebar-logo-text">SAGHIRY</span>
+                </div>
+                <div class="notification-icon" id="notificationIcon">
+                    <span>🔔</span>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+            </div>
+            <div class="sidebar-session">
+                <span id="sessionLabelText">📅 SESSION ACTIVE:</span>
+                <strong id="sessionYear">2025 - 2026</strong>
+                <span class="session-badge" id="roleBadgeText">Administration</span>
+            </div>
+        </div>
+
+        <div class="user-profile-card" id="userProfileCard">
+            <div class="profile-avatar" id="profileAvatar">AD</div>
+            <div class="profile-info">
+                <div class="profile-name" id="profileName">Chargement...</div>
+                <span class="profile-role" id="profileRoleText">Administration</span>
+                <div class="profile-email" id="profileEmail">admin@saghiry.edu.ma</div>
+            </div>
+        </div>
+
+        <div class="sidebar-search">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="globalSearch" 
+                       placeholder="Rechercher un élève, un professeur..." 
+                       autocomplete="off">
+            </div>
+        </div>
+
+        <nav class="sidebar-nav" id="sidebarNav">
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionManagement">GESTION</div>
+                <div class="nav-item" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text" id="navDashboardText">Tableau de bord</span>
+                </div>
+                <div class="nav-item" data-page="parents">
+                    <span class="nav-icon">👪</span>
+                    <span class="nav-text" id="navParentsText">Parents</span>
+                </div>
+                <div class="nav-item" data-page="eleves">
+                    <span class="nav-icon">🧑‍🎓</span>
+                    <span class="nav-text" id="navStudentsText">Élèves</span>
+                </div>
+                <div class="nav-item" data-page="enseignants">
+                    <span class="nav-icon">👨‍🏫</span>
+                    <span class="nav-text" id="navTeachersText">Enseignants</span>
+                </div>
+                <div class="nav-item" data-page="salles">
+                    <span class="nav-icon">🏢</span>
+                    <span class="nav-text" id="navRoomsText">Salles</span>
+                </div>
+                <div class="nav-item" data-page="admin-voeux">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text" id="navTeacherWishesText">Vœux enseignants</span>
+                </div>
+                <div class="nav-item" data-page="gestion-conges">
+                    <span class="nav-icon">🏖️</span>
+                    <span class="nav-text" id="navLeaveRequestsText">Demandes de congé</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionAcademic">ACADÉMIQUE</div>
+                <div class="nav-item" data-page="classes">
+                    <span class="nav-icon">🏛️</span>
+                    <span class="nav-text" id="navClassesText">Classes</span>
+                </div>
+                <div class="nav-item" data-page="matieres">
+                    <span class="nav-icon">📐</span>
+                    <span class="nav-text" id="navSubjectsText">Matières</span>
+                </div>
+                <div class="nav-item" data-page="emploi-temps">
+                    <span class="nav-icon">⏰</span>
+                    <span class="nav-text" id="navTimetableText">Emploi du temps</span>
+                </div>
+                <div class="nav-item" data-page="examen">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text" id="navExamManagementText">Gestion examen</span>
+                </div>
+                <div class="nav-item" data-page="notes-et-moyennes">
+                    <span class="nav-icon">⭐</span>
+                    <span class="nav-text" id="navGradesText">Notes & Moyennes</span>
+                </div>
+                <div class="nav-item" data-page="calendrier">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text" id="navCalendarText">Calendrier scolaire</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionCommunication">COMMUNICATION</div>
+                <div class="nav-item" data-page="annonces">
+                    <span class="nav-icon">📢</span>
+                    <span class="nav-text" id="navAnnouncementsText">Annonces</span>
+                </div>
+                <div class="nav-item" data-page="messagerie">
+                    <span class="nav-icon">✉️</span>
+                    <span class="nav-text" id="navMessagingText">Messagerie</span>
+                    <span class="nav-badge" id="messagesBadge" style="display: none;">0</span>
+                </div>
+                <div class="nav-item" data-page="donation">
+                    <span class="nav-icon">💰</span>
+                    <span class="nav-text" id="navDonationText">Donation</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title" id="sectionSystem">SYSTÈME</div>
+                <div class="nav-item" data-page="parametres">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text" id="navSettingsText">Paramètres</span>
+                </div>
+            </div>
+        </nav>
+
+        <div class="logout-section">
+            <div class="logout-btn" id="logoutBtn">
+                <span>🚪</span>
+                <span id="logoutText">Déconnexion</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content-area" id="mainContentArea">
+        <div id="dynamicContent" class="page-transition">
+            <div class="loading-container">
+                <div style="text-align: center;">
+                    <div class="loading-spinner"></div>
+                    <p id="loadingMsg" style="margin-top: 1rem; color: var(--text-light);">Chargement de l'espace administration...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="notifications-overlay" id="notificationsOverlay"></div>
+
+    <div class="notifications-dropdown" id="notificationsDropdown">
+        <div class="notifications-header">
+            <span id="notifHeaderTitle">🔔 Mes notifications</span>
+            <div style="display: flex; gap: 10px;">
+                <span class="mark-all-read" id="markAllReadBtn">✓ Tout marquer lu</span>
+                <span class="close-notifications" id="closeNotificationsBtn">✕</span>
+            </div>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+            <div class="notifications-empty" id="noNotifMsg">📭 Aucune notification</div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION ADMIN COMPLÈTE - STYLE ENSEIGNANT
+        // ============================================
+        
+        const ADMIN_CONFIG = {
+            currentPage: 'dashboard',
+            user: { name: 'Administrateur', role: 'Administration', email: '', initials: 'AD', id: null },
+            token: null,
+            sessionYear: '2025 - 2026',
+            notifications: [],
+            unreadCount: 0,
+            unreadMessagesCount: 0
+        };
+
+        const notificationTypeConfig = {
+            'message': { label: 'Message', class: 'badge-message', icon: '💬' },
+            'absence': { label: 'Absence', class: 'badge-absence', icon: '❌' },
+            'retard': { label: 'Retard', class: 'badge-retard', icon: '⏰' },
+            'note': { label: 'Information', class: 'badge-note', icon: '📝' },
+            'annonce': { label: 'Annonce', class: 'badge-annonce', icon: '📢' },
+            'evenement': { label: 'Événement', class: 'badge-note', icon: '📅' }
+        };
+
+        let currentLang = 'fr';
+        let appSettings = {
+            theme: localStorage.getItem('saghiry_theme') || 'clair',
+            langue: localStorage.getItem('saghiry_langue') || 'fr',
+            couleurPrimaire: localStorage.getItem('saghiry_primary_color') || '#4ca896',
+            couleurSecondaire: localStorage.getItem('saghiry_secondary_color') || '#ff9466'
+        };
+
+        const translations = {
+            fr: {
+                sessionLabel: "📅 SESSION ACTIVE:", roleBadgeText: "Administration",
+                notifHeaderTitle: "🔔 Mes notifications", markAllRead: "✓ Tout marquer lu", noNotifMsg: "📭 Aucune notification",
+                searchPlaceholder: "Rechercher un élève, un professeur...",
+                profileRoleText: "Administration",
+                sectionManagement: "GESTION", navDashboardText: "Tableau de bord", navParentsText: "Parents",
+                navStudentsText: "Élèves", navTeachersText: "Enseignants", navRoomsText: "Salles",
+                navTeacherWishesText: "Vœux enseignants", navLeaveRequestsText: "Demandes de congé",
+                sectionAcademic: "ACADÉMIQUE", navClassesText: "Classes", navSubjectsText: "Matières",
+                navTimetableText: "Emploi du temps", navExamManagementText: "Gestion examen",
+                navGradesText: "Notes & Moyennes", navCalendarText: "Calendrier scolaire",
+                sectionCommunication: "COMMUNICATION", navAnnouncementsText: "Annonces",
+                navMessagingText: "Messagerie", navDonationText: "Donation",
+                sectionSystem: "SYSTÈME", navSettingsText: "Paramètres",
+                logoutText: "Déconnexion", loadingMsg: "Chargement de l'espace administration..."
+            },
+            en: {
+                sessionLabel: "📅 ACTIVE SESSION:", roleBadgeText: "Administration",
+                notifHeaderTitle: "🔔 My notifications", markAllRead: "✓ Mark all as read", noNotifMsg: "📭 No notifications",
+                searchPlaceholder: "Search student, teacher...",
+                profileRoleText: "Administration",
+                sectionManagement: "MANAGEMENT", navDashboardText: "Dashboard", navParentsText: "Parents",
+                navStudentsText: "Students", navTeachersText: "Teachers", navRoomsText: "Rooms",
+                navTeacherWishesText: "Teacher wishes", navLeaveRequestsText: "Leave requests",
+                sectionAcademic: "ACADEMIC", navClassesText: "Classes", navSubjectsText: "Subjects",
+                navTimetableText: "Timetable", navExamManagementText: "Exam management",
+                navGradesText: "Grades & Averages", navCalendarText: "School calendar",
+                sectionCommunication: "COMMUNICATION", navAnnouncementsText: "Announcements",
+                navMessagingText: "Messaging", navDonationText: "Donation",
+                sectionSystem: "SYSTEM", navSettingsText: "Settings",
+                logoutText: "Logout", loadingMsg: "Loading administration space..."
+            },
+    
+        };
+
+        // ============ FONCTIONS UTILITAIRES ============
+        
+        function applyTranslation() {
+            const t = translations[currentLang];
+            if (!t) return;
+            
+            const elements = {
+                'sessionLabelText': t.sessionLabel, 'roleBadgeText': t.roleBadgeText,
+                'notifHeaderTitle': t.notifHeaderTitle, 'markAllReadBtn': t.markAllRead, 'noNotifMsg': t.noNotifMsg,
+                'globalSearch': t.searchPlaceholder, 'profileRoleText': t.profileRoleText,
+                'sectionManagement': t.sectionManagement, 'navDashboardText': t.navDashboardText,
+                'navParentsText': t.navParentsText, 'navStudentsText': t.navStudentsText,
+                'navTeachersText': t.navTeachersText, 'navRoomsText': t.navRoomsText,
+                'navTeacherWishesText': t.navTeacherWishesText, 'navLeaveRequestsText': t.navLeaveRequestsText,
+                'sectionAcademic': t.sectionAcademic, 'navClassesText': t.navClassesText,
+                'navSubjectsText': t.navSubjectsText, 'navTimetableText': t.navTimetableText,
+                'navExamManagementText': t.navExamManagementText, 'navGradesText': t.navGradesText,
+                'navCalendarText': t.navCalendarText, 'sectionCommunication': t.sectionCommunication,
+                'navAnnouncementsText': t.navAnnouncementsText, 'navMessagingText': t.navMessagingText,
+                'navDonationText': t.navDonationText, 'sectionSystem': t.sectionSystem,
+                'navSettingsText': t.navSettingsText, 'logoutText': t.logoutText, 'loadingMsg': t.loadingMsg
+            };
+
+            for (const [id, text] of Object.entries(elements)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            }
+            
+            // Appliquer la direction RTL pour l'arabe
+            if (currentLang === 'ar') {
+                document.body.setAttribute('dir', 'rtl');
+                document.documentElement.lang = 'ar';
+            } else {
+                document.body.setAttribute('dir', 'ltr');
+                document.documentElement.lang = currentLang;
+            }
+        }
+
+        function applyTheme() {
+            let theme = appSettings.theme;
+            if (theme === 'systeme') {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'sombre' : 'clair';
+            }
+            document.body.classList.toggle('dark-mode', theme === 'sombre');
+            document.documentElement.style.setProperty('--primary-green', appSettings.couleurPrimaire);
+            document.documentElement.style.setProperty('--accent-orange', appSettings.couleurSecondaire);
+        }
+
+        function getAuthToken() {
+            try {
+                let token = localStorage.getItem('authToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                token = sessionStorage.getItem('authToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                return null;
+            } catch(e) { return null; }
+        }
+
+        function getCurrentUser() {
+            try {
+                let userStr = localStorage.getItem('currentUser');
+                if (!userStr || userStr === 'undefined') userStr = sessionStorage.getItem('currentUser');
+                if (userStr && userStr !== 'undefined') return JSON.parse(userStr);
+                return null;
+            } catch(e) { return null; }
+        }
+
+        function getInitials(prenom, nom) {
+            if (prenom && nom) return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
+            if (prenom) return prenom.charAt(0).toUpperCase();
+            if (nom) return nom.charAt(0).toUpperCase();
+            return 'AD';
+        }
+
+        function updateProfileDisplay() {
+            const user = ADMIN_CONFIG.user;
+            const avatarEl = document.getElementById('profileAvatar');
+            const nameEl = document.getElementById('profileName');
+            const emailEl = document.getElementById('profileEmail');
+            if (avatarEl) avatarEl.textContent = user.initials;
+            if (nameEl) nameEl.textContent = user.name;
+            if (emailEl) emailEl.textContent = user.email;
+        }
+
+        function showToast(title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast';
+            toast.innerHTML = `<strong>${title}</strong><small>${message}</small>`;
+            toast.onclick = () => toast.remove();
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        function getNotificationTypeInfo(type) {
+            const key = (type || 'note').toLowerCase();
+            return notificationTypeConfig[key] || notificationTypeConfig['note'];
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const now = new Date();
+            const diffMins = Math.floor((now - d) / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'À l\'instant';
+            if (diffMins < 60) return `Il y a ${diffMins} min`;
+            if (diffHours < 24) return `Il y a ${diffHours} h`;
+            if (diffDays === 1) return 'Hier';
+            if (diffDays < 7) return `Il y a ${diffDays} jours`;
+            return d.toLocaleDateString('fr-FR');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // ============ NOTIFICATIONS ============
+
+async function loadNotifications() {
+    try {
+        const token = ADMIN_CONFIG.token;
+        if (!token) return;
+        
+        const adminEmail = ADMIN_CONFIG.user.email;
+        const adminId = ADMIN_CONFIG.user.id;
+        
+        let allNotifications = [];
+        
+        // STRATÉGIE 1: Récupérer TOUTES les notifications et filtrer par email
+        // Cette méthode fonctionne même si l'endpoint spécifique ne retourne rien
+        try {
+            const response = await fetch(`http://localhost:5267/api/Notification`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                let notifications = [];
+                
+                // Extraire les notifications de la réponse (quel que soit le format)
+                if (data.success && data.data) notifications = data.data;
+                else if (data.Success && data.Data) notifications = data.Data;
+                else if (Array.isArray(data)) notifications = data;
+                else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                else if (data.$values) notifications = data.$values;
+                
+                // Filtrer par email de l'admin
+                const filteredByEmail = notifications.filter(n => {
+                    const notifEmail = n.destinataireEmail || n.DestinataireEmail;
+                    return notifEmail && notifEmail.toLowerCase() === adminEmail.toLowerCase();
+                });
+                
+                allNotifications.push(...filteredByEmail);
+                console.log(`📧 ${filteredByEmail.length} notification(s) trouvée(s) par email`);
+            }
+        } catch (err) {
+            console.warn('Erreur récupération toutes notifications:', err);
+        }
+        
+        // STRATÉGIE 2: Essayer par email directement (si l'API le supporte)
+        if (adminEmail) {
+            try {
+                const response = await fetch(`http://localhost:5267/api/Notification/destinataire/${encodeURIComponent(adminEmail)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let notifications = [];
+                    
+                    if (data.success && data.data) notifications = data.data;
+                    else if (data.Success && data.Data) notifications = data.Data;
+                    else if (Array.isArray(data)) notifications = data;
+                    else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                    else if (data.$values) notifications = data.$values;
+                    
+                    allNotifications.push(...notifications);
+                    console.log(`📧 ${notifications.length} notification(s) trouvée(s) par endpoint email`);
+                }
+            } catch (err) {
+                console.warn('Erreur récupération par email:', err);
+            }
+        }
+        
+        // STRATÉGIE 3: Essayer par ID (si l'admin a un ID)
+        if (adminId && adminId !== 'null' && adminId !== 'undefined') {
+            try {
+                const response = await fetch(`http://localhost:5267/api/Notification/destinataire/${adminId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let notifications = [];
+                    
+                    if (data.success && data.data) notifications = data.data;
+                    else if (data.Success && data.Data) notifications = data.Data;
+                    else if (Array.isArray(data)) notifications = data;
+                    else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                    else if (data.$values) notifications = data.$values;
+                    
+                    allNotifications.push(...notifications);
+                    console.log(`🆔 ${notifications.length} notification(s) trouvée(s) par ID`);
+                }
+            } catch (err) {
+                console.warn('Erreur récupération par ID:', err);
+            }
+        }
+        
+        // STRATÉGIE 4: Chercher par email dans le message (fallback)
+        // Utile si les notifications sont stockées différemment
+        try {
+            const response = await fetch(`http://localhost:5267/api/Notification`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                let notifications = [];
+                
+                if (data.success && data.data) notifications = data.data;
+                else if (Array.isArray(data)) notifications = data;
+                else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                
+                // Chercher les notifications qui contiennent l'email de l'admin dans le message
+                const filteredByMessage = notifications.filter(n => {
+                    const message = (n.message || n.Message || '').toLowerCase();
+                    return message.includes(adminEmail.toLowerCase());
+                });
+                
+                // Ajouter uniquement celles qui ne sont pas déjà dans la liste
+                const existingIds = new Set(allNotifications.map(n => n.id || n._id || n.Id));
+                const newNotifications = filteredByMessage.filter(n => {
+                    const id = n.id || n._id || n.Id;
+                    return !existingIds.has(id);
+                });
+                
+                allNotifications.push(...newNotifications);
+                console.log(`💬 ${newNotifications.length} notification(s) trouvée(s) par message`);
+            }
+        } catch (err) {
+            console.warn('Erreur recherche par message:', err);
+        }
+        
+        // Dédupliquer les notifications par ID
+        const uniqueNotifications = [];
+        const seenIds = new Set();
+        
+        for (const notif of allNotifications) {
+            const notifId = notif.id || notif._id || notif.Id;
+            if (notifId && !seenIds.has(notifId)) {
+                seenIds.add(notifId);
+                uniqueNotifications.push(notif);
+            }
+        }
+        
+        // Trier par date (plus récentes d'abord)
+        uniqueNotifications.sort((a, b) => {
+            const dateA = new Date(a.date || a.Date || a.createdAt || 0);
+            const dateB = new Date(b.date || b.Date || b.createdAt || 0);
+            return dateB - dateA;
+        });
+        
+        // Mettre à jour la configuration
+        ADMIN_CONFIG.notifications = uniqueNotifications.slice(0, 50);
+        ADMIN_CONFIG.unreadCount = uniqueNotifications.filter(n => !n.lu).length;
+        
+        console.log(`✅ Total: ${ADMIN_CONFIG.notifications.length} notifications, ${ADMIN_CONFIG.unreadCount} non lues`);
+        
+        // Mettre à jour l'affichage
+        updateNotificationBadge();
+        renderNotificationsDropdown();
+        
+        // Afficher une notification toast si nécessaire
+        if (ADMIN_CONFIG.unreadCount > 0) {
+            const lastNotif = uniqueNotifications[0];
+            if (lastNotif && !lastNotif.lu) {
+                const titre = lastNotif.titre || lastNotif.Titre || 'Nouvelle notification';
+                showToast('🔔 Nouvelle notification', titre);
+            }
+        }
+        
+    } catch (error) { 
+        console.error('❌ Erreur chargement notifications:', error); 
+    }
+}
+
+// ============================================
+// AJOUTER CETTE FONCTION POUR RÉCUPÉRER L'ID DE L'ADMIN
+// ============================================
+
+async function fetchAdminIdByEmail(email) {
+    try {
+        const token = ADMIN_CONFIG.token;
+        if (!token || !email) return null;
+        
+        // Essayer plusieurs endpoints pour trouver l'admin
+        const endpoints = [
+            `http://localhost:5267/api/User/email/${encodeURIComponent(email)}`,
+            `http://localhost:5267/api/Users/email/${encodeURIComponent(email)}`,
+            `http://localhost:5267/api/Auth/user/by-email/${encodeURIComponent(email)}`
+        ];
+        
+        for (const endpoint of endpoints) {
+            try {
+                const response = await fetch(endpoint, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let user = data.data || data;
+                    if (user && user.id) {
+                        console.log(`✅ ID admin trouvé: ${user.id}`);
+                        ADMIN_CONFIG.user.id = user.id;
+                        localStorage.setItem('adminId', user.id);
+                        return user.id;
+                    }
+                }
+            } catch (err) {
+                // Continuer avec le prochain endpoint
+            }
+        }
+        
+        // Si aucun endpoint ne fonctionne, essayer de récupérer depuis le token JWT
+        const tokenParts = token.split('.');
+        if (tokenParts.length === 3) {
+            try {
+                const payload = JSON.parse(atob(tokenParts[1]));
+                if (payload.nameid || payload.sub) {
+                    const idFromToken = payload.nameid || payload.sub;
+                    console.log(`🆔 ID admin trouvé dans le token: ${idFromToken}`);
+                    ADMIN_CONFIG.user.id = idFromToken;
+                    localStorage.setItem('adminId', idFromToken);
+                    return idFromToken;
+                }
+            } catch (err) {
+                console.warn('Erreur décodage token:', err);
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erreur recherche ID admin:', error);
+        return null;
+    }
+}
+
+
+        async function loadUnreadMessagesCount() {
+            try {
+                const token = ADMIN_CONFIG.token;
+                if (!token) return;
+                
+                const userId = ADMIN_CONFIG.user.id;
+                const email = ADMIN_CONFIG.user.email;
+                
+                let totalCount = 0;
+                
+                if (userId) {
+                    const response = await fetch(`http://localhost:5267/api/Notification/messages/unread-count/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        totalCount += (data.data || data || 0);
+                    }
+                }
+                
+                if (email) {
+                    const response = await fetch(`http://localhost:5267/api/Notification/messages/unread-count/${encodeURIComponent(email)}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        totalCount += (data.data || data || 0);
+                    }
+                }
+                
+                ADMIN_CONFIG.unreadMessagesCount = totalCount;
+                
+                const messagesBadge = document.getElementById('messagesBadge');
+                if (messagesBadge) {
+                    if (totalCount > 0) {
+                        messagesBadge.textContent = totalCount > 99 ? '99+' : totalCount;
+                        messagesBadge.style.display = 'inline-block';
+                    } else {
+                        messagesBadge.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement messages non lus:', error);
+            }
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                const count = ADMIN_CONFIG.unreadCount;
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        }
+
+        function renderNotificationsDropdown() {
+            const listContainer = document.getElementById('notificationsList');
+            if (!listContainer) return;
+            
+            if (!ADMIN_CONFIG.notifications.length) {
+                listContainer.innerHTML = '<div class="notifications-empty">📭 Aucune notification</div>';
+                return;
+            }
+            
+            let html = '';
+            for (const notif of ADMIN_CONFIG.notifications) {
+                const notifId = notif.id || notif._id || notif.Id;
+                if (!notifId) continue;
+                
+                const date = notif.date || notif.Date || notif.createdAt;
+                const timeAgo = formatDate(date);
+                const unreadClass = !notif.lu ? 'unread' : '';
+                const titre = notif.titre || notif.Titre || 'Notification';
+                const message = notif.message || notif.Message || '';
+                const typeNotif = notif.typeNotification || notif.TypeNotification || 'note';
+                const typeInfo = getNotificationTypeInfo(typeNotif);
+                
+                html += `<div class="notification-item ${unreadClass}" data-id="${notifId}" onclick="window.handleNotificationClick('${notifId}')">
+                            <div class="notification-header">
+                                <div class="notification-icon-type">${typeInfo.icon}</div>
+                                <span class="notification-type-badge ${typeInfo.class}">${typeInfo.label}</span>
+                            </div>
+                            <div class="notification-title">${escapeHtml(titre)}</div>
+                            <div class="notification-message">${escapeHtml(message)}</div>
+                            <div class="notification-time">
+                                <span>📅</span> ${timeAgo}
+                            </div>
+                        </div>`;
+            }
+            listContainer.innerHTML = html;
+        }
+
+        async function markAsRead(notificationId) {
+            if (!notificationId || notificationId === 'undefined' || notificationId === 'null') return false;
+            
+            try {
+                const token = ADMIN_CONFIG.token;
+                if (!token) return false;
+                
+                const response = await fetch(`http://localhost:5267/api/Notification/${notificationId}/marquer-lue`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const notif = ADMIN_CONFIG.notifications.find(n => (n.id || n._id || n.Id) === notificationId);
+                    if (notif && !notif.lu) {
+                        notif.lu = true;
+                        ADMIN_CONFIG.unreadCount = Math.max(0, ADMIN_CONFIG.unreadCount - 1);
+                        updateNotificationBadge();
+                        renderNotificationsDropdown();
+                    }
+                    return true;
+                }
+                return false;
+            } catch (error) { 
+                console.error('Erreur marquage notification:', error); 
+                return false;
+            }
+        }
+
+        async function handleNotificationClick(notificationId) {
+            if (!notificationId) return;
+            await markAsRead(notificationId);
+            closeNotificationsModal();
+        }
+
+        async function markAllNotificationsAsRead() {
+            try {
+                const token = ADMIN_CONFIG.token;
+                if (!token) return;
+                
+                const email = ADMIN_CONFIG.user.email;
+                if (email) {
+                    await fetch(`http://localhost:5267/api/Notification/destinataire/${encodeURIComponent(email)}/marquer-toutes-lues`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                
+                const userId = ADMIN_CONFIG.user.id;
+                if (userId) {
+                    await fetch(`http://localhost:5267/api/Notification/destinataire/${userId}/marquer-toutes-lues`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                }
+                
+                ADMIN_CONFIG.notifications.forEach(n => n.lu = true);
+                ADMIN_CONFIG.unreadCount = 0;
+                updateNotificationBadge();
+                renderNotificationsDropdown();
+            } catch (error) { 
+                console.error('Erreur marquage toutes notifications:', error); 
+            }
+        }
+
+        function openNotificationsModal() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const overlay = document.getElementById('notificationsOverlay');
+            if (dropdown && overlay) {
+                loadNotifications();
+                dropdown.classList.add('show');
+                overlay.classList.add('show');
+            }
+        }
+
+        function closeNotificationsModal() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const overlay = document.getElementById('notificationsOverlay');
+            if (dropdown) dropdown.classList.remove('show');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function startNotificationPolling() { 
+            setInterval(() => {
+                loadNotifications();
+                loadUnreadMessagesCount();
+            }, 30000);
+        }
+
+        // ============ NAVIGATION ============
+
+        function loadPageContent(pageName) {
+            const contentDiv = document.getElementById('dynamicContent');
+            const pageFiles = {
+                'dashboard': 'dashboard.html', 'parents': 'parents.html', 'eleves': 'eleves.html',
+                'enseignants': 'enseignants.html', 'salles': 'Salles.html', 'admin-voeux': 'admin-voeux.html',
+                'classes': 'classes.html', 'matieres': 'matieres.html', 'emploi-temps': 'emploi-temps.html',
+                'annonces': 'annonces.html', 'messagerie': 'messagerie.html', 'notifications': 'notifications.html',
+                'calendrier': 'calendrier.html', 'donation': 'donation.html', 'parametres': 'parametres.html',
+                'gestion-conges': 'gestion-conges.html', 'examen': 'examen.html', 'notes-et-moyennes': 'notes-et-moyennes.html'
+            };
+            const filePath = pageFiles[pageName] || `${pageName}.html`;
+            
+            ADMIN_CONFIG.currentPage = pageName;
+            sessionStorage.setItem('currentAdminPage', pageName);
+            
+            contentDiv.innerHTML = `<div class="loading-container">
+                                        <div style="text-align: center;">
+                                            <div class="loading-spinner"></div>
+                                            <p style="margin-top: 1rem; color: var(--text-light);">${translations[currentLang]?.loadingMsg || 'Chargement...'}</p>
+                                        </div>
+                                    </div>`;
+            
+            setTimeout(() => {
+                contentDiv.innerHTML = `<iframe src="${filePath}" class="dynamic-iframe" id="contentFrame" title="${pageName}"></iframe>`;
+                setTimeout(() => {
+                    const iframe = document.getElementById('contentFrame');
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({ type: 'saghiry-settings-response', settings: appSettings }, '*');
+                        if (ADMIN_CONFIG.token) {
+                            iframe.contentWindow.postMessage({ type: 'SET_TOKEN', token: ADMIN_CONFIG.token, user: ADMIN_CONFIG.user }, '*');
+                        }
+                    }
+                }, 500);
+            }, 300);
+        }
+
+        function updateActiveNavItem(pageName) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.dataset.page === pageName) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // ============ INITIALISATION ============
+
+        function initializeSidebar() {
+            console.log('🚀 Initialisation de l\'espace Administration...');
+            
+            const token = getAuthToken();
+            const user = getCurrentUser();
+            
+            if (!token || !user) {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            
+            const role = (user.role || '').toLowerCase();
+            if (role !== 'admin' && role !== 'administration') {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            
+            ADMIN_CONFIG.token = token;
+            
+            localStorage.setItem('authToken', token);
+            sessionStorage.setItem('authToken', token);
+            
+            let fullName = '';
+            if (user.prenom && user.nom) fullName = `${user.prenom} ${user.nom}`;
+            else if (user.prenom) fullName = user.prenom;
+            else if (user.nom) fullName = user.nom;
+            else if (user.email) fullName = user.email.split('@')[0];
+            else fullName = 'Administrateur';
+            
+            ADMIN_CONFIG.user = {
+                name: fullName,
+                role: 'Administration',
+                email: user.email || '',
+                initials: getInitials(user.prenom, user.nom),
+                id: user.id
+            };
+            
+            const savedLang = localStorage.getItem('saghiry_langue');
+            if (savedLang && ['fr', 'en', 'ar'].includes(savedLang)) {
+                currentLang = savedLang;
+                appSettings.langue = savedLang;
+            }
+            
+            const savedTheme = localStorage.getItem('saghiry_theme');
+            if (savedTheme) appSettings.theme = savedTheme;
+            
+            const savedPrimary = localStorage.getItem('saghiry_primary_color');
+            if (savedPrimary) appSettings.couleurPrimaire = savedPrimary;
+            
+            const savedSecondary = localStorage.getItem('saghiry_secondary_color');
+            if (savedSecondary) appSettings.couleurSecondaire = savedSecondary;
+            
+            applyTheme();
+            applyTranslation();
+            updateProfileDisplay();
+            
+            const savedPage = sessionStorage.getItem('currentAdminPage') || 'dashboard';
+            loadPageContent(savedPage);
+            updateActiveNavItem(savedPage);
+            
+            loadNotifications();
+            loadUnreadMessagesCount();
+            startNotificationPolling();
+        }
+
+        function attachEventListeners() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    if (!page) return;
+                    
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    loadPageContent(page);
+                    closeNotificationsModal();
+                });
+            });
+            
+            const notificationIcon = document.getElementById('notificationIcon');
+            if (notificationIcon) {
+                notificationIcon.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    openNotificationsModal(); 
+                });
+            }
+            
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    markAllNotificationsAsRead(); 
+                });
+            }
+            
+            const closeBtn = document.getElementById('closeNotificationsBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    closeNotificationsModal(); 
+                });
+            }
+            
+            const overlay = document.getElementById('notificationsOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() { 
+                    closeNotificationsModal(); 
+                });
+            }
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) { 
+                    e.preventDefault(); 
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.href = 'saghiry-auth.html';
+                });
+            }
+            
+            const globalSearch = document.getElementById('globalSearch');
+            if (globalSearch) {
+                globalSearch.addEventListener('keyup', function(e) {
+                    document.dispatchEvent(new CustomEvent('saghiryGlobalSearch', { 
+                        detail: { term: e.target.value, page: ADMIN_CONFIG.currentPage } 
+                    }));
+                });
+            }
+            
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                const theme = localStorage.getItem('saghiry_theme');
+                if (theme === 'systeme') {
+                    applyTheme();
+                }
+            });
+            
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'saghiry-settings-update') {
+                    if (event.data.settings) {
+                        appSettings = { ...appSettings, ...event.data.settings };
+                        localStorage.setItem('saghiry_theme', appSettings.theme);
+                        localStorage.setItem('saghiry_langue', appSettings.langue);
+                        localStorage.setItem('saghiry_primary_color', appSettings.couleurPrimaire);
+                        localStorage.setItem('saghiry_secondary_color', appSettings.couleurSecondaire);
+                        currentLang = appSettings.langue;
+                        applyTheme();
+                        applyTranslation();
+                    }
+                }
+                
+                if (event.data && event.data.type === 'REQUEST_TOKEN' && event.source) {
+                    event.source.postMessage({
+                        type: 'SET_TOKEN',
+                        token: ADMIN_CONFIG.token,
+                        user: ADMIN_CONFIG.user
+                    }, '*');
+                }
+                
+                if (event.data && event.data.type === 'newMessage') {
+                    loadUnreadMessagesCount();
+                    showToast('📩 Nouveau message', event.data.senderName + ' vous a envoyé un message');
+                }
+            });
+        }
+
+        // Exposer les fonctions globales
+        window.handleNotificationClick = handleNotificationClick;
+        window.markAsRead = markAsRead;
+        window.AdminSpace = {
+            getToken: () => ADMIN_CONFIG.token,
+            getCurrentUser: () => ADMIN_CONFIG.user,
+            refreshNotifications: loadNotifications,
+            refreshMessagesCount: loadUnreadMessagesCount
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSidebar();
+            attachEventListeners();
+        });
+    </script>
+</body>
+</html>

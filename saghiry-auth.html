@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Authentification</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 50%, #2d6b63 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+        
+        .container { 
+            max-width: 500px; 
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header { 
+            text-align: center; 
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-img {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 1rem;
+            display: block;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .tagline { 
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d6b63;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .card-subtitle {
+            color: #5a9d91;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        
+        .form-group { 
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            color: #2d6b63;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: #f8faf9;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #2d6b63;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input::placeholder {
+            color: #a0b5b0;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #4ca896;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(76, 168, 150, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        /* Conteneur pour le champ mot de passe + bouton œil */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        
+        .password-wrapper .form-input {
+            padding-right: 3.2rem;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+            width: 24px;
+            height: 24px;
+        }
+        
+        .toggle-password:hover {
+            opacity: 0.7;
+        }
+        
+        .eye-icon {
+            width: 20px;
+            height: 20px;
+            display: block;
+            stroke: #5a9d91;
+            stroke-width: 1.8;
+            fill: none;
+            transition: stroke 0.2s;
+        }
+        
+        .toggle-password:hover .eye-icon {
+            stroke: #2d6b63;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(76, 168, 150, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 168, 150, 0.4);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            animation: slideIn 0.4s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #e6f7f4 0%, #d4f1ea 100%);
+            border: 1px solid #4ca896;
+            color: #2d6b63;
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+            border: 1px solid #ff6b6b;
+            color: #c92a2a;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);
+            border: 1px solid #339af0;
+            color: #1864ab;
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #ff9466;
+            border: 2px solid #ff9466;
+            margin-top: 1rem;
+            box-shadow: 0 2px 8px rgba(255, 148, 102, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #ff9466 0%, #ff7b3d 100%);
+            color: white;
+            border-color: #ff9466;
+        }
+        
+        .timer {
+            text-align: center;
+            color: #5a9d91;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f1f8f6;
+            border-radius: 8px;
+        }
+        
+        .timer-value {
+            color: #ff9466;
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+        
+        .code-input-group {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .code-digit {
+            width: 55px;
+            height: 65px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: #f8faf9;
+            border: 2px solid #e0e9e7;
+            border-radius: 12px;
+            color: #2d6b63;
+            transition: all 0.3s ease;
+        }
+        
+        .code-digit:focus {
+            outline: none;
+            border-color: #4ca896;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(76, 168, 150, 0.15);
+            transform: scale(1.05);
+        }
+        
+        .user-role {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role-administration { 
+            background: linear-gradient(135deg, #ff9466 0%, #ff7b3d 100%);
+            color: white; 
+        }
+        
+        .role-enseignant { 
+            background: linear-gradient(135deg, #4ca896 0%, #3d8a7f 100%);
+            color: white; 
+        }
+        
+        .role-permanent { 
+            background: linear-gradient(135deg, #339af0 0%, #1c7ed6 100%);
+            color: white; 
+        }
+        
+        .role-parent { 
+            background: linear-gradient(135deg, #9775fa 0%, #845ef7 100%);
+            color: white; 
+        }
+        
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .code-digit {
+                width: 48px;
+                height: 58px;
+                font-size: 1.6rem;
+            }
+            
+            .code-input-group {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <img src="public/images/Logo-saghiry.png" alt="SAGHIRY Logo" class="logo-img">
+            <p class="tagline">Système de Gestion Scolaire Intelligent</p>
+        </div>
+
+        <!-- PAGE DE CONNEXION -->
+        <div id="loginPage" class="auth-card">
+            <h2 class="card-title">Connexion</h2>
+            <p class="card-subtitle">Accédez à votre espace personnel</p>
+            <div id="loginAlert"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="identifier">Email ou CIN</label>
+                    <input type="text" id="identifier" name="identifier" class="form-input" placeholder="admin@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" data-target="password" aria-label="Afficher/masquer le mot de passe">
+                            <svg class="eye-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Par défaut (mot de passe masqué) : œil barré -->
+                                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" fill="none"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/>
+                                <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn" id="loginButton">Se connecter</button>
+            </form>
+        </div>
+
+        <!-- PAGE 2FA -->
+        <div id="twoFactorPage" class="auth-card hidden">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: #8b5cf6; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                    <span style="color: white; font-size: 1.8rem;">👪</span>
+                </div>
+            </div>
+            <h2 class="card-title">🔐 Code de vérification</h2>
+            <p class="card-subtitle" id="twoFactorGreeting">
+                Un code de vérification a été envoyé à votre email
+            </p>
+            <div id="twoFactorAlert"></div>
+            <form id="twoFactorForm">
+                <div class="code-input-group" id="codeInputGroup"></div>
+                <div class="timer">
+                    ⏳ Code expire dans <span id="timerValue" class="timer-value">10:00</span>
+                </div>
+                <button type="submit" class="btn" id="verifyButton" style="margin-top: 2rem;">
+                    Vérifier le code
+                </button>
+                <button type="button" class="btn btn-secondary" id="resendCodeBtn">
+                    Renvoyer le code
+                </button>
+                <button type="button" class="btn" id="backToLoginBtn" style="background: #64748b; margin-top: 0.5rem;">
+                    Retour à la connexion
+                </button>
+            </form>
+        </div>
+
+        <!-- PAGE CHANGEMENT MOT DE PASSE FORCÉ -->
+        <div id="forcePasswordPage" class="auth-card hidden">
+            <h2 class="card-title">Changement de mot de passe</h2>
+            <p class="card-subtitle">Pour des raisons de sécurité, veuillez créer un nouveau mot de passe</p>
+            <div id="forcePasswordAlert"></div>
+            <form id="forcePasswordForm">
+                <div class="form-group">
+                    <label class="form-label" for="forceEmail">Email</label>
+                    <input type="email" id="forceEmail" name="forceEmail" class="form-input" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newPassword">Nouveau mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="newPassword" name="newPassword" class="form-input" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" data-target="newPassword" aria-label="Afficher/masquer le mot de passe">
+                            <svg class="eye-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" fill="none"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/>
+                                <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirmer le mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="••••••••" required>
+                        <button type="button" class="toggle-password" data-target="confirmPassword" aria-label="Afficher/masquer le mot de passe">
+                            <svg class="eye-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" fill="none"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/>
+                                <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn" id="forcePasswordButton">
+                    Changer mon mot de passe
+                </button>
+            </form>
+        </div>
+
+        <!-- PAGE DASHBOARD -->
+        <div id="dashboardPage" class="auth-card hidden">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: #059669; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto;">
+                    <span id="userInitials" style="color: white; font-size: 2rem; font-weight: bold;">👤</span>
+                </div>
+                <h2 class="card-title" id="dashboardTitle">Bienvenue</h2>
+                <span id="userRoleBadge" class="user-role"></span>
+            </div>
+            <div id="dashboardContent" style="text-align: center; padding: 1rem; background: #f8fafc; border-radius: 12px;">
+                <p id="userFullName" style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin-bottom: 0.5rem;"></p>
+                <p id="userEmail" style="color: #64748b; margin-bottom: 1rem;"></p>
+                <p style="color: #10b981; font-weight: 600;">✅ Connecté avec succès</p>
+                <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 1rem;" id="connectionTime"></p>
+            </div>
+            <button id="logoutBtn" class="btn btn-secondary" style="margin-top: 2rem;">
+                Déconnexion
+            </button>
+        </div>
+    </div>
+
+<script>
+    // ============================================
+    // CONFIGURATION DES URLs BACKEND
+    // ============================================
+    const BACKEND_PORT = '5267';
+    const API_BASE_URL = `http://localhost:${BACKEND_PORT}`;
+    const LOGIN_URL = `${API_BASE_URL}/api/utilisateurs/login`;
+    const VERIFY_2FA_URL = `${API_BASE_URL}/api/utilisateurs/verify-2fa`;
+    const COMPLETE_2FA_URL = `${API_BASE_URL}/api/utilisateurs/complete-2fa`;
+    const FORCE_CHANGE_PASSWORD_URL = `${API_BASE_URL}/api/utilisateurs/force-change-password`;
+    const LOGOUT_URL = `${API_BASE_URL}/api/utilisateurs/logout`;
+    const RESEND_2FA_URL = `${API_BASE_URL}/api/utilisateurs/resend-2fa`;
+
+    // ============================================
+    // ÉTAT GLOBAL DE L'APPLICATION
+    // ============================================
+    const state = {
+        currentView: 'login',       // 'login', 'twoFactor', 'forcePassword', 'dashboard'
+        sessionId: null,            // ID de session pour la 2FA
+        email: null,                // Email de l'utilisateur en cours
+        user: null,                 // Objet utilisateur complet
+        token: null,                // Token JWT
+        twoFactorTimer: null,       // Référence du timer 2FA
+        twoFactorTimeLeft: 600      // Temps restant en secondes (10 minutes)
+    };
+
+    // ============================================
+    // INITIALISATION AU CHARGEMENT DE LA PAGE
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🧹 Nettoyage des sessions...');
+        
+        // Sauvegarde temporaire des données 2FA avant nettoyage
+        const twoFactorSessionId = sessionStorage.getItem('twoFactorSessionId') || localStorage.getItem('twoFactorSessionId');
+        const twoFactorEmail = sessionStorage.getItem('twoFactorEmail') || localStorage.getItem('twoFactorEmail');
+        
+        // Nettoyage complet des storages pour éviter les sessions orphelines
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Restauration des données 2FA si elles existaient
+        if (twoFactorSessionId && twoFactorEmail) {
+            sessionStorage.setItem('twoFactorSessionId', twoFactorSessionId);
+            sessionStorage.setItem('twoFactorEmail', twoFactorEmail);
+            console.log('✅ Données 2FA restaurées');
+        }
+        
+        // Vérification d'une session existante (token + utilisateur)
+        const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        const userStr = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
+        
+        if (token && userStr) {
+            try {
+                const parsedUser = JSON.parse(userStr);
+                console.log('👤 Utilisateur trouvé:', parsedUser.email, 'Rôle:', parsedUser.role);
+                
+                // Redirection automatique selon le rôle vers les tableaux de bord respectifs
+                if (parsedUser.role === 'admin' || parsedUser.role === 'superadmin') {
+                    console.log('➡️ Redirection vers index.html');
+                    window.location.href = 'index.html';
+                    return;
+                } else if (parsedUser.role === 'enseignant' || parsedUser.role === 'permanent') {
+                    console.log('➡️ Redirection vers enseignant-index.html');
+                    window.location.href = 'enseignant-index.html';
+                    return;
+                } else if (parsedUser.role === 'parent') {
+                    console.log('➡️ Redirection vers parent-index.html');
+                    window.location.href = 'parent-index.html';
+                    return;
+                } else {
+                    console.log('🧹 Rôle inconnu, suppression de la session');
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    sessionStorage.removeItem('authToken');
+                    sessionStorage.removeItem('currentUser');
+                }
+            } catch (e) {
+                console.error('❌ Erreur parsing session:', e);
+                localStorage.clear();
+                sessionStorage.clear();
+            }
+        } else {
+            console.log('✅ Aucune session active, affichage page login');
+        }
+        
+        initEventListeners();     // Initialisation des écouteurs d'événements
+        createCodeInputs();       // Création des champs pour le code 2FA
+        initPasswordToggles();    // Initialisation des toggles d'affichage mot de passe (œil)
+    });
+
+    // ============================================
+    // ÉCOUTEURS D'ÉVÉNEMENTS PRINCIPAUX
+    // ============================================
+    function initEventListeners() {
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('twoFactorForm').addEventListener('submit', handleVerify2FA);
+        document.getElementById('resendCodeBtn').addEventListener('click', handleResendCode);
+        document.getElementById('backToLoginBtn').addEventListener('click', () => showView('login'));
+        document.getElementById('forcePasswordForm').addEventListener('submit', handleForceChangePassword);
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    }
+
+    // ============================================
+    // FONCTION DE BASCULE MOT DE PASSE (ŒIL BARRÉ / ŒIL OUVERT)
+    // Convention : quand le champ est de type "password" (masqué) → icône œil barré
+    //              quand le champ est de type "text" (visible) → icône œil ouvert sans barre
+    // ============================================
+    function initPasswordToggles() {
+        const toggles = document.querySelectorAll('.toggle-password');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                if (input) {
+                    const isPassword = input.type === 'password';
+                    // Inverser le type
+                    input.type = isPassword ? 'text' : 'password';
+                    
+                    // Modifier le SVG en fonction du nouvel état
+                    const svg = this.querySelector('.eye-icon');
+                    if (svg) {
+                        if (input.type === 'password') {
+                            // Mot de passe masqué → œil barré
+                            svg.innerHTML = `
+                                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" fill="none"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/>
+                                <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                            `;
+                        } else {
+                            // Mot de passe visible → œil ouvert sans barre
+                            svg.innerHTML = `
+                                <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" fill="none"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" fill="none"/>
+                            `;
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    // ============================================
+    // CRÉATION DES 6 CHAMPS POUR LE CODE 2FA
+    // ============================================
+    function createCodeInputs() {
+        const container = document.getElementById('codeInputGroup');
+        container.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = '1';
+            input.className = 'code-digit';
+            input.id = `code-${i}`;
+            input.name = `code-${i}`;
+            input.dataset.index = i;
+            input.setAttribute('inputmode', 'numeric');
+            input.setAttribute('pattern', '[0-9]*');
+            
+            // Passage automatique au champ suivant quand un chiffre est saisi
+            input.addEventListener('input', function(e) {
+                if (e.target.value && i < 5) {
+                    container.children[i + 1]?.focus();
+                }
+            });
+            // Retour arrière pour revenir au champ précédent
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !this.value && i > 0) {
+                    container.children[i - 1]?.focus();
+                }
+            });
+            container.appendChild(input);
+        }
+    }
+
+    // ============================================
+    // TRAITEMENT DE LA CONNEXION (LOGIN)
+    // ============================================
+    async function handleLogin(e) {
+        e.preventDefault();
+        const identifier = document.getElementById('identifier').value;
+        const password = document.getElementById('password').value;
+        const button = document.getElementById('loginButton');
+        
+        button.disabled = true;
+        button.innerHTML = 'Connexion...';
+        showAlert('loginAlert', 'info', 'Connexion en cours...');
+
+        try {
+            const response = await fetch(LOGIN_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ emailOrCIN: identifier, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                showAlert('loginAlert', 'error', data.message || 'Identifiants incorrects');
+                button.disabled = false;
+                button.innerHTML = 'Se connecter';
+                return;
+            }
+
+            const userRole = (data.role || data.Role || '').toLowerCase();
+            
+            // CAS 1 : PARENT - 2FA requis
+            if (userRole === 'parent') {
+                console.log('✅ 2FA requis - Parent');
+                
+                state.sessionId = data.SessionId || data.sessionId;
+                state.email = data.Email || data.email || identifier;
+                
+                if (state.sessionId) {
+                    sessionStorage.setItem('twoFactorSessionId', state.sessionId);
+                    localStorage.setItem('twoFactorSessionId', state.sessionId);
+                }
+                
+                if (state.email) {
+                    sessionStorage.setItem('twoFactorEmail', state.email);
+                    localStorage.setItem('twoFactorEmail', state.email);
+                }
+                
+                state.user = {
+                    id: data.Id || data.id,
+                    email: state.email,
+                    nom: data.Nom || data.nom,
+                    prenom: data.Prenom || data.prenom,
+                    role: userRole
+                };
+                
+                document.getElementById('twoFactorGreeting').textContent = 
+                    `Bonjour ${state.user.prenom || ''}, un code a été envoyé à ${state.user.email}`;
+                
+                showTwoFactor();
+                button.disabled = false;
+                button.innerHTML = 'Se connecter';
+                return;
+            }
+            
+            // CAS 2 : CHANGEMENT MOT DE PASSE OBLIGATOIRE (première connexion ou réinitialisation)
+            if (data.requirePasswordChange === true || data.RequirePasswordChange === true) {
+                console.log("🔑 Changement mot de passe obligatoire");
+                
+                state.token = data.token || data.Token;
+                state.user = {
+                    id: data.id || data.Id,
+                    email: data.email || data.Email,
+                    nom: data.nom || data.Nom,
+                    prenom: data.prenom || data.Prenom,
+                    role: userRole
+                };
+                
+                showForcePassword(data.email || data.Email);
+                button.disabled = false;
+                button.innerHTML = 'Se connecter';
+                return;
+            }
+            
+            // CAS 3 : CONNEXION DIRECTE (Admin, Enseignant, Permanent)
+            console.log("✅ Connexion directe - Rôle:", userRole);
+
+            state.token = data.token || data.Token;
+            state.user = {
+                id: data.id || data.Id,
+                email: data.email || data.Email || identifier,
+                nom: data.nom || data.Nom,
+                prenom: data.prenom || data.Prenom,
+                role: userRole
+            };
+            
+            // Sauvegarde des identifiants dans le localStorage / sessionStorage
+            try {
+                localStorage.setItem('authToken', state.token);
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: state.user.id,
+                    email: state.user.email,
+                    nom: state.user.nom || '',
+                    prenom: state.user.prenom || '',
+                    role: userRole
+                }));
+                
+                // Nettoyer les résidus 2FA
+                localStorage.removeItem('twoFactorSessionId');
+                localStorage.removeItem('twoFactorEmail');
+                sessionStorage.removeItem('twoFactorSessionId');
+                sessionStorage.removeItem('twoFactorEmail');
+                
+                console.log('✅ Session sauvegardée proprement');
+                
+            } catch (e) {
+                console.error('❌ Erreur sauvegarde localStorage:', e);
+                sessionStorage.setItem('authToken', state.token);
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    id: state.user.id,
+                    email: state.user.email,
+                    nom: state.user.nom || '',
+                    prenom: state.user.prenom || '',
+                    role: userRole
+                }));
+            }
+
+            showAlert('loginAlert', 'success', '✅ Connexion réussie !');
+            
+            // Redirection après délai
+            setTimeout(() => {
+                if (userRole === 'admin' || userRole === 'superadmin') {
+                    window.location.href = 'index.html';
+                } else if (userRole === 'enseignant' || userRole === 'permanent') {
+                    window.location.href = 'enseignant-index.html';
+                } else if (userRole === 'parent') {
+                    window.location.href = 'parent-index.html';
+                } else {
+                    window.location.href = 'saghiry-auth.html#dashboard';
+                }
+            }, 800);
+
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            showAlert('loginAlert', 'error', '❌ Impossible de contacter le serveur');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = 'Se connecter';
+        }
+    }
+
+    // ============================================
+    // AFFICHAGE DE LA PAGE 2FA
+    // ============================================
+    function showTwoFactor() {
+        console.log('Affichage page 2FA');
+        
+        if (!state.sessionId) {
+            state.sessionId = sessionStorage.getItem('twoFactorSessionId') 
+                           || localStorage.getItem('twoFactorSessionId');
+            console.log('🆘 Récupération session:', state.sessionId);
+        }
+        
+        if (!state.email) {
+            state.email = sessionStorage.getItem('twoFactorEmail')
+                       || localStorage.getItem('twoFactorEmail');
+            console.log('🆘 Récupération email:', state.email);
+        }
+        
+        if (!state.email) {
+            console.error('❌ CRITIQUE: Email introuvable');
+            showAlert('twoFactorAlert', 'error', 'Erreur: session invalide - veuillez vous reconnecter');
+            setTimeout(() => {
+                showView('login');
+                document.getElementById('loginForm').reset();
+            }, 2000);
+            return;
+        }
+        
+        createCodeInputs();
+        
+        // Masquer toutes les pages et afficher la page 2FA
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('dashboardPage').classList.add('hidden');
+        document.getElementById('forcePasswordPage').classList.add('hidden');
+        document.getElementById('twoFactorPage').classList.remove('hidden');
+        state.currentView = 'twoFactor';
+        
+        document.querySelectorAll('.code-digit').forEach(input => input.value = '');
+        startTwoFactorTimer();
+        setTimeout(() => document.querySelector('.code-digit')?.focus(), 200);
+        
+        showAlert('twoFactorAlert', 'info', `📧 Code envoyé à ${state.email}`);
+    }
+
+    // ============================================
+    // VÉRIFICATION DU CODE 2FA ET FINALISATION
+    // ============================================
+    async function handleVerify2FA(e) {
+        e.preventDefault();
+        
+        const inputs = document.querySelectorAll('.code-digit');
+        const code = Array.from(inputs).map(input => input.value).join('');
+        
+        if (code.length !== 6) {
+            showAlert('twoFactorAlert', 'error', 'Veuillez entrer les 6 chiffres');
+            return;
+        }
+
+        const button = document.getElementById('verifyButton');
+        button.disabled = true;
+        button.innerHTML = 'Vérification...';
+
+        let sessionId = state.sessionId || sessionStorage.getItem('twoFactorSessionId') || localStorage.getItem('twoFactorSessionId');
+        let email = state.email || sessionStorage.getItem('twoFactorEmail') || localStorage.getItem('twoFactorEmail');
+
+        if (!email) {
+            showAlert('twoFactorAlert', 'error', 'Session expirée - veuillez vous reconnecter');
+            inputs.forEach(input => input.value = '');
+            button.disabled = false;
+            button.innerHTML = 'Vérifier';
+            setTimeout(() => showView('login'), 2000);
+            return;
+        }
+
+        try {
+            // 1ère étape : vérification du code
+            const verifyResponse = await fetch(VERIFY_2FA_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Email: email, Code: code, SessionId: sessionId })
+            });
+            
+            const verifyData = await verifyResponse.json();
+            
+            if (!verifyResponse.ok || verifyData.success === false) {
+                showAlert('twoFactorAlert', 'error', verifyData.message || 'Code invalide');
+                inputs.forEach(input => input.value = '');
+                inputs[0]?.focus();
+                button.disabled = false;
+                button.innerHTML = 'Vérifier';
+                return;
+            }
+
+            // 2ème étape : finalisation de la connexion et récupération du token JWT
+            const completeResponse = await fetch(COMPLETE_2FA_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Email: email, SessionId: sessionId })
+            });
+            
+            const completeData = await completeResponse.json();
+            console.log('📥 Réponse complete-2fa:', completeData);
+
+            const token = completeData.Token || completeData.token;
+            
+            if (token) {
+                const userData = {
+                    id: completeData.Id || completeData.id,
+                    email: completeData.Email || completeData.email,
+                    nom: completeData.Nom || completeData.nom || '',
+                    prenom: completeData.Prenom || completeData.prenom || '',
+                    role: completeData.Role || completeData.role || 'parent'
+                };
+                
+                // Sauvegarde du token et des infos utilisateur
+                localStorage.setItem('authToken', token);
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                sessionStorage.setItem('authToken', token);
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                
+                console.log('✅ Token stocké avec succès, longueur:', token.length);
+                console.log('✅ Utilisateur stocké:', userData.email, 'Rôle:', userData.role);
+                
+                // Nettoyage des données temporaires 2FA
+                sessionStorage.removeItem('twoFactorSessionId');
+                sessionStorage.removeItem('twoFactorEmail');
+                localStorage.removeItem('twoFactorSessionId');
+                localStorage.removeItem('twoFactorEmail');
+                
+                showAlert('twoFactorAlert', 'success', '✅ Connexion réussie !');
+                
+                // Redirection vers le dashboard parent
+                setTimeout(() => {
+                    window.location.href = 'parent-index.html';
+                }, 1000);
+                
+            } else {
+                console.error('❌ Aucun token dans la réponse:', completeData);
+                showAlert('twoFactorAlert', 'error', completeData.message || 'Erreur de validation');
+                button.disabled = false;
+                button.innerHTML = 'Vérifier';
+            }
+
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            showAlert('twoFactorAlert', 'error', 'Erreur de communication: ' + error.message);
+            button.disabled = false;
+            button.innerHTML = 'Vérifier';
+        }
+    }
+
+    // ============================================
+    // RENVOI D'UN NOUVEAU CODE 2FA
+    // ============================================
+    async function handleResendCode() {
+        const button = document.getElementById('resendCodeBtn');
+        button.disabled = true;
+        button.innerHTML = 'Envoi en cours...';
+
+        if (!state.sessionId) {
+            state.sessionId = sessionStorage.getItem('twoFactorSessionId') 
+                           || localStorage.getItem('twoFactorSessionId');
+        }
+
+        if (!state.email) {
+            state.email = sessionStorage.getItem('twoFactorEmail')
+                       || localStorage.getItem('twoFactorEmail');
+        }
+
+        if (!state.email) {
+            showAlert('twoFactorAlert', 'error', 'Session expirée - reconnectez-vous');
+            button.disabled = false;
+            button.innerHTML = 'Renvoyer le code';
+            setTimeout(() => showView('login'), 2000);
+            return;
+        }
+
+        const requestBody = {
+            Email: String(state.email).trim(),
+            SessionId: state.sessionId ? String(state.sessionId).trim() : ""
+        };
+
+        try {
+            const response = await fetch(RESEND_2FA_URL, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            let responseData;
+            try {
+                responseData = await response.json();
+            } catch (e) {}
+
+            if (response.ok) {
+                showAlert('twoFactorAlert', 'success', '📧 Nouveau code envoyé');
+                
+                if (responseData.sessionId) {
+                    state.sessionId = responseData.sessionId;
+                    sessionStorage.setItem('twoFactorSessionId', responseData.sessionId);
+                    localStorage.setItem('twoFactorSessionId', responseData.sessionId);
+                }
+                
+                // Réinitialisation du timer
+                state.twoFactorTimeLeft = 600;
+                clearInterval(state.twoFactorTimer);
+                startTwoFactorTimer();
+                
+                document.querySelectorAll('.code-digit').forEach(input => input.value = '');
+                document.querySelector('.code-digit')?.focus();
+                
+            } else {
+                showAlert('twoFactorAlert', 'error', responseData?.message || 'Erreur lors de l\'envoi');
+            }
+        } catch (error) {
+            console.error('❌ Erreur:', error);
+            showAlert('twoFactorAlert', 'error', '❌ Erreur de communication');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = 'Renvoyer le code';
+        }
+    }
+    
+    // ============================================
+    // TIMER POUR L'EXPIRATION DU CODE 2FA
+    // ============================================
+    function startTwoFactorTimer() {
+        if (state.twoFactorTimer) {
+            clearInterval(state.twoFactorTimer);
+        }
+        
+        state.twoFactorTimeLeft = 600;
+        
+        const timerElement = document.getElementById('timerValue');
+        if (!timerElement) return;
+        
+        state.twoFactorTimer = setInterval(() => {
+            state.twoFactorTimeLeft--;
+            
+            if (state.twoFactorTimeLeft <= 0) {
+                clearInterval(state.twoFactorTimer);
+                timerElement.textContent = '00:00';
+                showAlert('twoFactorAlert', 'error', '⏰ Code expiré - veuillez renvoyer un nouveau code');
+                const verifyBtn = document.getElementById('verifyButton');
+                if (verifyBtn) verifyBtn.disabled = true;
+            } else {
+                const minutes = Math.floor(state.twoFactorTimeLeft / 60);
+                const seconds = state.twoFactorTimeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    // ============================================
+    // CHANGEMENT FORCÉ DU MOT DE PASSE
+    // ============================================
+    function showForcePassword(email) {
+        document.getElementById('forceEmail').value = email || state.user?.email || '';
+        showView('forcePassword');
+    }
+
+    async function handleForceChangePassword(e) {
+        e.preventDefault();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const email = document.getElementById('forceEmail').value;
+
+        if (newPassword !== confirmPassword) {
+            showAlert('forcePasswordAlert', 'error', 'Les mots de passe ne correspondent pas');
+            return;
+        }
+
+        if (newPassword.length < 12) {
+            showAlert('forcePasswordAlert', 'error', '12 caractères minimum');
+            return;
+        }
+
+        const button = document.getElementById('forcePasswordButton');
+        button.disabled = true;
+        button.innerHTML = 'Changement...';
+
+        try {
+            const response = await fetch(FORCE_CHANGE_PASSWORD_URL, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${state.token}`
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    nouveauMotDePasse: newPassword, 
+                    confirmMotDePasse: confirmPassword 
+                })
+            });
+
+            if (response.ok) {
+                showAlert('forcePasswordAlert', 'success', '✅ Mot de passe changé !');
+                // Reconnecter automatiquement avec le nouveau mot de passe
+                setTimeout(() => {
+                    document.getElementById('password').value = newPassword;
+                    handleLogin(new Event('submit'));
+                }, 1500);
+            } else {
+                const data = await response.json();
+                showAlert('forcePasswordAlert', 'error', data.message || 'Erreur');
+            }
+        } catch (error) {
+            showAlert('forcePasswordAlert', 'error', '❌ Erreur');
+        } finally {
+            button.disabled = false;
+            button.innerHTML = 'Changer mon mot de passe';
+        }
+    }
+
+    // ============================================
+    // AFFICHAGE DU TABLEAU DE BORD (DASHBOARD)
+    // ============================================
+    function showDashboard() {
+        showView('dashboard');
+        
+        if (!state.user) {
+            showView('login');
+            return;
+        }
+        
+        const user = state.user;
+        
+        document.getElementById('dashboardTitle').textContent = 
+            user.prenom ? `Bienvenue, ${user.prenom} !` : 'Bienvenue !';
+        
+        let initiales = '👤';
+        if (user.prenom && user.nom) {
+            initiales = (user.prenom.charAt(0) + user.nom.charAt(0)).toUpperCase();
+        }
+        document.getElementById('userInitials').textContent = initiales;
+        document.getElementById('userFullName').textContent = 
+            `${user.prenom || ''} ${user.nom || ''}`.trim() || 'Utilisateur';
+        document.getElementById('userEmail').textContent = user.email || '';
+        
+        const role = (user.role || '').toLowerCase();
+        let roleText = 'Utilisateur';
+        let roleClass = '';
+        
+        if (role === 'admin' || role === 'superadmin') {
+            roleText = 'Administration';
+            roleClass = 'role-administration';
+        } else if (role === 'enseignant') {
+            roleText = 'Enseignant';
+            roleClass = 'role-enseignant';
+        } else if (role === 'permanent') {
+            roleText = 'Permanent';
+            roleClass = 'role-permanent';
+        } else if (role === 'parent') {
+            roleText = 'Parent';
+            roleClass = 'role-parent';
+        }
+        
+        const badge = document.getElementById('userRoleBadge');
+        badge.textContent = roleText;
+        badge.className = `user-role ${roleClass}`;
+        
+        document.getElementById('connectionTime').textContent = 
+            `Connecté le ${new Date().toLocaleString('fr-FR')}`;
+    }
+
+    // ============================================
+    // DÉCONNEXION
+    // ============================================
+    async function handleLogout() {
+        try {
+            if (state.token) {
+                await fetch(LOGOUT_URL, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${state.token}` }
+                });
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            // Réinitialisation complète de l'état
+            state.token = null;
+            state.user = null;
+            state.sessionId = null;
+            state.email = null;
+            
+            if (state.twoFactorTimer) {
+                clearInterval(state.twoFactorTimer);
+                state.twoFactorTimer = null;
+            }
+            
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            showView('login');
+            document.getElementById('loginForm').reset();
+            document.querySelectorAll('.code-digit').forEach(input => input.value = '');
+        }
+    }
+
+    // ============================================
+    // FONCTIONS UTILITAIRES
+    // ============================================
+    function showView(view) {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('twoFactorPage').classList.add('hidden');
+        document.getElementById('forcePasswordPage').classList.add('hidden');
+        document.getElementById('dashboardPage').classList.add('hidden');
+        
+        document.getElementById(`${view}Page`).classList.remove('hidden');
+        state.currentView = view;
+    }
+
+    function showAlert(containerId, type, message) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        if (type === 'success' || type === 'info') {
+            setTimeout(() => { container.innerHTML = ''; }, 5000);
+        }
+    }
+</script>
+</body>
+</html>

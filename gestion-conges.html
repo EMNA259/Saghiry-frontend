@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAGHIRY - Gestion des congés (Admin)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            
+            --pending-bg: #fff3e0;
+            --pending-color: #b85c00;
+            --approved-bg: #d4edda;
+            --approved-color: #155724;
+            --rejected-bg: #f8d7da;
+            --rejected-color: #721c24;
+            --warning-bg: #fff3cd;
+            --warning-color: #856404;
+        }
+
+        body {
+            background: var(--gray-bg);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+        }
+
+        .page-title {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title::before {
+            content: '🏖️';
+            font-size: 2rem;
+            -webkit-text-fill-color: initial;
+            color: var(--primary-green);
+        }
+
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 14px rgba(76, 168, 150, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(76, 168, 150, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-dark);
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .filters-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-end;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-group label {
+            display: block;
+            color: var(--text-soft);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--gray-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+            cursor: pointer;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(76, 168, 150, 0.1);
+        }
+
+        .demandes-table {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow-sm);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-border);
+            color: var(--text-soft);
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: rgba(76, 168, 150, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .status-pending {
+            background: var(--pending-bg);
+            color: var(--pending-color);
+            border-color: #ffeeba;
+        }
+
+        .status-approved {
+            background: var(--approved-bg);
+            color: var(--approved-color);
+            border-color: #c3e6cb;
+        }
+
+        .status-rejected {
+            background: var(--rejected-bg);
+            color: var(--rejected-color);
+            border-color: #f5c6cb;
+        }
+
+        .type-badge {
+            display: inline-block;
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .btn-view {
+            background: var(--blue-light);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-view:hover {
+            background: #1e7fd9;
+            transform: translateY(-2px);
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-approve:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 168, 150, 0.3);
+        }
+
+        .btn-approve:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-disabled {
+            background: #6c757d;
+            opacity: 0.5;
+            cursor: not-allowed;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: white;
+            border: none;
+            display: inline-block;
+        }
+
+        .enseignant-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .enseignant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .enseignant-details {
+            flex: 1;
+        }
+
+        .enseignant-nom {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .enseignant-email {
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-border);
+        }
+
+        .modal-header h2 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: var(--gray-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--gray-bg);
+            border-radius: 16px;
+        }
+
+        .detail-section h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--gray-border);
+        }
+
+        .detail-label {
+            width: 140px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .detail-value {
+            flex: 1;
+            color: var(--text-soft);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        .regle-info {
+            background: #e8f4f1;
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #2d6b63;
+        }
+
+        .warning-box {
+            background: var(--warning-bg);
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            color: #155724;
+        }
+
+        .remplacant-card {
+            background: white;
+            border: 1px solid var(--gray-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .remplacant-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .remplacant-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .remplacant-details {
+            flex: 1;
+        }
+
+        .remplacant-nom {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .remplacant-specialite {
+            font-size: 0.75rem;
+            color: var(--primary-green);
+        }
+
+        .remplacant-status {
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-disponible {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-indisponible {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .specialite-tag {
+            display: inline-block;
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-dark);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+            max-width: 400px;
+        }
+
+        .alert-success {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .alert-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .alert-info {
+            background: var(--blue-light);
+            color: white;
+        }
+
+        .alert-warning {
+            background: #ffc107;
+            color: #856404;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--gray-border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-orange));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            .filters-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            .filter-group {
+                width: 100%;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            th, td {
+                padding: 0.8rem;
+                font-size: 0.8rem;
+            }
+            .enseignant-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Gestion des demandes de congé</h1>
+                <p class="page-subtitle">Gérez les demandes de congé des enseignants avec vérification automatique des remplaçants</p>
+            </div>
+            <button class="btn-secondary" onclick="rafraichir()">
+                🔄 Rafraîchir
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">⏳ En attente</div>
+                <div class="stat-value" id="statPending">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">✅ Approuvées</div>
+                <div class="stat-value" id="statApproved">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">❌ Refusées</div>
+                <div class="stat-value" id="statRejected">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">📊 Total</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+        </div>
+
+        <div class="filters-bar">
+            <div class="filter-group">
+                <label>📌 Statut</label>
+                <select id="filterStatus">
+                    <option value="all">Tous</option>
+                    <option value="en_attente">En attente</option>
+                    <option value="approuve">Approuvés</option>
+                    <option value="refuse">Refusés</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🏷️ Type de congé</label>
+                <select id="filterType">
+                    <option value="all">Tous</option>
+                    <option value="maladie">Maladie</option>
+                    <option value="personnel">Personnel</option>
+                    <option value="congé annuel">Congé annuel</option>
+                    <option value="maternité">Maternité</option>
+                    <option value="paternité">Paternité</option>
+                    <option value="événement familial">Événement familial</option>
+                    <option value="formation">Formation</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🔍 Rechercher</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Nom, prénom ou email...">
+            </div>
+            <button class="btn-primary" onclick="appliquerFiltres()">Appliquer</button>
+        </div>
+
+        <div class="demandes-table">
+            <table id="demandesTable">
+                <thead>
+                    <tr>
+                        <th>Enseignant</th>
+                        <th>Type de congé</th>
+                        <th>Période</th>
+                        <th>Durée</th>
+                        <th>Statut</th>
+                        <th>Demandé le</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="demandesList">
+                    <tr>
+                        <td colspan="7" class="loading">Chargement des demandes......</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Détails -->
+    <div class="modal" id="viewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📄 Détails de la demande</h2>
+                <button class="modal-close" onclick="closeModal('viewModal')">&times;</button>
+            </div>
+            <div id="viewModalContent">
+                <div class="loading">Chargement...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Vérification Remplaçants -->
+    <div class="modal" id="verificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔍 Vérification des remplaçants</h2>
+                <button class="modal-close" onclick="closeVerificationModal()">&times;</button>
+            </div>
+            <div id="verificationModalContent">
+                <div class="loading">Vérification en cours...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmation -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="confirmTitle">Confirmation</h2>
+                <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <p id="confirmMessage">Êtes-vous sûr de vouloir effectuer cette action ?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal('confirmModal')">Annuler</button>
+                <button class="btn-primary" id="confirmActionBtn">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5267/api';
+        let token = null;
+        let allDemandes = [];
+        let enseignantsMap = new Map();
+
+        let currentDemandeId = null;
+        let currentVerificationData = null;
+
+        const typeIcons = {
+            'maladie': '🤒',
+            'personnel': '🏠',
+            'congé annuel': '🌴',
+            'maternité': '👶',
+            'paternité': '👨‍🍼',
+            'événement familial': '🎉',
+            'formation': '📚'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTokenAndData();
+            attachEventListeners();
+        });
+
+        function loadTokenAndData() {
+            token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+            
+            if (!token) {
+                document.getElementById('demandesList').innerHTML = `
+                    <tr><td colspan="7" style="text-align:center; padding:3rem;">
+                        🔐 Veuillez vous connecter
+                    </td></tr>
+                `;
+                showMessage('Veuillez vous connecter', 'error');
+                return;
+            }
+            
+            loadAllDemandes();
+        }
+
+        async function loadAllDemandes() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Conge/toutes`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    let demandes = [];
+                    
+                    if (result.Success === true && result.Data && Array.isArray(result.Data)) {
+                        demandes = result.Data;
+                    } else if (result.data && Array.isArray(result.data)) {
+                        demandes = result.data;
+                    } else if (Array.isArray(result)) {
+                        demandes = result;
+                    }
+                    
+                    allDemandes = demandes;
+                    console.log(`${allDemandes.length} demande(s) chargée(s)`);
+                    
+                    await loadEnseignantsForDemandes();
+                    updateStats();
+                    renderTable();
+                } else {
+                    throw new Error('Erreur chargement');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('demandesList').innerHTML = `
+                    <tr><td colspan="7" style="text-align:center; padding:3rem;">
+                        ❌ Erreur de chargement<br>
+                        <button onclick="location.reload()" style="margin-top:1rem; padding:0.5rem 1rem; background:#4ca896; color:white; border:none; border-radius:8px;">Réessayer</button>
+                    </td></tr>
+                `;
+                showMessage('Erreur de chargement', 'error');
+            }
+        }
+
+        async function loadEnseignantsForDemandes() {
+            const uniqueIds = [...new Set(allDemandes.map(d => {
+                let id = d.enseignantId || d.EnseignantId || d.enseignant;
+                if (id && typeof id === 'object') id = id.$oid || id._id;
+                return id ? id.toString() : null;
+            }).filter(id => id))];
+            
+            for (const id of uniqueIds) {
+                if (!enseignantsMap.has(id)) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/utilisateurs/${id}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        if (response.ok) {
+                            const result = await response.json();
+                            const user = result.Data || result;
+                            const nom = user.nom || user.Nom || '';
+                            const prenom = user.prenom || user.Prenom || '';
+                            const email = user.email || user.Email || '';
+                            const specialites = user.specialites || user.Specialites || [];
+                            
+                            enseignantsMap.set(id, {
+                                nom: nom,
+                                prenom: prenom,
+                                email: email,
+                                specialites: specialites,
+                                nomComplet: (prenom + ' ' + nom).trim() || 'Enseignant',
+                                initials: (prenom?.[0] || '') + (nom?.[0] || '') || '??'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Erreur chargement enseignant:', error);
+                    }
+                }
+            }
+        }
+
+        function getValue(obj, keys, defaultValue) {
+            if (!obj || typeof obj !== 'object') return defaultValue;
+            for (const key of keys) {
+                if (obj[key] !== undefined && obj[key] !== null) {
+                    let val = obj[key];
+                    if (val && typeof val === 'object' && val.$oid) return val.$oid;
+                    return val;
+                }
+            }
+            return defaultValue;
+        }
+
+        function parseMongoDate(dateValue) {
+            if (!dateValue) return null;
+            if (dateValue instanceof Date) return dateValue;
+            if (typeof dateValue === 'string') {
+                const parsed = new Date(dateValue);
+                if (!isNaN(parsed.getTime())) return parsed;
+            }
+            if (dateValue && typeof dateValue === 'object') {
+                if (dateValue.$date) return new Date(dateValue.$date);
+                if (dateValue.iso) return new Date(dateValue.iso);
+            }
+            return null;
+        }
+
+        function formatDate(dateValue) {
+            const date = parseMongoDate(dateValue);
+            if (!date || isNaN(date.getTime())) return 'Date invalide';
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function formatDateTime(dateValue) {
+            const date = parseMongoDate(dateValue);
+            if (!date || isNaN(date.getTime())) return 'Date invalide';
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function calculerJoursOuvrables(dateDebut, dateFin) {
+            const start = parseMongoDate(dateDebut);
+            const end = parseMongoDate(dateFin);
+            if (!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+            
+            let joursOuvrables = 0;
+            let current = new Date(start);
+            while (current <= end) {
+                const dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    joursOuvrables++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            return joursOuvrables;
+        }
+
+        function getEnseignantInfo(enseignantId) {
+            let idStr = enseignantId;
+            if (enseignantId && typeof enseignantId === 'object') idStr = enseignantId.$oid || enseignantId.toString();
+            const ens = enseignantsMap.get(idStr);
+            
+            if (ens) {
+                return {
+                    nom: ens.nomComplet,
+                    email: ens.email,
+                    initials: ens.initials,
+                    specialites: ens.specialites || []
+                };
+            }
+            return {
+                nom: 'Chargement...',
+                email: 'Chargement...',
+                initials: '??',
+                specialites: []
+            };
+        }
+
+        function updateStats() {
+            const pending = allDemandes.filter(d => {
+                const statut = getValue(d, ['statut', 'Statut', 'status'], '');
+                return statut === 'en_attente';
+            }).length;
+            
+            const approved = allDemandes.filter(d => {
+                const statut = getValue(d, ['statut', 'Statut', 'status'], '');
+                return statut === 'approuve' || statut === 'approuvé';
+            }).length;
+            
+            const rejected = allDemandes.filter(d => {
+                const statut = getValue(d, ['statut', 'Statut', 'status'], '');
+                return statut === 'refuse' || statut === 'refusé';
+            }).length;
+            
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statApproved').textContent = approved;
+            document.getElementById('statRejected').textContent = rejected;
+            document.getElementById('statTotal').textContent = allDemandes.length;
+        }
+
+        function renderTable() {
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filterType = document.getElementById('filterType').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = [...allDemandes];
+            
+            if (filterStatus !== 'all') {
+                filtered = filtered.filter(d => {
+                    const statut = getValue(d, ['statut', 'Statut', 'status'], '');
+                    return statut === filterStatus;
+                });
+            }
+            
+            if (filterType !== 'all') {
+                filtered = filtered.filter(d => {
+                    const type = getValue(d, ['type', 'Type', 'typeConge'], '');
+                    return type === filterType;
+                });
+            }
+            
+            if (searchTerm) {
+                filtered = filtered.filter(d => {
+                    const enseignantId = getValue(d, ['enseignantId', 'EnseignantId', 'enseignant'], null);
+                    const info = getEnseignantInfo(enseignantId);
+                    return info.nom.toLowerCase().includes(searchTerm) || info.email.toLowerCase().includes(searchTerm);
+                });
+            }
+            
+            filtered.sort((a, b) => {
+                const dateA = parseMongoDate(getValue(a, ['createdAt', 'CreatedAt', 'dateCreation'], null));
+                const dateB = parseMongoDate(getValue(b, ['createdAt', 'CreatedAt', 'dateCreation'], null));
+                if (!dateA) return 1;
+                if (!dateB) return -1;
+                return dateB - dateA;
+            });
+            
+            const tbody = document.getElementById('demandesList');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-light);">📭 Aucune demande trouvée</td></tr>';
+                return;
+            }
+            
+            let html = '';
+            for (const demande of filtered) {
+                const id = getValue(demande, ['id', '_id', 'Id'], null);
+                const enseignantId = getValue(demande, ['enseignantId', 'EnseignantId', 'enseignant'], null);
+                const info = getEnseignantInfo(enseignantId);
+                const type = getValue(demande, ['type', 'Type', 'typeConge'], 'Non spécifié');
+                const statut = getValue(demande, ['statut', 'Statut', 'status'], 'en_attente');
+                const dateDebut = getValue(demande, ['dateDebut', 'DateDebut', 'date_debut'], null);
+                const dateFin = getValue(demande, ['dateFin', 'DateFin', 'date_fin'], null);
+                const createdAt = getValue(demande, ['createdAt', 'CreatedAt', 'dateCreation'], null);
+                
+                const typeIcon = typeIcons[type] || '📋';
+                const duree = calculerJoursOuvrables(dateDebut, dateFin);
+                
+                let statusClass = '', statusText = '';
+                if (statut === 'en_attente') {
+                    statusText = '⏳ En attente';
+                    statusClass = 'status-pending';
+                } else if (statut === 'approuve' || statut === 'approuvé') {
+                    statusText = '✅ Approuvé';
+                    statusClass = 'status-approved';
+                } else if (statut === 'refuse' || statut === 'refusé') {
+                    statusText = '❌ Refusé';
+                    statusClass = 'status-rejected';
+                } else {
+                    statusText = statut;
+                    statusClass = 'status-pending';
+                }
+                
+                const canAction = (statut === 'en_attente');
+                
+                html += `
+                    <tr>
+                        <td>
+                            <div class="enseignant-info">
+                                <div class="enseignant-avatar">${escapeHtml(info.initials)}</div>
+                                <div class="enseignant-details">
+                                    <div class="enseignant-nom">${escapeHtml(info.nom)}</div>
+                                    <div class="enseignant-email">${escapeHtml(info.email)}</div>
+                                    ${info.specialites && info.specialites.length > 0 ? 
+                                        `<div style="margin-top: 0.3rem;">${info.specialites.map(s => `<span class="specialite-tag">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="type-badge">${typeIcon} ${escapeHtml(type)}</span></td>
+                        <td>
+                            <div>Du ${formatDate(dateDebut)}</div>
+                            <div>Au ${formatDate(dateFin)}</div>
+                        </td>
+                        <td><strong>${duree} jour(s)</strong></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${formatDateTime(createdAt)}</td>
+                        <td class="action-buttons">
+                            <button class="btn-view" onclick="viewDetails('${id}')">👁️ Voir</button>
+                            ${canAction ? `
+                                <button class="btn-approve" onclick="checkAndApprove('${id}')" id="approveBtn_${id}">✅ Approuver</button>
+                                <button class="btn-reject" onclick="rejectDemande('${id}')">❌ Refuser</button>
+                            ` : '<span class="btn-disabled">✅ Traité</span>'}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        async function checkAndApprove(demandeId) {
+            const demande = allDemandes.find(d => {
+                const id = getValue(d, ['id', '_id', 'Id'], null);
+                return id == demandeId;
+            });
+            
+            if (!demande) {
+                showMessage('Demande non trouvée', 'error');
+                return;
+            }
+            
+            const enseignantId = getValue(demande, ['enseignantId', 'EnseignantId', 'enseignant'], null);
+            const dateDebut = getValue(demande, ['dateDebut', 'DateDebut', 'date_debut'], null);
+            const dateFin = getValue(demande, ['dateFin', 'DateFin', 'date_fin'], null);
+            
+            if (!enseignantId || !dateDebut || !dateFin) {
+                showMessage('Données de demande incomplètes', 'error');
+                return;
+            }
+            
+            currentDemandeId = demandeId;
+            
+            // Ouvrir la modal de vérification
+            await openVerificationModal(enseignantId, dateDebut, dateFin, demande);
+        }
+
+        async function openVerificationModal(enseignantId, dateDebut, dateFin, demande) {
+            const modal = document.getElementById('verificationModal');
+            const content = document.getElementById('verificationModalContent');
+            
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="loader" style="display: inline-block; width: 30px; height: 30px; border: 3px solid #e0e9e7; border-top-color: #4ca896; border-radius: 50%; animation: spin 0.6s linear infinite;"></div>
+                    <p style="margin-top: 1rem;">Recherche des remplaçants disponibles...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <style>
+                    @keyframes spin {
+                        to { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
+            
+            modal.classList.add('active');
+            
+            // Animer la barre de progression
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                const progressFill = document.getElementById('progressFill');
+                if (progressFill) {
+                    progressFill.style.width = Math.min(progress, 90) + '%';
+                }
+                if (progress >= 90) clearInterval(progressInterval);
+            }, 200);
+            
+            try {
+                // Appel API pour vérifier les remplaçants
+                const response = await fetch(`${API_BASE_URL}/Conge/enseignant/${enseignantId}/verifier-remplacants?dateDebut=${new Date(dateDebut).toISOString()}&dateFin=${new Date(dateFin).toISOString()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                clearInterval(progressInterval);
+                const progressFill = document.getElementById('progressFill');
+                if (progressFill) progressFill.style.width = '100%';
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    let remplacants = [];
+                    
+                    // Extraire les données correctement
+                    if (result.Success && result.Data && Array.isArray(result.Data)) {
+                        remplacants = result.Data;
+                    } else if (result.data && Array.isArray(result.data)) {
+                        remplacants = result.data;
+                    } else if (Array.isArray(result)) {
+                        remplacants = result;
+                    }
+                    
+                    console.log('Remplaçants reçus:', remplacants);
+                    
+                    const info = getEnseignantInfo(enseignantId);
+                    const specialitesEnseignant = info.specialites || [];
+                    
+                    // Grouper les remplaçants par spécialité
+                    const remplacantsParSpecialite = {};
+                    
+                    for (const r of remplacants) {
+                        const specialite = r.specialite || r.Specialite;
+                        if (specialite) {
+                            if (!remplacantsParSpecialite[specialite]) {
+                                remplacantsParSpecialite[specialite] = [];
+                            }
+                            remplacantsParSpecialite[specialite].push({
+                                id: r.permanentId || r.PermanentId,
+                                nom: r.permanentNom || r.PermanentNom,
+                                prenom: r.permanentPrenom || r.PermanentPrenom,
+                                specialite: specialite,
+                                estDisponible: r.estDisponible === true || r.EstDisponible === true,
+                                message: r.disponibiliteMessage || r.DisponibiliteMessage || (r.estDisponible ? 'Disponible' : 'Indisponible')
+                            });
+                        }
+                    }
+                    
+                    // CRITIQUE: Vérifier quelles spécialités sont couvertes par des remplaçants DISPONIBLES
+                    const specialitesCouvertes = [];
+                    const specialitesNonCouvertes = [];
+                    
+                    for (const specialite of specialitesEnseignant) {
+                        const remps = remplacantsParSpecialite[specialite] || [];
+                        // Vérifier si au moins un remplaçant est disponible pour cette spécialité
+                        const aDisponible = remps.some(r => r.estDisponible === true);
+                        if (aDisponible) {
+                            specialitesCouvertes.push(specialite);
+                        } else {
+                            specialitesNonCouvertes.push(specialite);
+                        }
+                    }
+                    
+                    // Vérifier si tous les remplaçants sont disponibles
+                    const aDesRemplacantsDisponibles = remplacants.some(r => {
+                        const estDispo = r.estDisponible === true || r.EstDisponible === true;
+                        return estDispo;
+                    });
+                    
+                    const toutesSpecialitesCouvertes = specialitesNonCouvertes.length === 0;
+                    
+                    console.log('Spécialités enseignants:', specialitesEnseignant);
+                    console.log('Spécialités couvertes:', specialitesCouvertes);
+                    console.log('Spécialités non couvertes:', specialitesNonCouvertes);
+                    console.log('Toutes couvertes:', toutesSpecialitesCouvertes);
+                    console.log('A des remplaçants disponibles:', aDesRemplacantsDisponibles);
+                    
+                    let html = `
+                        <div class="detail-section">
+                            <h3>👤 Enseignant à remplacer</h3>
+                            <div class="detail-row">
+                                <div class="detail-label">Nom</div>
+                                <div class="detail-value"><strong>${escapeHtml(info.nom)}</strong></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Email</div>
+                                <div class="detail-value">${escapeHtml(info.email)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Spécialités</div>
+                                <div class="detail-value">
+                                    ${specialitesEnseignant.length > 0 ? 
+                                        specialitesEnseignant.map(s => `<span class="specialite-tag">${escapeHtml(s)}</span>`).join('') : 
+                                        '<span class="text-light">Aucune spécialité définie</span>'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>🔍 Remplaçants trouvés</h3>
+                    `;
+                    
+                    if (remplacants.length === 0) {
+                        html += `
+                            <div class="warning-box">
+                                <strong>⚠️ Aucun remplaçant trouvé</strong><br>
+                                Aucun permanent ou vacataire n'a été trouvé avec les spécialités de cet enseignant.
+                            </div>
+                        `;
+                    } else {
+                        // Afficher par spécialité
+                        for (const specialite of specialitesEnseignant) {
+                            const remps = remplacantsParSpecialite[specialite] || [];
+                            const disponibles = remps.filter(r => r.estDisponible === true);
+                            const indisponibles = remps.filter(r => r.estDisponible === false);
+                            
+                            html += `
+                                <div style="margin-bottom: 1.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <strong style="color: var(--primary-dark); font-size: 1rem;">📌 ${escapeHtml(specialite)}</strong>
+                                        ${disponibles.length > 0 ? 
+                                            `<span class="status-badge status-approved" style="margin-left: 0.5rem;">✅ ${disponibles.length} disponible(s)</span>` :
+                                            `<span class="status-badge status-rejected" style="margin-left: 0.5rem;">❌ Aucun disponible</span>`
+                                        }
+                                    </div>
+                            `;
+                            
+                            // Afficher les disponibles
+                            for (const r of disponibles) {
+                                html += `
+                                    <div class="remplacant-card" style="border-left: 4px solid #28a745;">
+                                        <div class="remplacant-info">
+                                            <div class="remplacant-avatar">${(r.prenom?.[0] || '')}${(r.nom?.[0] || '')}</div>
+                                            <div class="remplacant-details">
+                                                <div class="remplacant-nom">${escapeHtml(r.prenom || '')} ${escapeHtml(r.nom || '')}</div>
+                                                <div class="remplacant-specialite">${escapeHtml(r.specialite)}</div>
+                                            </div>
+                                        </div>
+                                        <span class="remplacant-status status-disponible">✅ Disponible</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            // Afficher les indisponibles
+                            for (const r of indisponibles) {
+                                html += `
+                                    <div class="remplacant-card" style="opacity: 0.6; border-left: 4px solid #dc3545;">
+                                        <div class="remplacant-info">
+                                            <div class="remplacant-avatar">${(r.prenom?.[0] || '')}${(r.nom?.[0] || '')}</div>
+                                            <div class="remplacant-details">
+                                                <div class="remplacant-nom">${escapeHtml(r.prenom || '')} ${escapeHtml(r.nom || '')}</div>
+                                                <div class="remplacant-specialite">${escapeHtml(r.specialite)}</div>
+                                            </div>
+                                        </div>
+                                        <span class="remplacant-status status-indisponible">⛔ ${escapeHtml(r.message)}</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            html += `</div>`;
+                        }
+                    }
+                    
+                    html += `</div>`;
+                    
+                    // AFFICHAGE DU MESSAGE CORRECT
+                    if (toutesSpecialitesCouvertes && aDesRemplacantsDisponibles) {
+                        html += `
+                            <div class="success-box">
+                                <strong>✅ Toutes les spécialités sont couvertes !</strong><br>
+                                Des remplaçants disponibles ont été trouvés pour toutes les spécialités.<br>
+                                L'approbation de ce congé déclenchera automatiquement le transfert des responsabilités.
+                            </div>
+                        `;
+                    } else if (!toutesSpecialitesCouvertes) {
+                        html += `
+                            <div class="warning-box" style="background: #f8d7da; border-left-color: #dc3545;">
+                                <strong>❌ Impossible d'approuver</strong><br>
+                                Les spécialités suivantes n'ont aucun remplaçant disponible :<br>
+                                ${specialitesNonCouvertes.map(s => `<strong>${escapeHtml(s)}</strong>`).join(', ')}<br><br>
+                                Veuillez trouver un remplaçant pour ces spécialités avant d'approuver.
+                            </div>
+                        `;
+                    } else if (!aDesRemplacantsDisponibles) {
+                        html += `
+                            <div class="warning-box" style="background: #f8d7da; border-left-color: #dc3545;">
+                                <strong>❌ Impossible d'approuver</strong><br>
+                                Aucun permanent disponible n'a été trouvé pour remplacer cet enseignant.
+                            </div>
+                        `;
+                    }
+                    
+                    html += `
+                        <div class="modal-actions">
+                            <button class="btn-secondary" onclick="closeVerificationModal()">Fermer</button>
+                            ${toutesSpecialitesCouvertes && aDesRemplacantsDisponibles ? 
+                                `<button class="btn-primary" onclick="confirmApproveWithReplacement('${currentDemandeId}')">✅ Approuver et transférer</button>` : 
+                                `<button class="btn-primary" disabled style="opacity:0.5;">❌ Approuver impossible</button>`
+                            }
+                        </div>
+                    `;
+                    
+                    content.innerHTML = html;
+                    currentVerificationData = { remplacants, specialitesCouvertes, specialitesNonCouvertes };
+                    
+                } else {
+                    const error = await response.json();
+                    content.innerHTML = `
+                        <div class="warning-box">
+                            <strong>❌ Erreur</strong><br>
+                            ${error.message || 'Erreur lors de la vérification des remplaçants'}
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn-secondary" onclick="closeVerificationModal()">Fermer</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                content.innerHTML = `
+                    <div class="warning-box">
+                        <strong>❌ Erreur de connexion</strong><br>
+                        ${error.message}
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" onclick="closeVerificationModal()">Fermer</button>
+                    </div>
+                `;
+            }
+        }
+
+        function closeVerificationModal() {
+            document.getElementById('verificationModal').classList.remove('active');
+            currentVerificationData = null;
+        }
+
+        async function confirmApproveWithReplacement(demandeId) {
+            closeVerificationModal();
+            
+            // Ouvrir modal de confirmation
+            document.getElementById('confirmTitle').textContent = '✅ Approuver la demande';
+            document.getElementById('confirmMessage').innerHTML = `
+                <strong>⚠️ Attention : Cette action est irréversible !</strong><br><br>
+                L'approbation de ce congé va :<br>
+                1. Approuver définitivement la demande de congé<br>
+                2. Transférer automatiquement tous les cours et responsabilités aux remplaçants disponibles<br>
+                3. Marquer l'enseignant comme "en congé"<br><br>
+                Êtes-vous sûr de vouloir continuer ?
+            `;
+            
+            document.getElementById('confirmActionBtn').onclick = () => executeApproveWithReplacement(demandeId);
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        async function executeApproveWithReplacement(demandeId) {
+            closeModal('confirmModal');
+            
+            showMessage('⏳ Approbation en cours et transfert des responsabilités...', 'info');
+            
+            // Désactiver le bouton d'approbation
+            const approveBtn = document.getElementById(`approveBtn_${demandeId}`);
+            if (approveBtn) {
+                approveBtn.disabled = true;
+                approveBtn.textContent = '⏳ Traitement...';
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/Conge/${demandeId}/approuver-avec-remplacement`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ commentaire: '' })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.Success) {
+                        showMessage(`✅ ${result.data?.message || 'Congé approuvé avec succès ! Les responsabilités ont été transférées.'}`, 'success');
+                        await loadAllDemandes();
+                    } else {
+                        showMessage(`❌ Erreur: ${result.message}`, 'error');
+                        if (approveBtn) {
+                            approveBtn.disabled = false;
+                            approveBtn.textContent = '✅ Approuver';
+                        }
+                    }
+                } else {
+                    const error = await response.json();
+                    showMessage(`❌ Erreur: ${error.message || 'Erreur lors de l\'approbation'}`, 'error');
+                    if (approveBtn) {
+                        approveBtn.disabled = false;
+                        approveBtn.textContent = '✅ Approuver';
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage(`❌ Erreur de connexion: ${error.message}`, 'error');
+                if (approveBtn) {
+                    approveBtn.disabled = false;
+                    approveBtn.textContent = '✅ Approuver';
+                }
+            }
+        }
+
+        async function rejectDemande(demandeId) {
+            currentDemandeId = demandeId;
+            
+            document.getElementById('confirmTitle').textContent = '❌ Refuser la demande';
+            document.getElementById('confirmMessage').innerHTML = `
+                Êtes-vous sûr de vouloir refuser cette demande de congé ?<br>
+                <small>Vous pouvez ajouter un commentaire pour expliquer le refus.</small>
+                <textarea id="rejectComment" rows="3" style="width:100%; margin-top:1rem; padding:0.5rem; border-radius:8px; border:1px solid #ddd;" placeholder="Motif du refus (optionnel)..."></textarea>
+            `;
+            
+            document.getElementById('confirmActionBtn').onclick = () => executeReject(demandeId);
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        async function executeReject(demandeId) {
+            const comment = document.getElementById('rejectComment')?.value || '';
+            closeModal('confirmModal');
+            
+            showMessage('⏳ Traitement du refus...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/Conge/${demandeId}/statut`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ statut: 'refuse' })
+                });
+                
+                if (response.ok) {
+                    showMessage('✅ Demande refusée avec succès', 'success');
+                    await loadAllDemandes();
+                } else {
+                    const error = await response.json();
+                    showMessage(`❌ Erreur: ${error.message || 'Erreur lors du refus'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showMessage(`❌ Erreur de connexion: ${error.message}`, 'error');
+            }
+        }
+
+        function viewDetails(demandeId) {
+            const demande = allDemandes.find(d => {
+                const id = getValue(d, ['id', '_id', 'Id'], null);
+                return id == demandeId;
+            });
+            
+            if (!demande) {
+                showMessage('Demande non trouvée', 'error');
+                return;
+            }
+            
+            const enseignantId = getValue(demande, ['enseignantId', 'EnseignantId', 'enseignant'], null);
+            const info = getEnseignantInfo(enseignantId);
+            const type = getValue(demande, ['type', 'Type', 'typeConge'], 'Non spécifié');
+            const statut = getValue(demande, ['statut', 'Statut', 'status'], 'en_attente');
+            const dateDebut = getValue(demande, ['dateDebut', 'DateDebut', 'date_debut'], null);
+            const dateFin = getValue(demande, ['dateFin', 'DateFin', 'date_fin'], null);
+            const motif = getValue(demande, ['motif', 'Motif', 'reason'], 'Non spécifié');
+            const createdAt = getValue(demande, ['createdAt', 'CreatedAt', 'dateCreation'], null);
+            const pieceJointe = getValue(demande, ['pieceJointe', 'PieceJointe'], null);
+            const salairePourcentage = getValue(demande, ['salairePourcentage'], null);
+            const commentaireAdmin = getValue(demande, ['commentaireAdmin'], null);
+            const permanentsRemplacantsIds = getValue(demande, ['permanentsRemplacantsIds'], []);
+            
+            const duree = calculerJoursOuvrables(dateDebut, dateFin);
+            const typeIcon = typeIcons[type] || '📋';
+            
+            let statusText = '', statusClass = '';
+            if (statut === 'en_attente') {
+                statusText = '⏳ En attente';
+                statusClass = 'status-pending';
+            } else if (statut === 'approuve' || statut === 'approuvé') {
+                statusText = '✅ Approuvé';
+                statusClass = 'status-approved';
+            } else if (statut === 'refuse' || statut === 'refusé') {
+                statusText = '❌ Refusé';
+                statusClass = 'status-rejected';
+            }
+            
+            let salaireInfo = '';
+            if (type === 'maladie' && salairePourcentage) {
+                salaireInfo = `
+                    <div class="detail-row">
+                        <div class="detail-label">💰 Pourcentage salaire</div>
+                        <div class="detail-value">${salairePourcentage}% du salaire de base</div>
+                    </div>
+                `;
+            }
+            
+            let remplacantsInfo = '';
+            if (permanentsRemplacantsIds && permanentsRemplacantsIds.length > 0) {
+                remplacantsInfo = `
+                    <div class="detail-row">
+                        <div class="detail-label">👥 Remplaçants assignés</div>
+                        <div class="detail-value">${permanentsRemplacantsIds.length} permanent(s) assigné(s)</div>
+                    </div>
+                `;
+            }
+            
+            let commentaireInfo = '';
+            if (commentaireAdmin) {
+                commentaireInfo = `
+                    <div class="detail-row">
+                        <div class="detail-label">📝 Commentaire admin</div>
+                        <div class="detail-value">${escapeHtml(commentaireAdmin)}</div>
+                    </div>
+                `;
+            }
+            
+            const canAction = (statut === 'en_attente');
+            
+            const modalContent = document.getElementById('viewModalContent');
+            modalContent.innerHTML = `
+                <div class="detail-section">
+                    <h3>👤 Enseignant</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Nom complet</div>
+                        <div class="detail-value"><strong>${escapeHtml(info.nom)}</strong></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${escapeHtml(info.email)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Spécialités</div>
+                        <div class="detail-value">
+                            ${info.specialites && info.specialites.length > 0 ? 
+                                info.specialites.map(s => `<span class="specialite-tag">${escapeHtml(s)}</span>`).join('') : 
+                                '<span class="text-light">Aucune spécialité définie</span>'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>📋 Informations congé</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Type</div>
+                        <div class="detail-value">${typeIcon} ${escapeHtml(type)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Période</div>
+                        <div class="detail-value">Du ${formatDate(dateDebut)} au ${formatDate(dateFin)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Durée</div>
+                        <div class="detail-value">${duree} jour(s) ouvré(s)</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Motif</div>
+                        <div class="detail-value">${escapeHtml(motif)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Demandé le</div>
+                        <div class="detail-value">${formatDateTime(createdAt)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Statut</div>
+                        <div class="detail-value"><span class="status-badge ${statusClass}">${statusText}</span></div>
+                    </div>
+                    ${salaireInfo}
+                    ${remplacantsInfo}
+                    ${commentaireInfo}
+                </div>
+                
+                ${pieceJointe ? `
+                <div class="detail-section">
+                    <h3>📎 Pièce jointe</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Fichier</div>
+                        <div class="detail-value">
+                            <button class="btn-view" onclick="downloadPieceJointe('${demandeId}')">
+                                📎 Télécharger ${escapeHtml(pieceJointe.nom || 'le fichier')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="closeModal('viewModal')">Fermer</button>
+                    ${canAction ? `
+                        <button class="btn-approve" onclick="closeModal('viewModal'); checkAndApprove('${demandeId}')">✅ Approuver</button>
+                        <button class="btn-reject" onclick="closeModal('viewModal'); rejectDemande('${demandeId}')">❌ Refuser</button>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        async function downloadPieceJointe(demandeId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/Conge/${demandeId}/piece-jointe`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    
+                    const contentDisposition = response.headers.get('Content-Disposition');
+                    let filename = 'piece_jointe';
+                    if (contentDisposition) {
+                        const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        if (match && match[1]) filename = match[1].replace(/['"]/g, '');
+                    }
+                    
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    showMessage('❌ Impossible de télécharger la pièce jointe', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur téléchargement:', error);
+                showMessage('❌ Erreur de téléchargement', 'error');
+            }
+        }
+
+        function appliquerFiltres() {
+            renderTable();
+        }
+
+        function rafraichir() {
+            enseignantsMap.clear();
+            loadAllDemandes();
+            showMessage('Actualisation terminée', 'success');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            const rejectComment = document.getElementById('rejectComment');
+            if (rejectComment) rejectComment.value = '';
+        }
+
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        function attachEventListeners() {
+            document.getElementById('filterStatus').addEventListener('change', renderTable);
+            document.getElementById('filterType').addEventListener('change', renderTable);
+            document.getElementById('searchInput').addEventListener('input', renderTable);
+            
+            document.getElementById('viewModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('viewModal');
+            });
+            document.getElementById('confirmModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal('confirmModal');
+            });
+            document.getElementById('verificationModal').addEventListener('click', function(e) {
+                if (e.target === this) closeVerificationModal();
+            });
+        }
+    </script>
+</body>
+</html>

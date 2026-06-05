@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SAGHIRY - Espace Parent</title>
+    <style>
+        /* ============ VARIABLES SAGHIRY ============ */
+        :root {
+            --primary-green: #4ca896;
+            --primary-dark: #3d8a7f;
+            --primary-deep: #2d6b63;
+            --accent-orange: #ff9466;
+            --accent-orange-dark: #ff7b3d;
+            --blue-light: #339af0;
+            --gray-bg: #f8fafc;
+            --gray-border: #e0e9e7;
+            --text-dark: #1e3b36;
+            --text-soft: #3d5a54;
+            --text-light: #5a9d91;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
+            --sidebar-bg: white;
+            --card-bg: white;
+            --body-bg-start: #4ca896;
+            --body-bg-mid: #3d8a7f;
+            --body-bg-end: #2d6b63;
+            --text-primary: #1e3b36;
+            --text-secondary: #3d5a54;
+            --border-color: #e0e9e7;
+            --input-bg: #fefefe;
+            --toggle-bg: #ccc;
+        }
+
+        body.dark-mode {
+            --primary-green: #6abfad;
+            --primary-dark: #5aa695;
+            --primary-deep: #4a8a7a;
+            --accent-orange: #ffad80;
+            --accent-orange-dark: #ff9466;
+            --blue-light: #4db8ff;
+            --gray-bg: #1a1a2e;
+            --gray-border: #2d2d44;
+            --text-dark: #e0e0e0;
+            --text-soft: #c0c0c0;
+            --text-light: #9a9ac0;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.25);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --sidebar-bg: #16213e;
+            --card-bg: #16213e;
+            --body-bg-start: #0f0f1a;
+            --body-bg-mid: #13132a;
+            --body-bg-end: #1a1a2e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #c0c0c0;
+            --border-color: #2d2d44;
+            --input-bg: #0a0a1a;
+            --toggle-bg: #4a4a6a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--body-bg-start) 0%, var(--body-bg-mid) 50%, var(--body-bg-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moveBackground 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        /* ============ SIDEBAR ============ */
+        .saghiry-sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar-track {
+            background: var(--gray-border);
+        }
+
+        .saghiry-sidebar::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 10px;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.8rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-deep);
+            letter-spacing: -0.02em;
+        }
+
+        .sidebar-session {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            background: rgba(76, 168, 150, 0.1);
+            border-radius: 12px;
+            color: var(--primary-dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(76, 168, 150, 0.2);
+        }
+
+        .session-badge {
+            background: var(--accent-orange);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .sidebar-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            background: rgba(76, 168, 150, 0.1);
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-size: 1.2rem;
+        }
+
+        .notification-icon:hover {
+            background: rgba(76, 168, 150, 0.2);
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-orange);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .user-profile-card {
+            margin: 1.5rem 1.5rem;
+            padding: 1.2rem;
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.25);
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .profile-role {
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 40px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .profile-email {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .nav-section {
+            margin-bottom: 1.2rem;
+        }
+
+        .nav-section-title {
+            color: var(--text-light);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 0.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(76, 168, 150, 0.1);
+            color: var(--primary-green);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 6px 12px rgba(76, 168, 150, 0.25);
+        }
+
+        .logout-section {
+            padding: 1.5rem 1.5rem 1.8rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            border-radius: 14px;
+            color: #ff6b6b;
+            font-weight: 600;
+            background: rgba(255, 107, 107, 0.05);
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.15);
+            color: #c92a2a;
+        }
+
+        .main-content-area {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            width: calc(100% - 300px);
+            background: transparent;
+        }
+
+        .dynamic-iframe {
+            width: 100%;
+            border: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            min-height: calc(100vh - 4rem);
+            height: auto;
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .saghiry-sidebar { width: 280px; }
+            .main-content-area { margin-left: 280px; width: calc(100% - 280px); }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .saghiry-sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .main-content-area { margin-left: 0; width: 100%; padding: 1rem; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ============ NOTIFICATIONS DROPDOWN - STYLE COMPLET ============ */
+        .notifications-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .notifications-overlay.show {
+            display: block;
+        }
+
+        .notifications-dropdown {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 550px;
+            max-height: 80vh;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            display: none;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            flex-direction: column;
+        }
+
+        .notifications-dropdown.show { 
+            display: flex; 
+            animation: zoomIn 0.3s ease; 
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .notifications-header {
+            padding: 1.2rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .notifications-header span:first-child {
+            font-size: 1.1rem;
+        }
+
+        .mark-all-read {
+            cursor: pointer;
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            transition: background 0.2s;
+        }
+
+        .mark-all-read:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .close-notifications {
+            cursor: pointer;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .close-notifications:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .notifications-list { 
+            flex: 1;
+            overflow-y: auto; 
+            padding: 0.5rem 0;
+        }
+
+        .notification-item { 
+            padding: 1rem 1.2rem; 
+            border-bottom: 1px solid var(--border-color); 
+            cursor: pointer; 
+            transition: background 0.2s ease;
+            margin: 0.3rem 0.8rem;
+            border-radius: 16px;
+        }
+
+        .notification-item:hover { 
+            background: var(--gray-bg); 
+        }
+
+        .notification-item.unread { 
+            background: rgba(76, 168, 150, 0.1); 
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon-type {
+            font-size: 1.3rem;
+        }
+
+        .notification-type-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-absence { background: #ffebee; color: #c62828; }
+        .badge-retard { background: #fff8e1; color: #f57c00; }
+        .badge-note { background: #e8f5e9; color: #2e7d32; }
+        .badge-presence { background: #e3f2fd; color: #1976d2; }
+
+        .notification-title { 
+            font-weight: 700; 
+            color: var(--text-primary); 
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .notification-message { 
+            font-size: 0.85rem; 
+            color: var(--text-secondary); 
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        .notification-time { 
+            font-size: 0.7rem; 
+            color: var(--text-light);
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .notifications-empty { 
+            padding: 3rem 2rem; 
+            text-align: center; 
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .notifications-footer { 
+            padding: 1rem; 
+            text-align: center; 
+            border-top: 1px solid var(--border-color); 
+            background: var(--gray-bg);
+            position: sticky;
+            bottom: 0;
+        }
+
+        .notifications-footer button { 
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notifications-footer button:hover {
+            background: var(--primary-dark);
+        }
+        
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 4rem);
+            background: var(--card-bg);
+            border-radius: 16px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-border);
+            border-top-color: var(--primary-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .notifications-dropdown {
+                width: 95%;
+                max-height: 85vh;
+            }
+            .notification-title {
+                font-size: 0.9rem;
+            }
+            .notification-message {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside class="saghiry-sidebar" id="saghirySidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-header-top">
+                <div class="logo-wrapper">
+                    <span class="sidebar-logo-text">SAGHIRY</span>
+                </div>
+                <div class="notification-icon" id="notificationIcon">
+                    <span>🔔</span>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+            </div>
+            <div class="sidebar-session">
+                <span id="sessionLabel">📅 ANNÉE SCOLAIRE:</span>
+                <strong id="sessionYear">2025 - 2026</strong>
+                <span class="session-badge" id="parentBadge">Espace Parent</span>
+            </div>
+        </div>
+
+        <div class="user-profile-card" id="userProfileCard">
+            <div class="profile-avatar" id="profileAvatar">PA</div>
+            <div class="profile-info">
+                <div class="profile-name" id="profileName">Parent</div>
+                <span class="profile-role" id="profileRole">Parent d'élève</span>
+                <div class="profile-email" id="profileEmail">parent@saghiry.tn</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav" id="sidebarNav">
+            <div class="nav-section">
+                <div class="nav-section-title"><span id="navDashboardTitle">TABLEAU DE BORD</span></div>
+                <div class="nav-item active" data-page="dashboard-parent"><span class="nav-icon">📊</span> <span id="navDashboard">Tableau de bord</span></div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title"><span id="navSuiviTitle">SUIVI SCOLAIRE</span></div>
+                <div class="nav-item" data-page="mes-enfants"><span class="nav-icon">👧🧒</span> <span id="navEnfants">Mes enfants</span></div>
+                <div class="nav-item" data-page="notes-enfants"><span class="nav-icon">📊</span> <span id="navNotes">Notes & Moyennes</span></div>
+                <div class="nav-item" data-page="emploi-temps-enfants"><span class="nav-icon">⏰</span> <span id="navEmploi">Emploi du temps</span></div>
+                <div class="nav-item" data-page="examens-enfants"><span class="nav-icon">📋</span> <span id="navExamens">Examens</span></div>
+                <div class="nav-item" data-page="absences-enfants"><span class="nav-icon">📝</span> <span id="navAbsences">Absences & Retards</span></div>
+                <div class="nav-item" data-page="activites-enfants"><span class="nav-icon">📚</span> <span id="navActivites">Activités scolaires</span></div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title"><span id="navCommTitle">COMMUNICATION</span></div>
+                <div class="nav-item" data-page="messagerie-parent"><span class="nav-icon">✉️</span> <span id="navMessagerie">Messagerie</span></div>
+                <div class="nav-item" data-page="annonces-parent"><span class="nav-icon">📢</span> <span id="navAnnonces">Annonces</span></div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title"><span id="navFinanceTitle">FINANCES</span></div>
+                <div class="nav-item" data-page="donation-parent"><span class="nav-icon">🎁</span> <span id="navDonation">Donation</span></div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title"><span id="navCompteTitle">COMPTE</span></div>
+                <div class="nav-item" data-page="parametres-parent"><span class="nav-icon">⚙️</span> <span id="navParametres">Paramètres</span></div>
+            </div>
+        </nav>
+
+        <div class="logout-section">
+            <div class="logout-btn" id="logoutBtn"><span>🚪</span> <span id="logoutLabel">Déconnexion</span></div>
+        </div>
+    </aside>
+
+    <main class="main-content-area" id="mainContentArea">
+        <div id="dynamicContent" class="page-transition">
+            <div class="loading-container">
+                <div style="text-align: center;">
+                    <div class="loading-spinner"></div>
+                    <p id="loadingMsg" style="margin-top: 1rem; color: var(--text-light);">Chargement de l'espace parent...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Overlay pour fermer les notifications -->
+    <div class="notifications-overlay" id="notificationsOverlay"></div>
+
+    <!-- Modal des notifications centré -->
+    <div class="notifications-dropdown" id="notificationsDropdown">
+        <div class="notifications-header">
+            <span id="notifHeader">🔔 Mes notifications</span>
+            <div style="display: flex; gap: 10px;">
+                <span class="mark-all-read" id="markAllReadBtn">✓ Tout marquer lu</span>
+                <span class="close-notifications" id="closeNotificationsBtn">✕</span>
+            </div>
+        </div>
+        <div class="notifications-list" id="notificationsList">
+            <div class="notifications-empty" id="noNotifMsg">📭 Aucune notification</div>
+        </div>
+
+    </div>
+
+    <script src="global-settings.js"></script>
+
+    <script>
+        // ============================================
+        // CONFIGURATION PARENT
+        // ============================================
+        const PARENT_CONFIG = {
+            currentPage: 'dashboard-parent',
+            user: { name: 'Parent', role: 'Parent', email: '', initials: 'PA', id: null, elevesIds: [] },
+            token: null,
+            sessionYear: '2025 - 2026',
+            notifications: [],
+            unreadCount: 0,
+            enfants: []
+        };
+
+        // Mapping des types de notification
+        const notificationTypeConfig = {
+            'absence': { label: 'Absence', class: 'badge-absence', icon: '❌' },
+            'retard': { label: 'Retard', class: 'badge-retard', icon: '⏰' },
+            'note': { label: 'Information', class: 'badge-note', icon: '📝' },
+            'presence': { label: 'Présence', class: 'badge-presence', icon: '✅' },
+            'annonce': { label: 'Annonce', class: 'badge-note', icon: '📢' },
+            'evenement': { label: 'Événement', class: 'badge-note', icon: '📅' }
+        };
+
+        // ============ TRADUCTIONS ============
+        const sidebarTranslations = {
+            fr: {
+                sessionLabel: "📅 ANNÉE SCOLAIRE:",
+                parentBadge: "Espace Parent",
+                notifHeader: "🔔 Mes notifications",
+                markAllRead: "✓ Tout marquer lu",
+                noNotifMsg: "📭 Aucune notification",
+                profileRole: "Parent d'élève",
+                navDashboardTitle: "TABLEAU DE BORD",
+                navDashboard: "Tableau de bord",
+                navSuiviTitle: "SUIVI SCOLAIRE",
+                navEnfants: "Mes enfants",
+                navNotes: "Notes & Moyennes",
+                navEmploi: "Emploi du temps",
+                navExamens: "Examens",
+                navAbsences: "Absences & Retards",
+                navActivites: "Activités scolaires",
+                navCommTitle: "COMMUNICATION",
+                navMessagerie: "Messagerie",
+                navAnnonces: "Annonces",
+                navFinanceTitle: "FINANCES",
+                navDonation: "Donation",
+                navCompteTitle: "COMPTE",
+                navParametres: "Paramètres",
+                logoutLabel: "Déconnexion",
+                loadingMsg: "Chargement de l'espace parent..."
+            },
+            en: {
+                sessionLabel: "📅 SCHOOL YEAR:",
+                parentBadge: "Parent Space",
+                notifHeader: "🔔 My notifications",
+                markAllRead: "✓ Mark all as read",
+                noNotifMsg: "📭 No notifications",
+                profileRole: "Parent",
+                navDashboardTitle: "DASHBOARD",
+                navDashboard: "Dashboard",
+                navSuiviTitle: "ACADEMIC TRACKING",
+                navEnfants: "My children",
+                navNotes: "Grades & Averages",
+                navEmploi: "Schedule",
+                navExamens: "Exams",
+                navAbsences: "Absences & Delays",
+                navActivites: "School activities",
+                navCommTitle: "COMMUNICATION",
+                navMessagerie: "Messages",
+                navAnnonces: "Announcements",
+                navFinanceTitle: "FINANCES",
+                navDonation: "Donation",
+                navCompteTitle: "ACCOUNT",
+                navParametres: "Settings",
+                logoutLabel: "Logout",
+                loadingMsg: "Loading parent space..."
+            },
+            ar: {
+                sessionLabel: "📅 السنة الدراسية:",
+                parentBadge: "فضاء الأولياء",
+                notifHeader: "🔔 إشعاراتي",
+                markAllRead: "✓ تحديد الكل كمقروء",
+                noNotifMsg: "📭 لا توجد إشعارات",
+                profileRole: "ولي أمر",
+                navDashboardTitle: "لوحة التحكم",
+                navDashboard: "لوحة التحكم",
+                navSuiviTitle: "المتابعة الدراسية",
+                navEnfants: "أطفالي",
+                navNotes: "العلامات والمعدلات",
+                navEmploi: "الجدول الزمني",
+                navExamens: "الامتحانات",
+                navAbsences: "الغيابات والتأخيرات",
+                navActivites: "الأنشطة المدرسية",
+                navCommTitle: "التواصل",
+                navMessagerie: "الرسائل",
+                navAnnonces: "الإعلانات",
+                navFinanceTitle: "الشؤون المالية",
+                navDonation: "التبرع",
+                navCompteTitle: "الحساب",
+                navParametres: "الإعدادات",
+                logoutLabel: "تسجيل الخروج",
+                loadingMsg: "جاري تحميل فضاء الأولياء..."
+            }
+        };
+
+        function applySidebarLanguage() {
+            const lang = window.SaghirySettings ? window.SaghirySettings.getLangue() : 'fr';
+            const t = sidebarTranslations[lang] || sidebarTranslations.fr;
+            
+            if (lang === 'ar') {
+                document.body.style.direction = 'rtl';
+                document.body.style.textAlign = 'right';
+            } else {
+                document.body.style.direction = 'ltr';
+                document.body.style.textAlign = 'left';
+            }
+            
+            const elementsToTranslate = [
+                'sessionLabel', 'parentBadge', 'notifHeader', 'markAllReadBtn',
+                'noNotifMsg', 'profileRole', 'navDashboardTitle',
+                'navDashboard', 'navSuiviTitle', 'navEnfants', 'navNotes', 'navEmploi',
+                'navExamens', 'navAbsences', 'navActivites', 'navCommTitle', 'navMessagerie',
+                'navAnnonces', 'navFinanceTitle', 'navDonation', 'navCompteTitle',
+                'navParametres', 'logoutLabel', 'loadingMsg'
+            ];
+            
+            elementsToTranslate.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && t[id]) el.textContent = t[id];
+            });
+        }
+
+        function applyParentTheme() {
+            if (window.SaghirySettings) {
+                const primaryColor = window.SaghirySettings.getPrimaryColor();
+                const secondaryColor = window.SaghirySettings.getSecondaryColor();
+                const theme = window.SaghirySettings.getTheme();
+                
+                document.documentElement.style.setProperty('--primary-green', primaryColor);
+                document.documentElement.style.setProperty('--accent-orange', secondaryColor);
+                
+                let effectiveTheme = theme;
+                if (theme === 'systeme') {
+                    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'sombre' : 'clair';
+                }
+                
+                if (effectiveTheme === 'sombre') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            }
+        }
+
+        function initSettingsListener() {
+            if (window.SaghirySettings) {
+                applyParentTheme();
+                applySidebarLanguage();
+                
+                window.SaghirySettings.onLanguageChange(() => {
+                    applySidebarLanguage();
+                    broadcastSettingsToIframes();
+                });
+                
+                document.addEventListener('settingsUpdated', (e) => {
+                    if (e.detail) {
+                        applyParentTheme();
+                        if (e.detail.langue) applySidebarLanguage();
+                        broadcastSettingsToIframes();
+                    }
+                });
+            }
+        }
+
+        function getAuthToken() {
+            try {
+                let token = localStorage.getItem('authToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                token = sessionStorage.getItem('authToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                token = localStorage.getItem('parentAuthToken');
+                if (token && token !== 'undefined' && token !== 'null' && token.length > 10) return token;
+                return null;
+            } catch(e) { return null; }
+        }
+
+        function getCurrentUser() {
+            try {
+                let userStr = localStorage.getItem('currentUser');
+                if (!userStr || userStr === 'undefined') userStr = sessionStorage.getItem('currentUser');
+                if (userStr && userStr !== 'undefined') return JSON.parse(userStr);
+                return null;
+            } catch(e) { return null; }
+        }
+
+        function getInitials(prenom, nom) {
+            if (prenom && nom) return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
+            if (prenom) return prenom.charAt(0).toUpperCase();
+            if (nom) return nom.charAt(0).toUpperCase();
+            if (PARENT_CONFIG.user.email) return PARENT_CONFIG.user.email.charAt(0).toUpperCase();
+            return 'PA';
+        }
+
+        function updateProfileDisplay() {
+            const user = PARENT_CONFIG.user;
+            const avatarEl = document.getElementById('profileAvatar');
+            const nameEl = document.getElementById('profileName');
+            const emailEl = document.getElementById('profileEmail');
+            if (avatarEl) avatarEl.textContent = user.initials;
+            if (nameEl) nameEl.textContent = user.name;
+            if (emailEl) emailEl.textContent = user.email;
+        }
+
+        function initializeSidebar() {
+            console.log('🚀 Initialisation de l\'espace Parent...');
+            
+            const token = getAuthToken();
+            const user = getCurrentUser();
+            
+            if (!token || !user) {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            
+            const role = (user.role || '').toLowerCase();
+            if (role !== 'parent') {
+                window.location.href = 'saghiry-auth.html';
+                return;
+            }
+            
+            PARENT_CONFIG.token = token;
+            
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('parentAuthToken', token);
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            sessionStorage.setItem('authToken', token);
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            
+            let fullName = '';
+            if (user.prenom && user.nom) fullName = `${user.prenom} ${user.nom}`;
+            else if (user.prenom) fullName = user.prenom;
+            else if (user.nom) fullName = user.nom;
+            else if (user.email) fullName = user.email.split('@')[0];
+            else fullName = 'Parent';
+            
+            PARENT_CONFIG.user = {
+                name: fullName,
+                role: 'Parent d\'élève',
+                email: user.email || '',
+                initials: getInitials(user.prenom, user.nom),
+                id: user.id,
+                elevesIds: user.elevesIds || []
+            };
+            
+            updateProfileDisplay();
+            initSettingsListener();
+            
+            const savedPage = sessionStorage.getItem('currentParentPage');
+            if (savedPage && savedPage !== 'dashboard-parent') {
+                loadPageContent(savedPage);
+                updateActiveNavItem(savedPage);
+            } else {
+                loadPageContent('dashboard-parent');
+                updateActiveNavItem('dashboard-parent');
+            }
+        }
+        
+        function updateActiveNavItem(pageName) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.dataset.page === pageName) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+        }
+
+        function getNotificationTypeInfo(type) {
+            const key = (type || 'note').toLowerCase();
+            return notificationTypeConfig[key] || notificationTypeConfig['note'];
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const now = new Date();
+            const diffMs = now - d;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'À l\'instant';
+            if (diffMins < 60) return `Il y a ${diffMins} min`;
+            if (diffHours < 24) return `Il y a ${diffHours} h`;
+            if (diffDays === 1) return 'Hier';
+            if (diffDays < 7) return `Il y a ${diffDays} jours`;
+            return d.toLocaleDateString('fr-FR');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        async function loadNotifications() {
+            try {
+                const token = PARENT_CONFIG.token;
+                if (!token) return;
+                
+                const parentEmail = PARENT_CONFIG.user.email;
+                if (!parentEmail) {
+                    console.log('⚠️ Aucun email parent trouvé');
+                    return;
+                }
+                
+                const response = await fetch(`http://localhost:5267/api/Notification/destinataire/${encodeURIComponent(parentEmail)}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    let notifications = [];
+                    
+                    if (data.success && data.data) notifications = data.data;
+                    else if (data.Success && data.Data) notifications = data.Data;
+                    else if (Array.isArray(data)) notifications = data;
+                    else if (data.data && Array.isArray(data.data)) notifications = data.data;
+                    else if (data.$values) notifications = data.$values;
+                    
+                    if (!Array.isArray(notifications)) notifications = [];
+                    
+                    PARENT_CONFIG.notifications = notifications.slice(0, 30);
+                    PARENT_CONFIG.unreadCount = notifications.filter(n => !n.lu).length;
+                    updateNotificationBadge();
+                    renderNotificationsDropdown();
+                } else {
+                    console.error('Erreur chargement notifications:', response.status);
+                }
+            } catch (error) { 
+                console.error('Erreur chargement notifications:', error); 
+            }
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                const count = PARENT_CONFIG.unreadCount;
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = count > 0 ? 'flex' : 'none';
+            }
+        }
+
+        function renderNotificationsDropdown() {
+            const listContainer = document.getElementById('notificationsList');
+            if (!listContainer) return;
+            
+            if (!PARENT_CONFIG.notifications.length) {
+                listContainer.innerHTML = '<div class="notifications-empty">📭 Aucune notification</div>';
+                return;
+            }
+            
+            let html = '';
+            for (const notif of PARENT_CONFIG.notifications) {
+                const notifId = notif.id || notif._id || notif.Id;
+                if (!notifId) continue;
+                
+                const date = notif.date || notif.Date || notif.createdAt;
+                const timeAgo = formatDate(date);
+                const unreadClass = !notif.lu ? 'unread' : '';
+                const titre = notif.titre || notif.Titre || 'Notification';
+                const message = notif.message || notif.Message || '';
+                const typeNotif = notif.typeNotification || notif.TypeNotification || 'note';
+                const typeInfo = getNotificationTypeInfo(typeNotif);
+                
+                html += `<div class="notification-item ${unreadClass}" data-id="${notifId}" onclick="event.stopPropagation(); window.handleNotificationClick('${notifId}')">
+                            <div class="notification-header">
+                                <div class="notification-icon-type">${typeInfo.icon}</div>
+                                <span class="notification-type-badge ${typeInfo.class}">${typeInfo.label}</span>
+                            </div>
+                            <div class="notification-title">${escapeHtml(titre)}</div>
+                            <div class="notification-message">${escapeHtml(message)}</div>
+                            <div class="notification-time">
+                                <span>📅</span> ${timeAgo}
+                            </div>
+                        </div>`;
+            }
+            listContainer.innerHTML = html;
+        }
+        
+        async function markAsRead(notificationId) {
+            if (!notificationId || notificationId === 'undefined' || notificationId === 'null') {
+                console.error('ID de notification invalide:', notificationId);
+                return false;
+            }
+            
+            try {
+                const token = PARENT_CONFIG.token;
+                if (!token) return false;
+                
+                const response = await fetch(`http://localhost:5267/api/Notification/${notificationId}/marquer-lue`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const notif = PARENT_CONFIG.notifications.find(n => (n.id || n._id || n.Id) === notificationId);
+                    if (notif && !notif.lu) {
+                        notif.lu = true;
+                        PARENT_CONFIG.unreadCount = Math.max(0, PARENT_CONFIG.unreadCount - 1);
+                        updateNotificationBadge();
+                        renderNotificationsDropdown();
+                    }
+                    return true;
+                }
+                return false;
+            } catch (error) { 
+                console.error('Erreur marquage notification:', error); 
+                return false;
+            }
+        }
+        
+        async function handleNotificationClick(notificationId) {
+            if (!notificationId) return;
+            
+            // Marquer comme lue
+            await markAsRead(notificationId);
+            
+            // Fermer le modal
+            closeNotificationsModal();
+            
+            // Rediriger vers la page des notifications
+            const targetItem = document.querySelector(`.nav-item[data-page="notifications"]`);
+            if (targetItem) {
+                targetItem.click();
+            }
+        }
+        
+        async function markAllNotificationsAsRead() {
+            try {
+                const token = PARENT_CONFIG.token;
+                if (!token) return;
+                
+                const parentEmail = PARENT_CONFIG.user.email;
+                if (parentEmail) {
+                    const response = await fetch(`http://localhost:5267/api/Notification/destinataire/${encodeURIComponent(parentEmail)}/marquer-toutes-lues`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                    });
+                    if (response.ok) {
+                        PARENT_CONFIG.notifications.forEach(n => n.lu = true);
+                        PARENT_CONFIG.unreadCount = 0;
+                        updateNotificationBadge();
+                        renderNotificationsDropdown();
+                    }
+                }
+            } catch (error) { 
+                console.error('Erreur marquage toutes notifications:', error); 
+            }
+        }
+        
+        function startNotificationPolling() { 
+            setInterval(() => { loadNotifications(); }, 30000); 
+        }
+        
+        function openNotificationsModal() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const overlay = document.getElementById('notificationsOverlay');
+            if (dropdown && overlay) {
+                loadNotifications();
+                dropdown.classList.add('show');
+                overlay.classList.add('show');
+            }
+        }
+        
+        function closeNotificationsModal() {
+            const dropdown = document.getElementById('notificationsDropdown');
+            const overlay = document.getElementById('notificationsOverlay');
+            if (dropdown) dropdown.classList.remove('show');
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function loadPageContent(pageName) {
+            console.log(`📂 Chargement de la page parent: ${pageName}`);
+            const contentDiv = document.getElementById('dynamicContent');
+            const pageFiles = {
+                'dashboard-parent': 'parent-dashboard.html',
+                'mes-enfants': 'parent-enfants.html',
+                'activites-enfants': 'parent-activites.html',
+                'notes-enfants': 'parent-notes.html',
+                'emploi-temps-enfants': 'parent-emploi-temps.html',
+                'absences-enfants': 'parent-absences.html',
+                'messagerie-parent': 'parent-messagerie.html',
+                'annonces-parent': 'parent-annonces.html',
+                'donation-parent': 'parent-donation.html',
+                'parametres-parent': 'parent-parametres.html',
+                'notifications': 'parent-notifications.html',
+                'examens-enfants': 'parent-examens.html'
+            };
+            const filePath = pageFiles[pageName] || `${pageName}.html`;
+            
+            if (PARENT_CONFIG.token) {
+                localStorage.setItem('parentAuthToken', PARENT_CONFIG.token);
+                localStorage.setItem('authToken', PARENT_CONFIG.token);
+            }
+            
+            PARENT_CONFIG.currentPage = pageName;
+            sessionStorage.setItem('currentParentPage', pageName);
+            
+            contentDiv.innerHTML = `<div class="loading-container">
+                                        <div style="text-align: center;">
+                                            <div class="loading-spinner"></div>
+                                            <p style="margin-top: 1rem; color: var(--text-light);">Chargement...</p>
+                                        </div>
+                                    </div>`;
+            
+            setTimeout(() => {
+                contentDiv.innerHTML = `<iframe src="${filePath}" class="dynamic-iframe" id="contentFrame" title="Espace Parent - ${pageName}"></iframe>`;
+                setTimeout(() => broadcastSettingsToIframes(), 500);
+            }, 100);
+        }
+
+        function broadcastSettingsToIframes() {
+            const iframe = document.getElementById('contentFrame');
+            if (iframe && iframe.contentWindow && window.SaghirySettings) {
+                try {
+                    iframe.contentWindow.postMessage({
+                        type: 'saghiry-settings-response',
+                        settings: {
+                            theme: window.SaghirySettings.getTheme(),
+                            langue: window.SaghirySettings.getLangue(),
+                            couleurPrimaire: window.SaghirySettings.getPrimaryColor(),
+                            couleurSecondaire: window.SaghirySettings.getSecondaryColor()
+                        }
+                    }, '*');
+                } catch(e) { console.warn('Erreur broadcast settings:', e); }
+            }
+        }
+
+        window.addEventListener('message', function(event) {
+            const isLocalFile = event.origin === 'null' || event.origin === '';
+            
+            if (event.data && event.data.type === 'resize-iframe') {
+                const iframe = document.getElementById('contentFrame');
+                if (iframe) iframe.style.height = event.data.height + 'px';
+            }
+            
+            if (event.data && event.data.type === 'REQUEST_TOKEN') {
+                if (PARENT_CONFIG.token && event.source) {
+                    try {
+                        const targetOrigin = isLocalFile ? '*' : event.origin;
+                        event.source.postMessage({
+                            type: 'SET_TOKEN',
+                            token: PARENT_CONFIG.token,
+                            user: PARENT_CONFIG.user
+                        }, targetOrigin);
+                    } catch(e) { console.warn('Erreur envoi token:', e); }
+                }
+            }
+            
+            if (event.data && event.data.type === 'saghiry-settings-update') {
+                if (event.data.settings && window.SaghirySettings) {
+                    window.SaghirySettings.set(event.data.settings);
+                }
+            }
+        });
+
+        function attachEventListeners() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.dataset.page;
+                    if (!page) return;
+                    
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    loadPageContent(page);
+                    closeNotificationsModal();
+                });
+            });
+            
+            const notificationIcon = document.getElementById('notificationIcon');
+            if (notificationIcon) {
+                notificationIcon.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    openNotificationsModal(); 
+                });
+            }
+            
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    markAllNotificationsAsRead(); 
+                });
+            }
+            
+            const closeBtn = document.getElementById('closeNotificationsBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) { 
+                    e.stopPropagation(); 
+                    closeNotificationsModal(); 
+                });
+            }
+            
+            const overlay = document.getElementById('notificationsOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function() { 
+                    closeNotificationsModal(); 
+                });
+            }
+            
+            const viewAllBtn = document.getElementById('viewAllNotifBtn');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', function() {
+                    closeNotificationsModal();
+                    const targetItem = document.querySelector(`.nav-item[data-page="notifications"]`);
+                    if (targetItem) targetItem.click();
+                });
+            }
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) { 
+                    e.preventDefault(); 
+                    handleLogout(); 
+                });
+            }
+            
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (window.SaghirySettings && window.SaghirySettings.getTheme() === 'systeme') {
+                    applyParentTheme();
+                }
+            });
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'saghiry-auth.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSidebar();
+            attachEventListeners();
+            loadNotifications();
+            startNotificationPolling();
+        });
+
+        window.ParentSpace = {
+            getToken: () => PARENT_CONFIG.token,
+            getCurrentUser: () => PARENT_CONFIG.user,
+            refreshNotifications: loadNotifications
+        };
+        window.markAsRead = markAsRead;
+        window.handleNotificationClick = handleNotificationClick;
+    </script>
+</body>
+</html>
